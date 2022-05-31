@@ -28,7 +28,7 @@ def load_texture(filepath: str) -> GLuint | np.uint32:
     return texture_id
     
 
-MAX_QUAD_COUNT = 100
+MAX_QUAD_COUNT = 10000
 MAX_VERTEX_COUNT = MAX_QUAD_COUNT * 4
 MAX_INDEX_COUNT = MAX_QUAD_COUNT * 6
 MAX_TEXTURES = 16
@@ -46,8 +46,9 @@ class RenderData:
     vertex_count = 0 
 
     # glm.array[glm.uint32]
-    texture_slots: glm.array
+    texture_slots: list[int]
     texture_slot_index = 1
+    texture_map = {}
     
     quad_shader: Shader
     
@@ -112,7 +113,8 @@ def init():
     color = glm.array(glm.uint8, 255, 255, 255, 255)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, color.ptr)
 
-    _s_data.texture_slots = glm.array.zeros(MAX_TEXTURES, glm.uint32)
+    # _s_data.texture_slots = glm.array.zeros(MAX_TEXTURES, glm.uint32)
+    _s_data.texture_slots = [0] * MAX_TEXTURES
     _s_data.texture_slots[0] = _s_data.white_texture
 
 def on_resize(width: int, height: int):
@@ -123,6 +125,7 @@ def on_resize(width: int, height: int):
 def begin_batch():
     _s_data.vertex_count = 0
     _s_data.texture_slot_index = 1
+    _s_data.texture_map = {}
 
 def end_batch():
     glBindBuffer(GL_ARRAY_BUFFER, _s_data.vbo)
@@ -182,15 +185,17 @@ def draw_textured_quad(position, size, texture_id):
 
     color = (1.0, 1.0, 1.0, 1.0)
 
-    texture_index = 0.0
-    for i in range(1, _s_data.texture_slot_index):
-        if (_s_data.texture_slots[i] == texture_id):
-            texture_index = float(i)
-            break
+    # texture_index = 0.0
+    # for i in range(1, _s_data.texture_slot_index):
+    #     if (_s_data.texture_slots[i] == texture_id):
+    #         texture_index = float(i)
+    #         break
+    texture_index = float(_s_data.texture_map.get(texture_id, 0))
 
     if (texture_index == 0.0):
         texture_index = float(_s_data.texture_slot_index)
         _s_data.texture_slots[_s_data.texture_slot_index] = texture_id
+        _s_data.texture_map[texture_id] = _s_data.texture_slot_index
         _s_data.texture_slot_index += 1
     
     positions = (
