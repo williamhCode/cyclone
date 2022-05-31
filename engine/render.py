@@ -185,17 +185,17 @@ def draw_textured_quad(position, size, texture_id):
 
     color = (1.0, 1.0, 1.0, 1.0)
 
-    # texture_index = 0.0
-    # for i in range(1, _s_data.texture_slot_index):
-    #     if (_s_data.texture_slots[i] == texture_id):
-    #         texture_index = float(i)
-    #         break
-    texture_index = float(_s_data.texture_map.get(texture_id, 0))
+    texture_index = 0.0
+    for i in range(1, _s_data.texture_slot_index):
+        if (_s_data.texture_slots[i] == texture_id):
+            texture_index = float(i)
+            break
+    # texture_index = float(_s_data.texture_map.get(texture_id, 0))
 
     if (texture_index == 0.0):
         texture_index = float(_s_data.texture_slot_index)
         _s_data.texture_slots[_s_data.texture_slot_index] = texture_id
-        _s_data.texture_map[texture_id] = _s_data.texture_slot_index
+        # _s_data.texture_map[texture_id] = _s_data.texture_slot_index
         _s_data.texture_slot_index += 1
     
     positions = (

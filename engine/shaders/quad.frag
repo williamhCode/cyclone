@@ -7,7 +7,6 @@ in vec2 v_TexCoord;
 in float v_TexIndex;
 
 uniform sampler2D u_Textures[16];
-// uniform sampler2D tex;
 
 void main()
 {

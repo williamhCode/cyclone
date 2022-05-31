@@ -2,6 +2,7 @@ import pyglet
 pyglet.options['shadow_window'] = False
 # import numpy as np
 from OpenGL.GL import *
+import glm
 
 import random
 import time
@@ -39,10 +40,11 @@ class MainWindow(pyglet.window.Window):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         engine.render.begin_batch()
         
-        for i in range(200):
-            for j in range(100):
-                engine.render.draw_colored_quad((i * 10, j * 10), (9, 9), (255, 0, 0, 255))
-                # engine.render.draw_textured_quad((i * 5, j * 5), (4, 4), self.test1_tex_id)
+        for i in range(300):
+            for j in range(200):
+                # engine.render.draw_colored_quad((i * 10, j * 10), (9, 9), (255, 0, 0, 255))
+                engine.render.draw_textured_quad((i * 5, j * 5), (4, 4), self.test1_tex_id)
+                # engine.render.draw_textured_quad((100 + i * 10, 100 + j * 10), (9, 9), self.test2_tex_id)
         engine.render.end_batch()
 
         engine.render.flush()
