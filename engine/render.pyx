@@ -29,7 +29,7 @@ def load_texture(filepath: str) -> np.uint32:
 
     return texture_id
     
-DEF MAX_QUAD_COUNT = 10000
+DEF MAX_QUAD_COUNT = 100000
 DEF MAX_VERTEX_COUNT = MAX_QUAD_COUNT * 4
 DEF MAX_INDEX_COUNT = MAX_QUAD_COUNT * 6
 DEF MAX_TEXTURES = 16
@@ -51,7 +51,7 @@ cdef class RenderData:
 cdef RenderData _s_data = RenderData()
 quad_shader = None
 
-def init():
+cpdef void init():
     global quad_shader
     quad_shader = Shader('engine/shaders/quad.vert', 'engine/shaders/quad.frag')
     quad_shader.use()
@@ -115,20 +115,20 @@ def init():
     _s_data.texture_slots = np.zeros(MAX_TEXTURES, dtype=np.uint32)
     _s_data.texture_slots[0] = _s_data.white_texture
 
-def on_resize(width: int, height: int):
+cpdef void on_resize(width: int, height: int):
     view_matrix = glm.ortho(0, width, 0, height, -1, 1)
     quad_shader.use()
     quad_shader.set_mat4('u_ViewProj', view_matrix)
 
-def begin_batch():
+cpdef void begin_batch():
     _s_data.vertex_count = 0
     _s_data.texture_slot_index = 1
 
-def end_batch():
+cpdef void end_batch():
     glBindBuffer(GL_ARRAY_BUFFER, _s_data.vbo)
     glBufferSubData(GL_ARRAY_BUFFER, 0, _s_data.vertex_count * VERTEX_STRIDE * 4, np.asarray(_s_data.vertices))
 
-def flush():
+cpdef void flush():
     cdef int i
     for i in range(_s_data.texture_slot_index):
         glActiveTexture(GL_TEXTURE0 + i)
@@ -150,13 +150,13 @@ cdef void set_vertex_data_from_quad(int curr_index, float[3] position, float[4] 
     _s_data.vertices[curr_index + 8] = tex_coords[1]
     _s_data.vertices[curr_index + 9] = tex_index 
 
-cpdef void draw_colored_quad(tuple position, tuple size, tuple color):
+cpdef void draw_colored_quad(position, size, color):
     if (_s_data.vertex_count >= MAX_VERTEX_COUNT):
         end_batch()
         flush()
         begin_batch()
 
-    cdef float[4] color_c = [color[0], color[1], color[2], color[3]]
+    cdef float[4] color_c = [color[0]/255, color[1]/255, color[2]/255, color[3]/255]
     cdef float texture_index = 0.0
     cdef float[4][3] positions = [
         [position[0], position[1], 0],
@@ -178,7 +178,7 @@ cpdef void draw_colored_quad(tuple position, tuple size, tuple color):
         set_vertex_data_from_quad(curr_index, positions[i], color_c, tex_coords[i], texture_index)
         _s_data.vertex_count += 1
 
-cpdef void draw_textured_quad(tuple position, tuple size, unsigned int texture_id):
+cpdef void draw_textured_quad(position, size, unsigned int texture_id):
     if (_s_data.vertex_count >= MAX_VERTEX_COUNT or _s_data.texture_slot_index >= MAX_TEXTURES):
         end_batch()
         flush()
