@@ -35,11 +35,15 @@ MAX_TEXTURES = 16
 VERTEX_STRIDE = 10
 
 class RenderData:
-    vao: GLuint | np.uint32
-    vbo: GLuint | np.uint32
-    ibo: GLuint | np.uint32
+    vao: np.uint32
+    vbo: np.uint32
+    
+    circle_vao: np.uint32
+    circle_vbo: np.uint32
 
-    white_texture: GLuint | np.uint32
+    ibo: np.uint32
+
+    white_texture: np.uint32
 
     vertices: "glm.array[glm.float32]"
     vertex_count = 0 
@@ -215,5 +219,5 @@ def draw_textured_quad(position, size, texture_id):
         _s_data.vertex_count += 1
 
 
-def draw_circle(color, center, radius, width=0):
+def draw_circle(color, enter, radius, width=0):
     pass
