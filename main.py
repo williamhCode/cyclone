@@ -40,17 +40,17 @@ class MainWindow(pyglet.window.Window):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         engine.render.begin()
         
-        for i in range(100):
-            for j in range(100):
-                engine.render.draw_colored_quad((i * 5, j * 5), (4, 4), (255, 0, 0, 255))
-
-        for i in range(100):
-            for j in range(100):
-                engine.render.draw_colored_quad((100 + i * 5, 100 + j * 5), (4, 4), (0, 255, 0, 255))
+        # for i in range(100):
+        #     for j in range(100):
+        #         engine.render.draw_colored_quad((i * 5, j * 5), (4, 4), (255, 0, 0, 255))
 
         # for i in range(10):
         #     for j in range(10):
         #         engine.render.draw_textured_quad((250 + i * 50, 250 + j * 50), (49, 49), self.test1_tex_id)
+
+        engine.render.draw_circle((255, 0, 0, 255), (500, 300), 100, width=20, fade=0.3)
+
+        engine.render.draw_circle((0, 255, 0, 255), (700, 300), 50, width=0, fade=0.1)
 
         engine.render.end()
 

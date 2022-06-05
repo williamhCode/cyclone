@@ -35,20 +35,27 @@ DEF MAX_INDEX_COUNT = MAX_QUAD_COUNT * 6
 DEF MAX_TEXTURES = 16
 DEF VERTEX_STRIDE = 10
 
-cdef class RenderData:
+DEF test = [
+    [0, 0],
+    [1, 0],
+    [1, 1],
+    [0, 1]
+]
+
+cdef class CyRenderData:
     cdef unsigned int vao
     cdef unsigned int vbo
     cdef unsigned int ibo
 
-    cdef unsigned int white_texture    
+    cdef unsigned int white_texture
 
     cdef float[:] vertices
     cdef int vertex_count 
 
     cdef unsigned int[MAX_TEXTURES] texture_slots
-    cdef int texture_slot_index 
+    cdef int texture_slot_index
 
-cdef RenderData _s_data = RenderData()
+cdef CyRenderData _cy_data = CyRenderData()
 quad_shader = None
 
 cpdef void init():
@@ -60,15 +67,15 @@ cpdef void init():
     quad_shader.set_int_array('u_Textures', values)
 
     # generate vertices
-    _s_data.vertices = np.zeros(MAX_VERTEX_COUNT * VERTEX_STRIDE, dtype=np.float32)
+    _cy_data.vertices = np.zeros(MAX_VERTEX_COUNT * VERTEX_STRIDE, dtype=np.float32)
     
     # generate vertex array object
-    _s_data.vao = glGenVertexArrays(1)
-    glBindVertexArray(_s_data.vao)
+    _cy_data.vao = glGenVertexArrays(1)
+    glBindVertexArray(_cy_data.vao)
     
     # generate vertex buffer object and allocate memory
-    _s_data.vbo = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, _s_data.vbo)
+    _cy_data.vbo = glGenBuffers(1)
+    glBindBuffer(GL_ARRAY_BUFFER, _cy_data.vbo)
     glBufferData(GL_ARRAY_BUFFER, MAX_VERTEX_COUNT * VERTEX_STRIDE * 4, None, GL_DYNAMIC_DRAW)
 
     # set vertex attribute pointers
@@ -99,13 +106,13 @@ cpdef void init():
         indices[i + 5] = offset + 0
         offset += 4
 
-    _s_data.ibo = glGenBuffers(1)
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _s_data.ibo)
+    _cy_data.ibo = glGenBuffers(1)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _cy_data.ibo)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, MAX_INDEX_COUNT * 4, np.asarray(indices), GL_STATIC_DRAW)
 
     # create 1x1 white texture
-    _s_data.white_texture = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, _s_data.white_texture)
+    _cy_data.white_texture = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, _cy_data.white_texture)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
@@ -113,45 +120,45 @@ cpdef void init():
     cdef unsigned char[4] color = [255, 255, 0, 255]
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, color)
 
-    _s_data.texture_slots = np.zeros(MAX_TEXTURES, dtype=np.uint32)
-    _s_data.texture_slots[0] = _s_data.white_texture
+    _cy_data.texture_slots = np.zeros(MAX_TEXTURES, dtype=np.uint32)
+    _cy_data.texture_slots[0] = _cy_data.white_texture
 
 cpdef void on_resize(width: int, height: int):
     view_matrix = glm.ortho(0, width, 0, height, 0, 1.0)
     quad_shader.use()
-    quad_shader.set_mat4('u_ViewProj', view_matrix)
+    quad_shader.set_mat4('u_Proj', view_matrix)
 
 cpdef void begin():
-    _s_data.vertex_count = 0
-    _s_data.texture_slot_index = 1
+    _cy_data.vertex_count = 0
+    _cy_data.texture_slot_index = 1
 
 cpdef void end():
-    glBindBuffer(GL_ARRAY_BUFFER, _s_data.vbo)
-    glBufferSubData(GL_ARRAY_BUFFER, 0, _s_data.vertex_count * VERTEX_STRIDE * 4, np.asarray(_s_data.vertices))
+    glBindBuffer(GL_ARRAY_BUFFER, _cy_data.vbo)
+    glBufferSubData(GL_ARRAY_BUFFER, 0, _cy_data.vertex_count * VERTEX_STRIDE * 4, np.asarray(_cy_data.vertices))
 
     cdef int i
-    for i in range(_s_data.texture_slot_index):
+    for i in range(_cy_data.texture_slot_index):
         glActiveTexture(GL_TEXTURE0 + i)
-        glBindTexture(GL_TEXTURE_2D, _s_data.texture_slots[i])
+        glBindTexture(GL_TEXTURE_2D, _cy_data.texture_slots[i])
 
-    glBindVertexArray(_s_data.vao)
-    cdef int index_count = _s_data.vertex_count // 4 * 6
+    glBindVertexArray(_cy_data.vao)
+    cdef int index_count = _cy_data.vertex_count // 4 * 6
     glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, None)
 
 cdef void set_vertex_data_from_quad(int curr_index, float[3] position, float[4] color, float[2] tex_coords, float tex_index):
-    _s_data.vertices[curr_index + 0] = position[0]
-    _s_data.vertices[curr_index + 1] = position[1]
-    _s_data.vertices[curr_index + 2] = position[2]
-    _s_data.vertices[curr_index + 3] = color[0]
-    _s_data.vertices[curr_index + 4] = color[1]
-    _s_data.vertices[curr_index + 5] = color[2]
-    _s_data.vertices[curr_index + 6] = color[3]
-    _s_data.vertices[curr_index + 7] = tex_coords[0]
-    _s_data.vertices[curr_index + 8] = tex_coords[1]
-    _s_data.vertices[curr_index + 9] = tex_index 
+    _cy_data.vertices[curr_index + 0] = position[0]
+    _cy_data.vertices[curr_index + 1] = position[1]
+    _cy_data.vertices[curr_index + 2] = position[2]
+    _cy_data.vertices[curr_index + 3] = color[0]
+    _cy_data.vertices[curr_index + 4] = color[1]
+    _cy_data.vertices[curr_index + 5] = color[2]
+    _cy_data.vertices[curr_index + 6] = color[3]
+    _cy_data.vertices[curr_index + 7] = tex_coords[0]
+    _cy_data.vertices[curr_index + 8] = tex_coords[1]
+    _cy_data.vertices[curr_index + 9] = tex_index 
 
 cpdef void draw_colored_quad(position, size, color):
-    if (_s_data.vertex_count >= MAX_VERTEX_COUNT):
+    if (_cy_data.vertex_count >= MAX_VERTEX_COUNT):
         end()
         begin()
 
@@ -173,28 +180,29 @@ cpdef void draw_colored_quad(position, size, color):
     cdef int i
     cdef int curr_index
     for i in range(4):
-        curr_index = _s_data.vertex_count * VERTEX_STRIDE
+        curr_index = _cy_data.vertex_count * VERTEX_STRIDE
         set_vertex_data_from_quad(curr_index, positions[i], color_c, tex_coords[i], texture_index)
-        _s_data.vertex_count += 1
+        _cy_data.vertex_count += 1
 
 cpdef void draw_textured_quad(position, size, unsigned int texture_id):
-    if (_s_data.vertex_count >= MAX_VERTEX_COUNT or _s_data.texture_slot_index >= MAX_TEXTURES):
+    if (_cy_data.vertex_count >= MAX_VERTEX_COUNT or _cy_data.texture_slot_index >= MAX_TEXTURES):
         end()
         begin()
+
 
     cdef float[4] color = [1.0, 1.0, 1.0, 1.0]
 
     cdef float texture_index = 0.0
     cdef int i
-    for i in range(1, _s_data.texture_slot_index):
-        if (_s_data.texture_slots[i] == texture_id):
+    for i in range(1, _cy_data.texture_slot_index):
+        if (_cy_data.texture_slots[i] == texture_id):
             texture_index = <float>i
             break
 
     if (texture_index == 0.0):
-        texture_index = <float>_s_data.texture_slot_index
-        _s_data.texture_slots[_s_data.texture_slot_index] = texture_id
-        _s_data.texture_slot_index += 1
+        texture_index = <float>_cy_data.texture_slot_index
+        _cy_data.texture_slots[_cy_data.texture_slot_index] = texture_id
+        _cy_data.texture_slot_index += 1
         
     cdef float[4][3] positions = [
         [position[0], position[1], 0],
@@ -211,9 +219,9 @@ cpdef void draw_textured_quad(position, size, unsigned int texture_id):
     
     cdef int curr_index
     for i in range(4):
-        curr_index = _s_data.vertex_count * VERTEX_STRIDE
+        curr_index = _cy_data.vertex_count * VERTEX_STRIDE
         set_vertex_data_from_quad(curr_index, positions[i], color, tex_coords[i], texture_index)
-        _s_data.vertex_count += 1
+        _cy_data.vertex_count += 1
 
 def draw_circle(color, center, radius, width=0):
     pass
