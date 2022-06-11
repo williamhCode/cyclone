@@ -10,9 +10,9 @@ in float v_Fade;
 void main()
 {
     float distance = 1.0 - length(v_LocalPosition);
-    float circle = smoothstep(0.0, v_Fade, distance);
-    circle *= smoothstep(v_Thickness + v_Fade, v_Thickness, distance);
+    float alpha = smoothstep(0.0, v_Fade, distance);
+    alpha *= smoothstep(v_Thickness + v_Fade, v_Thickness, distance);
 
     o_Color = v_Color;
-    o_Color.a *= circle;
+    o_Color.a *= alpha;
 }

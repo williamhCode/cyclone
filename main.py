@@ -19,17 +19,16 @@ class MainWindow(pyglet.window.Window):
 
         engine.render.init()
         
+        self.test1_tex_id = engine.texture.load_texture('imgs/test.png')
+        self.test2_tex_id = engine.texture.load_texture('imgs/test2.jpeg')
 
-        self.test1_tex_id = engine.render.load_texture('imgs/test.png')
-        self.test2_tex_id = engine.render.load_texture('imgs/test2.jpeg')
-
-        self.timer = Timer() 
+        self.timer = Timer()
         
         self.event_loop()
         
     def on_key_press(self, symbol, modifiers):
         super().on_key_press(symbol, modifiers)
-       
+
     def on_resize(self, width, height):
         # pixel_width, pixel_height = self.get_framebuffer_size()
         # glViewport(0, 0, pixel_width, pixel_height)
@@ -39,18 +38,21 @@ class MainWindow(pyglet.window.Window):
     def on_draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         engine.render.begin()
-        
-        # for i in range(100):
-        #     for j in range(100):
-        #         engine.render.draw_colored_quad((i * 5, j * 5), (4, 4), (255, 0, 0, 255))
+
+        # for i in range(300):
+        #     for j in range(200):
+        #         engine.render.draw_colored_quad((255, 0, 0, 255), (i * 5, j * 5), (4, 4))
 
         # for i in range(10):
         #     for j in range(10):
-        #         engine.render.draw_textured_quad((250 + i * 50, 250 + j * 50), (49, 49), self.test1_tex_id)
+        #         engine.render.draw_textured_quad(self.test1_tex_id, (250 + i * 50, 250 + j * 50), (49, 49))
 
-        engine.render.draw_circle((255, 0, 0, 255), (500, 300), 100, width=20, fade=0.3)
+        # for i in range(100):
+        #     for j in range(100):
+        #         engine.render.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 5, width=1, fade=0.2)
 
-        engine.render.draw_circle((0, 255, 0, 255), (700, 300), 50, width=0, fade=0.1)
+        # engine.render.draw_circle((255, 0, 0, 255), (500, 300), 100, width=20, fade=0.1)
+        # engine.render.draw_circle((0, 255, 255, 240), (600, 300), 50, width=0, fade=0.02)
 
         engine.render.end()
 
