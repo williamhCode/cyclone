@@ -218,7 +218,7 @@ def _draw_quad(position, size, color, texture_index):
         _set_vertex_data_from_quad(curr_index, positions[i], color, tex_coords[i], texture_index)
         _data.quad_vertex_count += 1
 
-def draw_colored_quad(position, size, color):
+def draw_colored_quad(color, position, size):
     if (_data.quad_vertex_count >= MAX_VERTEX_COUNT):
         _end_quad_batch()
         _begin_quad_batch()

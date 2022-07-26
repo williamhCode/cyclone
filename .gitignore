@@ -4,5 +4,6 @@ build/
 *.c
 *.html
 .vscode
-
+.mypy_cache/
 test.py
+.ccls-cache/

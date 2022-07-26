@@ -9,8 +9,9 @@ ext_modules = [
     # Extension('test', ['engine/src/test.pyx']),
 ]
 
+PACKAGE_NAME = 'engine'
+
 setup(
-    ext_modules=cythonize(ext_modules),
-    packages=['engine'],
-    include_dirs=['.'],
+    ext_modules=cythonize(ext_modules, annotate=False),
+    include_dirs=[PACKAGE_NAME],
 )
