@@ -19,6 +19,7 @@ from libc.stdlib cimport malloc, free
 # cdef test.TestClass tc = test.TestClass()
 # print(tc.x, tc.y)
 
+
 DEF MAX_QUAD_COUNT = 100000
 DEF MAX_VERTEX_COUNT = MAX_QUAD_COUNT * 4
 DEF MAX_INDEX_COUNT = MAX_QUAD_COUNT * 6
@@ -26,6 +27,8 @@ DEF MAX_TEXTURES = 16
 DEF QUAD_VERTEX_STRIDE = 10
 DEF CIRCLE_VERTEX_STRIDE = 11
 DEF RECTANGLE_VERTEX_STRIDE = 13
+DEF LINE_VERTEX_STRIDE = 7
+
 
 cdef class Renderer:
     cdef:
@@ -44,7 +47,7 @@ cdef class Renderer:
         unsigned int circle_vao
         unsigned int circle_vbo
         unsigned int circle_ibo
-
+        
         float[:] circle_vertices
         int circle_vertex_count 
 
@@ -56,10 +59,19 @@ cdef class Renderer:
         float[:] rectangle_vertices
         int rectangle_vertex_count 
 
+        # line variables
+        unsigned int line_vao
+        unsigned int line_vbo
+        unsigned int line_ibo
+
+        float[:] line_vertices
+        int line_vertex_count 
+
         # shaders
         object quad_shader
         object circle_shader
         object rectangle_shader
+        object line_shader
         list shaders
 
 
@@ -72,12 +84,12 @@ cdef class Renderer:
             self.quad_shader = Shader('shaders/quad.vert', 'shaders/quad.frag')
             self.circle_shader = Shader('shaders/circle.vert', 'shaders/circle.frag')
             self.rectangle_shader = Shader('shaders/rectangle.vert', 'shaders/rectangle.frag')
-            self.shaders = [self.quad_shader, self.circle_shader, self.rectangle_shader]
+            self.line_shader = Shader('shaders/line.vert', 'shaders/line.frag')
+            self.shaders = [self.quad_shader, self.circle_shader, self.rectangle_shader, self.line_shader]
             
         self.quad_shader.use()
         values = glm.array(np.arange(MAX_TEXTURES, dtype=np.uint32))
         self.quad_shader.set_int_array('u_Textures', values)
-
 
         # quad initialization
         self.quad_vertices = np.empty(
@@ -167,6 +179,31 @@ cdef class Renderer:
         )
 
 
+        # line initialization
+        self.line_vertices = np.empty(
+            MAX_VERTEX_COUNT * LINE_VERTEX_STRIDE, np.float32
+        )
+
+        self.line_vao = glGenVertexArrays(1)
+        glBindVertexArray(self.line_vao)
+
+        self.line_vbo = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self.line_vbo)
+        glBufferData(
+            GL_ARRAY_BUFFER, self.line_vertices.nbytes, None, GL_DYNAMIC_DRAW
+        )
+
+        # 3 position, 4 color
+        self._set_attrib_pointers(2, [3, 4])
+
+        self.line_ibo = glGenBuffers(1)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.line_ibo)
+        glBufferData(
+            GL_ELEMENT_ARRAY_BUFFER, 
+            indices.nbytes, np.asarray(indices), GL_STATIC_DRAW
+        )
+
+
     cdef void _set_attrib_pointers(self, int size, int[] attrib_sizes):
         cdef int stride = 0
         cdef int i
@@ -190,6 +227,14 @@ cdef class Renderer:
             shader.set_mat4('u_Proj', view_matrix)
 
 
+    def set_clear_color(self, color):
+        color = [x/255.0 for x in color]
+        glClearColor(*color)
+
+    
+    def clear(self):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
     # begin functions --------------------------------- #
     cdef void _begin_quad_batch(self):
         self.quad_vertex_count = 0
@@ -204,10 +249,16 @@ cdef class Renderer:
         self.rectangle_vertex_count = 0
 
 
+    cdef void _begin_line_batch(self):
+        self.line_vertex_count = 0
+
+
     def begin(self):
         self._begin_quad_batch()
         self._begin_circle_batch()
         self._begin_rectangle_batch()
+        self._begin_line_batch()
+
 
     # end functions --------------------------------- #
     cdef void _end_quad_batch(self):
@@ -257,22 +308,35 @@ cdef class Renderer:
         glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, None)
 
 
+    cdef void _end_line_batch(self):
+        glBindBuffer(GL_ARRAY_BUFFER, self.line_vbo)
+        glBufferSubData(
+            GL_ARRAY_BUFFER, 0, 
+            self.line_vertex_count * LINE_VERTEX_STRIDE * 4, 
+            np.asarray(self.line_vertices)
+        )
+
+        self.line_shader.use()
+        glBindVertexArray(self.line_vao)
+        cdef int index_count = self.line_vertex_count // 4 * 6
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, None)
+
+
     def end(self):
         self._end_quad_batch()
         self._end_circle_batch()
         self._end_rectangle_batch()
+        self._end_line_batch()
 
 
     # drawing -------------------------------------- #
     cdef float* _handle_color(self, color):
-        cdef float[4] t_color
-        if (len(color) == 3):
-            t_color = [color[0], color[1], color[2], 255.0]
-        else:
-            t_color = [color[0], color[1], color[2], color[3]]
-
         cdef float *out_color = <float *>malloc(sizeof(float) * 4)
-        out_color[:4] = t_color
+        if (len(color) == 3):
+            out_color[:4] = [color[0]/255.0, color[1]/255.0, color[2]/255.0, 1.0]
+        else:
+            out_color[:4] = [color[0]/255.0, color[1]/255.0, color[2]/255.0, color[3]/255.0]
+
         return out_color
 
 
@@ -399,10 +463,6 @@ cdef class Renderer:
             [-1.0,  1.0]
         ]
 
-        cdef int i
-        for i in range(4):
-            color[i] = color[i] / 255.0
-
         cdef float thickness
         if width == 0.0:
             thickness = 1.0
@@ -411,6 +471,7 @@ cdef class Renderer:
 
         fade = fade / radius
 
+        cdef int i
         cdef Py_ssize_t curr_index
         for i in range(4):
             curr_index = self.circle_vertex_count * CIRCLE_VERTEX_STRIDE
@@ -418,7 +479,7 @@ cdef class Renderer:
             self.circle_vertex_count += 1
 
 
-    # line functions ----------------------------------- #
+    # rectangle functions ----------------------------------- #
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef void _set_vertex_data_from_rectangle(self, Py_ssize_t curr_index, float[3] position, float[2] local_position, float[4] color, float[2] thickness, float[2] fade) nogil:
@@ -480,9 +541,6 @@ cdef class Renderer:
             [-1.0,  1.0]
         ]
 
-        for i in range(4):
-            color[i] = color[i] / 255.0
-
         cdef float[2] thickness
         if width == 0.0:
             thickness = [1.0, 1.0]
@@ -498,6 +556,61 @@ cdef class Renderer:
             self.rectangle_vertex_count += 1
 
 
+    # line functions ----------------------------------- #
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef void _set_vertex_data_from_line(self, Py_ssize_t curr_index, float[3] position, float[4] color) nogil:
+        self.line_vertices[curr_index + 0] = position[0]
+        self.line_vertices[curr_index + 1] = position[1]
+        self.line_vertices[curr_index + 2] = position[2]
+        self.line_vertices[curr_index + 3] = color[0]
+        self.line_vertices[curr_index + 4] = color[1]
+        self.line_vertices[curr_index + 5] = color[2]
+        self.line_vertices[curr_index + 6] = color[3]
+
+
+    def draw_line(self, color, start, end, float width):
+        cdef float *t_color = self._handle_color(color)
+        cdef float[2] t_start = [start[0], start[1]]
+        cdef float[2] t_end = [end[0], end[1]]
+
+        self.cy_draw_line(t_color, t_start, t_end, width)
+        free(t_color)
+
+
+    cdef void cy_draw_line(self, float[4] color, float[2] start, float[2] end, float width):
+        if (self.line_vertex_count >= MAX_VERTEX_COUNT):
+            self._end_line_batch()
+            self._begin_line_batch()
+
+        cdef float corner_angle = math.atan2(end[1] - start[1], end[0] - start[0]) + math.pi / 2
+        cdef float *corner_offset = self._rotate_vector2([width / 2, 0], corner_angle)
+        cdef float[4][3] positions = [
+            [start[0] + corner_offset[0], start[1] + corner_offset[1], 0],
+            [start[0] - corner_offset[0], start[1] - corner_offset[1], 0],
+            [end[0] - corner_offset[0], end[1] - corner_offset[1], 0],
+            [end[0] + corner_offset[0], end[1] + corner_offset[1], 0],
+        ]
+
+        cdef int i
+        cdef Py_ssize_t curr_index
+        for i in range(4):
+            curr_index = self.line_vertex_count * LINE_VERTEX_STRIDE
+            self._set_vertex_data_from_line(curr_index, positions[i], color)
+            self.line_vertex_count += 1
+
+        free(corner_offset)
+
+
+    cdef float* _rotate_vector2(self, float[2] vector, float angle) nogil:
+        cdef float *result = <float *>malloc(sizeof(float) * 2)
+        cdef float s = math.sin(angle)
+        cdef float c = math.cos(angle)
+        result[0] = vector[0] * c - vector[1] * s
+        result[1] = vector[0] * s + vector[1] * c
+        return result
+
+
     cdef float* _rotate_vector(self, float[3] vector, float angle) nogil:
         cdef float *result = <float *>malloc(sizeof(float) * 3)
         cdef float s = math.sin(angle)
@@ -506,3 +619,4 @@ cdef class Renderer:
         result[1] = vector[0] * s + vector[1] * c
         result[2] = vector[2]
         return result
+

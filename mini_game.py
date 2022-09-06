@@ -8,6 +8,7 @@ import engine.timer as timer
 import math
 
 import engine
+from engine.render import Renderer
 
 from dataclasses import dataclass
 
@@ -79,8 +80,8 @@ class Platform:
         self.rect = Rect(x, y, w, h)
         self.color = color
 
-    def draw(self):
-        engine.render.draw_rectangle(
+    def draw(self, renderer: Renderer ):
+        renderer.draw_rectangle(
             self.color, self.rect.position, self.rect.size, fade=1)
 
 
@@ -126,8 +127,8 @@ class Player:
         self.vel.y -= 1000 * dt
         self.pos += self.vel * dt
 
-    def draw(self):
-        engine.render.draw_rectangle(
+    def draw(self, renderer: Renderer):
+        renderer.draw_rectangle(
             (255, 0, 0), (self.pos.x, self.pos.y), self.SIZE, fade=4, width=5)
 
 
@@ -146,8 +147,8 @@ def main():
     WIN_SIZE = (1200, 800)
     pygame.display.set_mode((WIN_SIZE), DOUBLEBUF | OPENGL)
 
-    engine.render.init()
-    engine.render.set_size(*WIN_SIZE)
+    renderer = engine.render.Renderer()
+    renderer.set_size(*WIN_SIZE)
 
     player = Player(100, 500)
     platforms = [
@@ -207,14 +208,14 @@ def main():
 
         # blit -------------------------------------------------- #
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        engine.render.begin()
+        renderer.begin()
 
         for platform in platforms:
-            platform.draw()
+            platform.draw(renderer)
 
-        player.draw()
+        player.draw(renderer)
 
-        engine.render.end()
+        renderer.end()
         pygame.display.flip()
 
 

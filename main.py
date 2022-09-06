@@ -3,11 +3,6 @@ pyglet.options['shadow_window'] = False
 # pyglet.options['debug_gl'] = False
 # import numpy as np
 from OpenGL.GL import *
-import glm
-
-import random
-import time
-import math
 
 from engine.timer import Timer
 import engine

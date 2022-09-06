@@ -7,3 +7,4 @@ build/
 .mypy_cache/
 test.py
 .ccls-cache/
+.zshrc

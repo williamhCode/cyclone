@@ -12,6 +12,10 @@ ext_modules = [
 PACKAGE_NAME = 'engine'
 
 setup(
-    ext_modules=cythonize(ext_modules, annotate=False),
+    ext_modules=cythonize(
+        ext_modules, 
+        annotate=True,
+        compiler_directives={'language_level' : "3"}
+    ),
     include_dirs=[PACKAGE_NAME],
 )
