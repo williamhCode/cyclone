@@ -330,14 +330,11 @@ cdef class Renderer:
 
 
     # drawing -------------------------------------- #
-    cdef float* _handle_color(self, color):
-        cdef float *out_color = <float *>malloc(sizeof(float) * 4)
+    cdef float _handle_color(self, color, float[4] out_color):
         if (len(color) == 3):
             out_color[:4] = [color[0]/255.0, color[1]/255.0, color[2]/255.0, 1.0]
         else:
             out_color[:4] = [color[0]/255.0, color[1]/255.0, color[2]/255.0, color[3]/255.0]
-
-        return out_color
 
 
     # quad functions ------------------------------------- #
@@ -395,11 +392,10 @@ cdef class Renderer:
         for i in range(4):
             positions[i][0] += offset[0]
             positions[i][1] += offset[1]
-        cdef float *rotated_vector
+        cdef float[3] rotated_vector
         for i in range(4):
-            rotated_vector = self._rotate_vector(positions[i], rad_rotation)
+            self._rotate_vector(positions[i], rad_rotation, rotated_vector)
             positions[i] = rotated_vector
-            free(rotated_vector)
         for i in range(4):
             positions[i][0] += position[0]
             positions[i][1] += position[1]
@@ -437,11 +433,11 @@ cdef class Renderer:
 
 
     def draw_circle(self, color, position, float radius, float width = 0.0, float fade = 0.0):
-        cdef float *t_color = self._handle_color(color)
+        cdef float[4] t_color
+        self._handle_color(color, t_color)
         cdef float[2] t_position = [position[0], position[1]]
 
         self.cy_draw_circle(t_color, t_position, radius, width, fade)
-        free(t_color)
 
 
     cdef void cy_draw_circle(self, float[4] color, float[2] position, float radius, float width = 0.0, float fade = 0.0):
@@ -499,13 +495,13 @@ cdef class Renderer:
 
 
     def draw_rectangle(self, color, position, size, float rotation=0.0, offset=[0.0, 0.0], float width=0.0, float fade=0.0):
-        cdef float *t_color = self._handle_color(color)
+        cdef float[4] t_color
+        self._handle_color(color, t_color)
         cdef float[2] t_position = [position[0], position[1]]
         cdef float[2] t_size = [size[0], size[1]]
         cdef float[2] t_offset = [offset[0], offset[1]]
 
         self.cy_draw_rectangle(t_color, t_position, t_size, rotation, t_offset, width, fade)
-        free(t_color)
 
 
     cdef void cy_draw_rectangle(self, float[4] color, float[2] position, float[2] size, float rotation, float[2] offset, float width, float fade):
@@ -525,11 +521,10 @@ cdef class Renderer:
         for i in range(4):
             positions[i][0] += offset[0]
             positions[i][1] += offset[1]
-        cdef float *rotated_vector
+        cdef float[3] rotated_vector
         for i in range(4):
-            rotated_vector = self._rotate_vector(positions[i], rad_rotation)
+            self._rotate_vector(positions[i], rad_rotation, rotated_vector)
             positions[i] = rotated_vector
-            free(rotated_vector)
         for i in range(4):
             positions[i][0] += position[0]
             positions[i][1] += position[1]
@@ -569,13 +564,13 @@ cdef class Renderer:
         self.line_vertices[curr_index + 6] = color[3]
 
 
-    def draw_line(self, color, start, end, float width):
-        cdef float *t_color = self._handle_color(color)
+    def draw_line(self, color, start, end, float width=1.0):
+        cdef float[4] t_color
+        self._handle_color(color, t_color)
         cdef float[2] t_start = [start[0], start[1]]
         cdef float[2] t_end = [end[0], end[1]]
 
         self.cy_draw_line(t_color, t_start, t_end, width)
-        free(t_color)
 
 
     cdef void cy_draw_line(self, float[4] color, float[2] start, float[2] end, float width):
@@ -584,7 +579,8 @@ cdef class Renderer:
             self._begin_line_batch()
 
         cdef float corner_angle = math.atan2(end[1] - start[1], end[0] - start[0]) + math.pi / 2
-        cdef float *corner_offset = self._rotate_vector2([width / 2, 0], corner_angle)
+        cdef float[2] corner_offset
+        self._rotate_vector2([width / 2, 0], corner_angle, corner_offset)
         cdef float[4][3] positions = [
             [start[0] + corner_offset[0], start[1] + corner_offset[1], 0],
             [start[0] - corner_offset[0], start[1] - corner_offset[1], 0],
@@ -598,25 +594,33 @@ cdef class Renderer:
             curr_index = self.line_vertex_count * LINE_VERTEX_STRIDE
             self._set_vertex_data_from_line(curr_index, positions[i], color)
             self.line_vertex_count += 1
+            
 
-        free(corner_offset)
+    def draw_lines(self, color, points, float width=1.0):
+        cdef float[4] t_color
+        self._handle_color(color, t_color)
+
+        cdef Py_ssize_t i
+        cdef float[2] t_start
+        cdef float[2] t_end = points[0]
+        for i in range(1, len(points)):
+            end = points[i]
+            t_start = t_end
+            t_end = [end[0], end[1]]
+            self.cy_draw_line(t_color, t_start, t_end, width)
 
 
-    cdef float* _rotate_vector2(self, float[2] vector, float angle) nogil:
-        cdef float *result = <float *>malloc(sizeof(float) * 2)
+    cdef void _rotate_vector2(self, float[2] vector, float angle, float[2] result) nogil:
         cdef float s = math.sin(angle)
         cdef float c = math.cos(angle)
         result[0] = vector[0] * c - vector[1] * s
         result[1] = vector[0] * s + vector[1] * c
-        return result
 
 
-    cdef float* _rotate_vector(self, float[3] vector, float angle) nogil:
-        cdef float *result = <float *>malloc(sizeof(float) * 3)
+    cdef void _rotate_vector(self, float[3] vector, float angle, float[3] result) nogil:
         cdef float s = math.sin(angle)
         cdef float c = math.cos(angle)
         result[0] = vector[0] * c - vector[1] * s
         result[1] = vector[0] * s + vector[1] * c
         result[2] = vector[2]
-        return result
 

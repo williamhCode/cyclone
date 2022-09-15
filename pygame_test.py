@@ -2,8 +2,23 @@ import pygame
 import glm
 import OpenGL.GL as gl
 import math
+import numpy as np
 
 import engine
+from engine.render import Renderer
+
+def spinning_star(renderer: Renderer, time):
+    points = []
+    start = (500, 400)
+    speed = 1
+    for i in range(25):
+        angle_diff = 2 * math.pi * 0.45 * i
+        x = math.cos((time) * speed + angle_diff) * 300 + start[0]
+        y = math.sin((time) * speed + angle_diff) * 300 + start[1]
+        points.append((x, y))
+
+    renderer.draw_lines((255, 0, 0, 255), points, 4)
+
 
 def main():
     # initialize -------------------------------------------------- #
@@ -19,7 +34,7 @@ def main():
     WIN_SIZE = (1200, 800)
     pygame.display.set_mode((WIN_SIZE), pygame.DOUBLEBUF | pygame.OPENGL)
 
-    renderer = engine.render.Renderer()
+    renderer = Renderer()
     renderer.set_clear_color((50, 50, 50, 255))
 
     renderer.set_size(*WIN_SIZE)
@@ -54,30 +69,31 @@ def main():
         renderer.begin()
         renderer.clear()
 
-        for i in range(200):
-            for j in range(300):
-                renderer.draw_texture(texture_1, (i * 10, j * 10))
+        #     for j in range(300):
+        # for i in range(200):
+        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
 
-        for i in range(100):
-            for j in range(100):
-                renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 5, width=1, fade=0.5)
+        # for i in range(100):
+        #     for j in range(100):
+        #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 5, width=1, fade=0.5)
 
         # renderer.draw_circle((255, 0, 0, 255), (500, 300), 100, width=10, fade=10)
         # renderer.draw_circle((0, 255, 255, 240), (600, 300), 50, width=0, fade=5)
 
+        # for i in range(200):
+        #     for j in range(300):
+        #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10)
+
         # renderer.draw_rectangle((255, 0, 0, 255), (500, 100), (100, 200), rotation=0, width=30, fade=10)
         # renderer.draw_rectangle((255, 0, 0, 255), (100, 100), (400, 100), rotation=0, width=10, fade=10)
 
-        # start = (500, 400)
-        # speed = 2
-        # x = math.cos(time * speed) * 300 + start[0]
-        # y = math.sin(time * speed) * 300 + start[1]
-        # renderer.draw_line((255, 0, 0, 255), start, (x, y), 10)
+        spinning_star(renderer, time)
+
+        renderer.end()
+        time += dt
 
         # flip screen
         pygame.display.flip()
-
-        time += dt
 
 
 if __name__ == "__main__":
