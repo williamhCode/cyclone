@@ -145,9 +145,9 @@ def main():
 
     # create window
     WIN_SIZE = (1200, 800)
-    pygame.display.set_mode((WIN_SIZE), DOUBLEBUF | OPENGL, vsync=0)
+    pygame.display.set_mode((WIN_SIZE), DOUBLEBUF | OPENGL)
 
-    renderer = Renderer()
+    renderer = engine.render.Renderer()
     renderer.set_size(*WIN_SIZE)
 
     player = Player(100, 500)
@@ -218,9 +218,7 @@ def main():
         renderer.end()
         pygame.display.flip()
 
+
 if __name__ == "__main__":
-    import os
-    os.chdir(os.path.abspath(os.path.dirname(__file__)))
     main()
     pygame.quit()
-
