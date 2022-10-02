@@ -5,7 +5,7 @@ from OpenGL.GL import *
 import glm
 import numpy as np
 
-from .utiliies import set_cwd
+from .utilities import set_cwd
 from .shader import Shader
 from .texture import Texture
 
@@ -74,12 +74,15 @@ cdef class Renderer:
         object line_shader
         list shaders
 
+        # matrices
+        object view_matrix
+
 
     def __init__(self):
         # glEnable(GL_DEPTH_TEST)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        
+       
         with set_cwd(Path(__file__).parent.resolve()):
             self.quad_shader = Shader('shaders/quad.vert', 'shaders/quad.frag')
             self.circle_shader = Shader('shaders/circle.vert', 'shaders/circle.frag')
@@ -221,19 +224,20 @@ cdef class Renderer:
 
 
     def set_size(self, width: int, height: int):
-        view_matrix = glm.ortho(0, width, 0, height, 0, 1.0)
+        proj_matrix = glm.ortho(0, width, 0, height, 0, 1.0)
         for shader in self.shaders:
             shader.use()
-            shader.set_mat4('u_Proj', view_matrix)
+            shader.set_mat4('u_Proj', proj_matrix)
 
 
     def set_clear_color(self, color):
-        color = [x/255.0 for x in color]
+        color = [x / 255.0 for x in color]
         glClearColor(*color)
 
     
     def clear(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
 
     # begin functions --------------------------------- #
     cdef void _begin_quad_batch(self):
@@ -253,7 +257,16 @@ cdef class Renderer:
         self.line_vertex_count = 0
 
 
-    def begin(self):
+    def begin(self, view_matrix=None):
+        if view_matrix is not None:
+            self.view_matrix = view_matrix
+        else:
+            self.view_matrix = glm.mat4()
+
+        for shader in self.shaders:
+            shader.use()
+            shader.set_mat4('u_View', self.view_matrix)
+
         self._begin_quad_batch()
         self._begin_circle_batch()
         self._begin_rectangle_batch()
@@ -353,23 +366,24 @@ cdef class Renderer:
         self.quad_vertices[curr_index + 9] = tex_index 
 
 
-    def draw_texture(self, texture: Texture, position, float rotation=0.0, offset=[0.0, 0.0]):
+    def draw_texture(self, texture: Texture, position, float rotation=0.0, offset=[0.0, 0.0], flipped=False, color=[255, 255, 255, 255]):
         cdef unsigned int texture_id = texture.id
         cdef float[2] t_position = [position[0], position[1]]
         cdef float[2] t_size = [texture.width, texture.height]
         cdef float[2] t_offset = [offset[0], offset[1]]
+        cdef bint t_flipped = flipped
+        cdef float[4] t_color
+        self._handle_color(color, t_color)
 
-        self.cy_draw_texture(texture_id, t_position, t_size, rotation, t_offset)
+        self.cy_draw_texture(texture_id, t_position, t_size, rotation, t_offset, t_flipped, t_color)
 
 
-    cdef void cy_draw_texture(self, unsigned int texture_id, float[2] position, float[2] size, float rotation, float[2] offset):
+    cdef void cy_draw_texture(self, unsigned int texture_id, float[2] position, float[2] size, float rotation, float[2] offset, bint flipped, float[4] color):
         if (self.quad_vertex_count >= MAX_VERTEX_COUNT or self.texture_slot_index >= MAX_TEXTURES):
             self._end_quad_batch()
             self._begin_quad_batch()
 
         cdef float rad_rotation = rotation * math.pi / 180.0
-
-        cdef float[4] color = [1.0, 1.0, 1.0, 1.0]
 
         cdef float texture_index = 0.0
         cdef int i
@@ -400,12 +414,21 @@ cdef class Renderer:
             positions[i][0] += position[0]
             positions[i][1] += position[1]
 
-        cdef float[4][2] tex_coords = [
-            [0, 0],
-            [1, 0],
-            [1, 1],
-            [0, 1]
-        ]
+        cdef float[4][2] tex_coords
+        if (flipped == 0):
+            tex_coords = [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [0, 1]
+            ]
+        else:
+            tex_coords = [
+                [1, 0],
+                [0, 0],
+                [0, 1],
+                [1, 1]
+            ]
         
         cdef Py_ssize_t curr_index
         for i in range(4):
@@ -604,10 +627,14 @@ cdef class Renderer:
         cdef float[2] t_start
         cdef float[2] t_end = points[0]
         for i in range(1, len(points)):
-            end = points[i]
+            point = points[i]
             t_start = t_end
-            t_end = [end[0], end[1]]
+            t_end = [point[0], point[1]]
             self.cy_draw_line(t_color, t_start, t_end, width)
+
+
+    def draw_lines_miter(self, color, points, float width=1.0):
+        pass
 
 
     cdef void _rotate_vector2(self, float[2] vector, float angle, float[2] result) nogil:
