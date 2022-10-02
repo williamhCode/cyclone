@@ -8,3 +8,5 @@ build/
 test.py
 .ccls-cache/
 .zshrc
+dist
+*.spec
