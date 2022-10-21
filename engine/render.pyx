@@ -13,11 +13,13 @@ from ctypes import c_void_p
 
 cimport cython
 from libc cimport math
-from libc.stdlib cimport malloc, free
+from libcpp cimport vector
 
-# from . cimport test
-# cdef test.TestClass tc = test.TestClass()
+# from engine.test cimport TestClass
+# cdef TestClass tc = TestClass()
 # print(tc.x, tc.y)
+
+cimport engine.libs.glad as gl
 
 
 DEF MAX_QUAD_COUNT = 100000
@@ -79,7 +81,8 @@ cdef class Renderer:
 
 
     def __init__(self):
-        # glEnable(GL_DEPTH_TEST)
+        # gl.glEnable(gl.GL_DEPTH_TEST)
+
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
        
@@ -114,7 +117,7 @@ cdef class Renderer:
         # generate index buffer object and buffer data
         cdef unsigned int[:] indices = np.empty(MAX_INDEX_COUNT, dtype=np.uint32)
         cdef int offset = 0
-        cdef Py_ssize_t i
+        cdef size_t i
         for i in range(0, MAX_INDEX_COUNT, 6):
             indices[i + 0] = offset + 0
             indices[i + 1] = offset + 1
@@ -351,34 +354,18 @@ cdef class Renderer:
 
 
     # quad functions ------------------------------------- #
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    cdef void _set_vertex_data_from_quad(self, Py_ssize_t curr_index, float[3] position, float[4] color, float[2] tex_coords, float tex_index):
-        self.quad_vertices[curr_index + 0] = position[0]
-        self.quad_vertices[curr_index + 1] = position[1]
-        self.quad_vertices[curr_index + 2] = position[2]
-        self.quad_vertices[curr_index + 3] = color[0]
-        self.quad_vertices[curr_index + 4] = color[1]
-        self.quad_vertices[curr_index + 5] = color[2]
-        self.quad_vertices[curr_index + 6] = color[3]
-        self.quad_vertices[curr_index + 7] = tex_coords[0]
-        self.quad_vertices[curr_index + 8] = tex_coords[1]
-        self.quad_vertices[curr_index + 9] = tex_index 
-
-
-    def draw_texture(self, texture: Texture, position, float rotation=0.0, offset=[0.0, 0.0], flipped=False, color=[255, 255, 255, 255]):
+    def draw_texture(self, texture: Texture, position, float rotation=0.0, offset=[0.0, 0.0], bint flipped=False, color=[255, 255, 255, 255]):
         cdef unsigned int texture_id = texture.id
         cdef float[2] t_position = [position[0], position[1]]
         cdef float[2] t_size = [texture.width, texture.height]
         cdef float[2] t_offset = [offset[0], offset[1]]
-        cdef bint t_flipped = flipped
         cdef float[4] t_color
         self._handle_color(color, t_color)
 
-        self.cy_draw_texture(texture_id, t_position, t_size, rotation, t_offset, t_flipped, t_color)
+        self._cy_draw_texture(texture_id, t_position, t_size, rotation, t_offset, flipped, t_color)
 
 
-    cdef void cy_draw_texture(self, unsigned int texture_id, float[2] position, float[2] size, float rotation, float[2] offset, bint flipped, float[4] color):
+    cdef void _cy_draw_texture(self, unsigned int texture_id, float[2] position, float[2] size, float rotation, float[2] offset, bint flipped, float[4] color):
         if (self.quad_vertex_count >= MAX_VERTEX_COUNT or self.texture_slot_index >= MAX_TEXTURES):
             self._end_quad_batch()
             self._begin_quad_batch()
@@ -430,7 +417,7 @@ cdef class Renderer:
                 [1, 1]
             ]
         
-        cdef Py_ssize_t curr_index
+        cdef size_t curr_index
         for i in range(4):
             curr_index = self.quad_vertex_count * QUAD_VERTEX_STRIDE
             self._set_vertex_data_from_quad(
@@ -438,32 +425,31 @@ cdef class Renderer:
             self.quad_vertex_count += 1
 
 
-    # circle functions ----------------------------------- #
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _set_vertex_data_from_circle(self, Py_ssize_t curr_index, float[3] position, float[2] local_position, float[4] color, float thickness, float fade):
-        self.circle_vertices[curr_index + 0] = position[0]
-        self.circle_vertices[curr_index + 1] = position[1]
-        self.circle_vertices[curr_index + 2] = position[2]
-        self.circle_vertices[curr_index + 3] = local_position[0]
-        self.circle_vertices[curr_index + 4] = local_position[1]
-        self.circle_vertices[curr_index + 5] = color[0]
-        self.circle_vertices[curr_index + 6] = color[1]
-        self.circle_vertices[curr_index + 7] = color[2]
-        self.circle_vertices[curr_index + 8] = color[3]
-        self.circle_vertices[curr_index + 9] = thickness
-        self.circle_vertices[curr_index + 10] = fade
+    cdef void _set_vertex_data_from_quad(self, size_t curr_index, float[3] position, float[4] color, float[2] tex_coords, float tex_index):
+        self.quad_vertices[curr_index + 0] = position[0]
+        self.quad_vertices[curr_index + 1] = position[1]
+        self.quad_vertices[curr_index + 2] = position[2]
+        self.quad_vertices[curr_index + 3] = color[0]
+        self.quad_vertices[curr_index + 4] = color[1]
+        self.quad_vertices[curr_index + 5] = color[2]
+        self.quad_vertices[curr_index + 6] = color[3]
+        self.quad_vertices[curr_index + 7] = tex_coords[0]
+        self.quad_vertices[curr_index + 8] = tex_coords[1]
+        self.quad_vertices[curr_index + 9] = tex_index 
 
 
+    # circle functions ----------------------------------- #
     def draw_circle(self, color, position, float radius, float width = 0.0, float fade = 0.0):
         cdef float[4] t_color
         self._handle_color(color, t_color)
         cdef float[2] t_position = [position[0], position[1]]
 
-        self.cy_draw_circle(t_color, t_position, radius, width, fade)
+        self._cy_draw_circle(t_color, t_position, radius, width, fade)
 
 
-    cdef void cy_draw_circle(self, float[4] color, float[2] position, float radius, float width = 0.0, float fade = 0.0):
+    cdef void _cy_draw_circle(self, float[4] color, float[2] position, float radius, float width = 0.0, float fade = 0.0):
         if (self.circle_vertex_count >= MAX_VERTEX_COUNT):
             self._end_circle_batch()
             self._begin_circle_batch()
@@ -491,32 +477,30 @@ cdef class Renderer:
         fade = fade / radius
 
         cdef int i
-        cdef Py_ssize_t curr_index
+        cdef size_t curr_index
         for i in range(4):
             curr_index = self.circle_vertex_count * CIRCLE_VERTEX_STRIDE
             self._set_vertex_data_from_circle(curr_index, positions[i], local_positions[i], color, thickness, fade)
             self.circle_vertex_count += 1
 
 
-    # rectangle functions ----------------------------------- #
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _set_vertex_data_from_rectangle(self, Py_ssize_t curr_index, float[3] position, float[2] local_position, float[4] color, float[2] thickness, float[2] fade) nogil:
-        self.rectangle_vertices[curr_index + 0] = position[0]
-        self.rectangle_vertices[curr_index + 1] = position[1]
-        self.rectangle_vertices[curr_index + 2] = position[2]
-        self.rectangle_vertices[curr_index + 3] = local_position[0]
-        self.rectangle_vertices[curr_index + 4] = local_position[1]
-        self.rectangle_vertices[curr_index + 5] = color[0]
-        self.rectangle_vertices[curr_index + 6] = color[1]
-        self.rectangle_vertices[curr_index + 7] = color[2]
-        self.rectangle_vertices[curr_index + 8] = color[3]
-        self.rectangle_vertices[curr_index + 9] = thickness[0]
-        self.rectangle_vertices[curr_index + 10] = thickness[1]
-        self.rectangle_vertices[curr_index + 11] = fade[0]
-        self.rectangle_vertices[curr_index + 12] = fade[1]
+    cdef void _set_vertex_data_from_circle(self, size_t curr_index, float[3] position, float[2] local_position, float[4] color, float thickness, float fade):
+        self.circle_vertices[curr_index + 0] = position[0]
+        self.circle_vertices[curr_index + 1] = position[1]
+        self.circle_vertices[curr_index + 2] = position[2]
+        self.circle_vertices[curr_index + 3] = local_position[0]
+        self.circle_vertices[curr_index + 4] = local_position[1]
+        self.circle_vertices[curr_index + 5] = color[0]
+        self.circle_vertices[curr_index + 6] = color[1]
+        self.circle_vertices[curr_index + 7] = color[2]
+        self.circle_vertices[curr_index + 8] = color[3]
+        self.circle_vertices[curr_index + 9] = thickness
+        self.circle_vertices[curr_index + 10] = fade
 
 
+    # rectangle functions ----------------------------------- #
     def draw_rectangle(self, color, position, size, float rotation=0.0, offset=[0.0, 0.0], float width=0.0, float fade=0.0):
         cdef float[4] t_color
         self._handle_color(color, t_color)
@@ -524,10 +508,10 @@ cdef class Renderer:
         cdef float[2] t_size = [size[0], size[1]]
         cdef float[2] t_offset = [offset[0], offset[1]]
 
-        self.cy_draw_rectangle(t_color, t_position, t_size, rotation, t_offset, width, fade)
+        self._cy_draw_rectangle(t_color, t_position, t_size, rotation, t_offset, width, fade)
 
 
-    cdef void cy_draw_rectangle(self, float[4] color, float[2] position, float[2] size, float rotation, float[2] offset, float width, float fade):
+    cdef void _cy_draw_rectangle(self, float[4] color, float[2] position, float[2] size, float rotation, float[2] offset, float width, float fade):
         if (self.rectangle_vertex_count >= MAX_VERTEX_COUNT):
             self._end_rectangle_batch()
             self._begin_rectangle_batch()
@@ -567,36 +551,60 @@ cdef class Renderer:
 
         cdef float[2] _fade = [fade / size[0] * 2, fade / size[1] * 2]
 
-        cdef Py_ssize_t curr_index
+        cdef size_t curr_index
         for i in range(4):
             curr_index = self.rectangle_vertex_count * RECTANGLE_VERTEX_STRIDE
             self._set_vertex_data_from_rectangle(curr_index, positions[i], local_positions[i], color, thickness, _fade)
             self.rectangle_vertex_count += 1
 
 
-    # line functions ----------------------------------- #
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef void _set_vertex_data_from_line(self, Py_ssize_t curr_index, float[3] position, float[4] color) nogil:
-        self.line_vertices[curr_index + 0] = position[0]
-        self.line_vertices[curr_index + 1] = position[1]
-        self.line_vertices[curr_index + 2] = position[2]
-        self.line_vertices[curr_index + 3] = color[0]
-        self.line_vertices[curr_index + 4] = color[1]
-        self.line_vertices[curr_index + 5] = color[2]
-        self.line_vertices[curr_index + 6] = color[3]
+    cdef void _set_vertex_data_from_rectangle(self, size_t curr_index, float[3] position, float[2] local_position, float[4] color, float[2] thickness, float[2] fade) nogil:
+        self.rectangle_vertices[curr_index + 0] = position[0]
+        self.rectangle_vertices[curr_index + 1] = position[1]
+        self.rectangle_vertices[curr_index + 2] = position[2]
+        self.rectangle_vertices[curr_index + 3] = local_position[0]
+        self.rectangle_vertices[curr_index + 4] = local_position[1]
+        self.rectangle_vertices[curr_index + 5] = color[0]
+        self.rectangle_vertices[curr_index + 6] = color[1]
+        self.rectangle_vertices[curr_index + 7] = color[2]
+        self.rectangle_vertices[curr_index + 8] = color[3]
+        self.rectangle_vertices[curr_index + 9] = thickness[0]
+        self.rectangle_vertices[curr_index + 10] = thickness[1]
+        self.rectangle_vertices[curr_index + 11] = fade[0]
+        self.rectangle_vertices[curr_index + 12] = fade[1]
 
 
+    # line functions ----------------------------------- #
     def draw_line(self, color, start, end, float width=1.0):
         cdef float[4] t_color
         self._handle_color(color, t_color)
         cdef float[2] t_start = [start[0], start[1]]
         cdef float[2] t_end = [end[0], end[1]]
 
-        self.cy_draw_line(t_color, t_start, t_end, width)
+        self._cy_draw_line(t_color, t_start, t_end, width)
 
 
-    cdef void cy_draw_line(self, float[4] color, float[2] start, float[2] end, float width):
+    def draw_lines(self, color, points, float width=1.0):
+        cdef float[4] t_color
+        self._handle_color(color, t_color)
+
+        cdef size_t i
+        cdef float[2] t_start
+        cdef float[2] t_end = points[0]
+        for i in range(1, len(points)):
+            point = points[i]
+            t_start = t_end
+            t_end = [point[0], point[1]]
+            self._cy_draw_line(t_color, t_start, t_end, width)
+
+
+    def draw_lines_miter(self, color, points, float width=1.0):
+        pass
+
+
+    cdef void _cy_draw_line(self, float[4] color, float[2] start, float[2] end, float width):
         if (self.line_vertex_count >= MAX_VERTEX_COUNT):
             self._end_line_batch()
             self._begin_line_batch()
@@ -612,31 +620,26 @@ cdef class Renderer:
         ]
 
         cdef int i
-        cdef Py_ssize_t curr_index
+        cdef size_t curr_index
         for i in range(4):
             curr_index = self.line_vertex_count * LINE_VERTEX_STRIDE
             self._set_vertex_data_from_line(curr_index, positions[i], color)
             self.line_vertex_count += 1
             
 
-    def draw_lines(self, color, points, float width=1.0):
-        cdef float[4] t_color
-        self._handle_color(color, t_color)
-
-        cdef Py_ssize_t i
-        cdef float[2] t_start
-        cdef float[2] t_end = points[0]
-        for i in range(1, len(points)):
-            point = points[i]
-            t_start = t_end
-            t_end = [point[0], point[1]]
-            self.cy_draw_line(t_color, t_start, t_end, width)
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef void _set_vertex_data_from_line(self, size_t curr_index, float[3] position, float[4] color) nogil:
+        self.line_vertices[curr_index + 0] = position[0]
+        self.line_vertices[curr_index + 1] = position[1]
+        self.line_vertices[curr_index + 2] = position[2]
+        self.line_vertices[curr_index + 3] = color[0]
+        self.line_vertices[curr_index + 4] = color[1]
+        self.line_vertices[curr_index + 5] = color[2]
+        self.line_vertices[curr_index + 6] = color[3]
 
 
-    def draw_lines_miter(self, color, points, float width=1.0):
-        pass
-
-
+    # extra functions
     cdef void _rotate_vector2(self, float[2] vector, float angle, float[2] result) nogil:
         cdef float s = math.sin(angle)
         cdef float c = math.cos(angle)

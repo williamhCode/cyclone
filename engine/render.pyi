@@ -2,7 +2,6 @@ import glm
 from engine.texture import Texture
 from .types import _Vec2, _Vec4, _Color
 
-
 class Renderer:
     def __init__(self) -> None: ...
     def set_size(self, width: int, height: int) -> None: ...

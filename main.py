@@ -15,8 +15,8 @@ class MainWindow(pyglet.window.Window):
 
         engine.render.init()
         
-        self.test1_tex_id = engine.texture.load_texture('imgs/test.png')
-        self.test2_tex_id = engine.texture.load_texture('imgs/test2.jpeg')
+        self.test1_tex_id = engine.texture.Texture.from_path('imgs/test.png')
+        self.test2_tex_id = engine.texture.Texture.from_path('imgs/test2.jpeg')
 
         self.timer = Timer()
         

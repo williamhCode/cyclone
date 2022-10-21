@@ -6,6 +6,7 @@ import numpy as np
 
 import engine
 from engine.render import Renderer
+from engine.texture import Texture
 
 def spinning_star(renderer: Renderer, time):
     points = []
@@ -40,7 +41,7 @@ def main():
     renderer.set_size(*WIN_SIZE)
 
     # texture_1 = engine.texture.load_texture("imgs/test.png")
-    texture_1 = engine.texture.load_texture("imgs/Flappy Bird_1.png")
+    texture_1 = Texture.from_path("imgs/Flappy Bird_1.png")
     texture_1.width = 10
     texture_1.height = 10
 
@@ -52,7 +53,7 @@ def main():
     running = True
     while running:
         # timing -------------------------------------------------- #
-        dt = clock.tick(60)
+        dt = clock.tick()
 
         framerate = clock.get_fps()
         pygame.display.set_caption(f"Running at {framerate :.2f} fps.")
@@ -69,9 +70,10 @@ def main():
         renderer.begin()
         renderer.clear()
 
-        #     for j in range(300):
-        # for i in range(200):
-        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
+
+        for j in range(100):
+            for i in range(100):
+                renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # for i in range(100):
         #     for j in range(100):
@@ -87,7 +89,7 @@ def main():
         # renderer.draw_rectangle((255, 0, 0, 255), (500, 100), (100, 200), rotation=0, width=30, fade=10)
         # renderer.draw_rectangle((255, 0, 0, 255), (100, 100), (400, 100), rotation=0, width=10, fade=10)
 
-        spinning_star(renderer, time)
+        # spinning_star(renderer, time)
 
         renderer.end()
         time += dt
