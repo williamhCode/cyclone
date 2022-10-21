@@ -13,13 +13,6 @@ from ctypes import c_void_p
 
 cimport cython
 from libc cimport math
-from libcpp cimport vector
-
-# from engine.test cimport TestClass
-# cdef TestClass tc = TestClass()
-# print(tc.x, tc.y)
-
-cimport engine.libs.glad as gl
 
 
 DEF MAX_QUAD_COUNT = 100000
@@ -81,8 +74,7 @@ cdef class Renderer:
 
 
     def __init__(self):
-        # gl.glEnable(gl.GL_DEPTH_TEST)
-
+        glEnable(GL_DEPTH_TEST)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
        

@@ -40,7 +40,6 @@ draw_lines_miter	./engine/render.pyx	/^    def draw_lines_miter(self, color, poi
 draw_rectangle	./engine/render.pyx	/^    def draw_rectangle(self, color, position, size, float rotation=0.0, offset=[0.0, 0.0], float/;"	m	class:Renderer
 draw_texture	./engine/render.pyx	/^    def draw_texture(self, texture: Texture, position, float rotation=0.0, offset=[0.0, 0.0], bi/;"	m	class:Renderer
 end	./engine/render.pyx	/^    def end(self):$/;"	m	class:Renderer
-gl	./engine/render.pyx	/^cimport engine.libs.glad as gl$/;"	I	nameref:module:engine.libs.glad
 np	./engine/render.pyx	/^import numpy as np$/;"	I	nameref:module:numpy
 set_clear_color	./engine/render.pyx	/^    def set_clear_color(self, color):$/;"	m	class:Renderer
 set_size	./engine/render.pyx	/^    def set_size(self, width: int, height: int):$/;"	m	class:Renderer
