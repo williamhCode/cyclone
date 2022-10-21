@@ -10,3 +10,4 @@ test.py
 .zshrc
 dist
 *.spec
+tags

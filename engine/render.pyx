@@ -15,10 +15,6 @@ cimport cython
 from libc cimport math
 from libcpp cimport vector
 
-# from engine.test cimport TestClass
-# cdef TestClass tc = TestClass()
-# print(tc.x, tc.y)
-
 cimport engine.libs.glad as gl
 
 

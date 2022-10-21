@@ -7,7 +7,6 @@ from glm import vec2
 import engine.timer as timer
 import math
 
-import engine
 from engine.render import Renderer
 
 from dataclasses import dataclass
