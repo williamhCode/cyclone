@@ -2,6 +2,10 @@ from engine.libs.glad cimport *
 from engine.libs.glfw cimport *
 
 
+cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
+    glViewport(0, 0, width, height)
+
+
 cdef class Window:
     cdef GLFWwindow* window
 
@@ -27,6 +31,12 @@ cdef class Window:
 
         glfwSetFramebufferSizeCallback(self.window, framebuffer_size_callback)
 
+    def set_should_close(self, bint should_close):
+        glfwSetWindowShouldClose(self.window, should_close)
+
+    def should_close(self):
+        return glfwWindowShouldClose(self.window)
+
     def get_key(self, key):
         return glfwGetKey(self.window, key)
 
@@ -36,8 +46,4 @@ cdef class Window:
 
     def quit(self):
         glfwTerminate()
-
-cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
-    glViewport(0, 0, width, height)
-
 

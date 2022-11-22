@@ -15,7 +15,7 @@ libraries = {
 }
 include_dirs = [
     "./engine/libs/include", 
-    "./engine/libs"
+    # "./engine/libs"
 ]
 library_dirs = {
     "Darwin": ["./engine/libs/shared/Darwin"],
@@ -65,8 +65,10 @@ if __name__ == "__main__":
     files= [
         ("engine.render", "./engine/render.pyx"),
         ("engine.window", "./engine/window.pyx"),
-        ("engine.constants", "./engine/constants.py")
+        ("engine.constants", "./engine/constants.py"),
+        ("engine.shader", "./engine/shader.pyx")
     ]
+
     for ext_name, ext_path in files:
         ext = Extension(
             name=ext_name, 
