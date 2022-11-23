@@ -8,7 +8,7 @@ from libc cimport math
 from libcpp.vector cimport vector
 
 from engine.libs.glad cimport *
-from engine.shader cimport Shader
+from engine.shader cimport *
 
 
 DEF MAX_QUAD_COUNT = 100000
@@ -23,59 +23,22 @@ DEF LINE_VERTEX_STRIDE = 7
 
 cdef class Renderer:
     cdef:
-        # quad variables
-        unsigned int quad_vao
-        unsigned int quad_vbo
-        unsigned int quad_ibo
-        
-        vector[float] quad_vertices
-        int quad_vertex_count 
-
-        unsigned int[MAX_TEXTURES] texture_slots
-        int texture_slot_index
-
-        # circle variables
-        unsigned int circle_vao
-        unsigned int circle_vbo
-        unsigned int circle_ibo
-        
-        vector[float] circle_vertices
-        int circle_vertex_count 
-
-        # rectangle variables
-        unsigned int rectangle_vao
-        unsigned int rectangle_vbo
-        unsigned int rectangle_ibo
-
-        vector[float] rectangle_vertices
-        int rectangle_vertex_count 
-
-        # line variables
-        unsigned int line_vao
-        unsigned int line_vbo
-        unsigned int line_ibo
-
-        vector[float] line_vertices
-        int line_vertex_count 
-
         # shaders
         Shader quad_shader
         Shader circle_shader
         Shader rectangle_shader
         Shader line_shader
-        list shaders
-
-        # matrices
-        object view_matrix
+        Shader[4] shaders
 
     def __init__(self):
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        self.quad_shader = Shader(b'./engine/shaders/quad.vert', b'./engine/shaders/quad.frag')
-        self.circle_shader = Shader(b'./engine/shaders/circle.vert', b'./engine/shaders/circle.frag')
-        self.rectangle_shader = Shader(b'./engine/shaders/rectangle.vert', b'./engine/shaders/rectangle.frag')
-        self.line_shader = Shader(b'./engine/shaders/line.vert', b'./engine/shaders/line.frag')
+        self.quad_shader = shader_create(b'./engine/shaders/quad.vert', b'./engine/shaders/quad.frag')
+        self.circle_shader = shader_create(b'./engine/shaders/circle.vert', b'./engine/shaders/circle.frag')
+        self.rectangle_shader = shader_create(b'./engine/shaders/rectangle.vert', b'./engine/shaders/rectangle.frag')
+        self.line_shader = shader_create(b'./engine/shaders/line.vert', b'./engine/shaders/line.frag')
+        self.shaders = [self.quad_shader, self.circle_shader, self.rectangle_shader, self.line_shader]
 
     def set_size(self, width: int, height: int):
         pass

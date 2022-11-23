@@ -1,8 +1,12 @@
-from libcpp.string cimport string as cppstring
 from engine.libs.glad cimport *
 
-cdef class Shader:
-    cdef unsigned int ID;
+cdef struct Shader:
+    GLuint ID, vs_ID, fs_ID
 
-    cdef void checkCompileErrors(self, GLuint shader, cppstring compile_type)
+cdef Shader shader_create(char* vertexPath, char* fragmentPath)
+
+cdef void shader_destroy(Shader self)
+
+cdef void shader_use(Shader self)
+
 

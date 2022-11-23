@@ -1,16 +1,22 @@
 from libc.stdio cimport *
+from libc.string cimport strcmp
 from libc.stdlib cimport malloc, free
-from libcpp.string cimport string as cppstring
 from engine.libs.glad cimport *
 
 import errno
 import os
+import sys
+import traceback
 
 cdef char *read_file(char *filename):
     cdef FILE *file = fopen(filename, "r")
   
     if (file == NULL):
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+        try:
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+        except Exception as e:
+            traceback.print_exc()
+            sys.exit()
   
     fseek(file, 0, SEEK_END) 
     cdef int length = ftell(file)
@@ -31,49 +37,68 @@ cdef char *read_file(char *filename):
 
     return out
 
+cdef void _checkCompileErrors(GLuint shader, char *compile_type, char *path):
+    cdef GLint success
+    cdef GLchar infoLog[1024]
+    if (strcmp(compile_type, "PROGRAM") != 0):
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success)
+        if (not success):
+            glGetShaderInfoLog(shader, 1024, NULL, infoLog)
+            try:
+                raise RuntimeError(f"Error compiling shader at {path.decode()}:\n{infoLog.decode()}")
+            except Exception as e:
+                traceback.print_exc()
+                sys.exit()
 
-cdef class Shader:
+    else:
+        glGetProgramiv(shader, GL_LINK_STATUS, &success)
+        if (not success):
+            glGetProgramInfoLog(shader, 1024, NULL, infoLog)
+            try:
+                raise RuntimeError(f"Error linking shader at {path.decode()}:\n{infoLog.decode()}")
+            except Exception as e:
+                traceback.print_exc()
+                sys.exit()
 
-    def __cinit__(self, char* vertexPath, char* fragmentPath):
-        cdef char* vShaderCode = read_file(vertexPath)
-        cdef char* fShaderCode = read_file(fragmentPath)
+cdef Shader shader_create(char* vs_path, char* fs_path):
+    cdef Shader self
 
-        cdef unsigned int vertex, fragment
+    cdef char* vShaderCode = read_file(vs_path)
+    cdef char* fShaderCode = read_file(fs_path)
 
-        vertex = glCreateShader(GL_VERTEX_SHADER)
-        glShaderSource(vertex, 1, &vShaderCode, NULL)
-        glCompileShader(vertex)
-        self.checkCompileErrors(vertex, b"VERTEX")
+    # vertex shader
+    self.vs_ID = glCreateShader(GL_VERTEX_SHADER)
+    glShaderSource(self.vs_ID, 1, &vShaderCode, NULL)
+    glCompileShader(self.vs_ID)
+    _checkCompileErrors(self.vs_ID, b"VERTEX", vs_path)
 
-        fragment = glCreateShader(GL_FRAGMENT_SHADER)
-        glShaderSource(fragment, 1, &fShaderCode, NULL)
-        glCompileShader(fragment)
-        self.checkCompileErrors(fragment, b"FRAGMENT")
+    # fragment shader
+    self.fs_ID = glCreateShader(GL_FRAGMENT_SHADER)
+    glShaderSource(self.fs_ID, 1, &fShaderCode, NULL)
+    glCompileShader(self.fs_ID)
+    _checkCompileErrors(self.fs_ID, b"FRAGMENT", fs_path)
 
-        self.ID = glCreateProgram()
-        glAttachShader(self.ID, vertex)
-        glAttachShader(self.ID, fragment)
-        glLinkProgram(self.ID)
-        self.checkCompileErrors(self.ID, b"PROGRAM")
+    # shader program
+    self.ID = glCreateProgram()
+    glAttachShader(self.ID, self.vs_ID)
+    glAttachShader(self.ID, self.fs_ID)
+    glLinkProgram(self.ID)
 
-        free(vShaderCode)
-        free(fShaderCode)
+    cdef char buf[512];
+    snprintf(buf, 512, "[%s, %s]", vs_path, fs_path);
+    _checkCompileErrors(self.ID, b"PROGRAM", buf)
 
-    cdef void checkCompileErrors(self, GLuint shader, cppstring compile_type):
-        cdef GLint success
-        cdef GLchar infoLog[1024]
-        if (compile_type != b"PROGRAM"):
-            glGetShaderiv(shader, GL_COMPILE_STATUS, &success)
-            if (not success):
-                glGetShaderInfoLog(shader, 1024, NULL, infoLog)
-                print("ERROR::SHADER_COMPILATION_ERROR of compile_type: ", compile_type.decode())
-                print(infoLog.decode())
-                print("-- --------------------------------------------------- -- ")
-        else:
-            glGetProgramiv(shader, GL_LINK_STATUS, &success)
-            if (not success):
-                glGetProgramInfoLog(shader, 1024, NULL, infoLog)
-                print("ERROR::PROGRAM_LINKING_ERROR of compile_type: ", compile_type.decode())
-                print(infoLog.decode())
-                print("-- --------------------------------------------------- -- ")
+    free(vShaderCode)
+    free(fShaderCode)
+
+    return self
+
+cdef void shader_destroy(Shader self):
+    glDeleteProgram(self.ID);
+    glDeleteShader(self.vs_ID);
+    glDeleteShader(self.fs_ID);
+
+cdef void shader_use(Shader self):
+    glUseProgram(self.ID); 
+
 
