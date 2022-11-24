@@ -27,16 +27,6 @@ cdef extern from "glm/glm.hpp" namespace "glm":
     ctypedef vec[_L, float, _Q] vec4
 
 
-    # bvec
-    ctypedef length_t _L "2"
-    ctypedef vec[_L, bint, _Q] bvec2
-
-    ctypedef length_t _L "3"
-    ctypedef vec[_L, bint, _Q] bvec3
-
-    ctypedef length_t _L "4"
-    ctypedef vec[_L, bint, _Q] bvec4
-
     vec[L, T, Q] radians[L, T, Q](vec[L, T, Q]&)
 
     vec[L, T, Q] pow[L, T, Q](vec[L, T, Q]&, vec[L, T, Q]&)

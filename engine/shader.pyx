@@ -10,15 +10,15 @@ import traceback
 
 cdef char *read_file(char *filename):
     cdef FILE *file = fopen(filename, "r")
-  
+
     if (file == NULL):
         try:
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
         except Exception as e:
             traceback.print_exc()
             sys.exit()
-  
-    fseek(file, 0, SEEK_END) 
+
+    fseek(file, 0, SEEK_END)
     cdef int length = ftell(file)
     fseek(file, 0, SEEK_SET)
 
@@ -60,11 +60,11 @@ cdef void _checkCompileErrors(GLuint shader, char *compile_type, char *path):
                 traceback.print_exc()
                 sys.exit()
 
-cdef Shader shader_create(char* vs_path, char* fs_path):
+cdef Shader create(char *vs_path, char *fs_path):
     cdef Shader self
 
-    cdef char* vShaderCode = read_file(vs_path)
-    cdef char* fShaderCode = read_file(fs_path)
+    cdef char *vShaderCode = read_file(vs_path)
+    cdef char *fShaderCode = read_file(fs_path)
 
     # vertex shader
     self.vs_ID = glCreateShader(GL_VERTEX_SHADER)
@@ -93,12 +93,16 @@ cdef Shader shader_create(char* vs_path, char* fs_path):
 
     return self
 
-cdef void shader_destroy(Shader self):
+cdef void destroy(Shader self):
     glDeleteProgram(self.ID);
     glDeleteShader(self.vs_ID);
     glDeleteShader(self.fs_ID);
 
-cdef void shader_use(Shader self):
-    glUseProgram(self.ID); 
+cdef void use(Shader self):
+    glUseProgram(self.ID);
+
+cdef void set_int_array(Shader self, char *name, GLsizei count, const GLint *values):
+    glUniform1iv(glGetUniformLocation(self.ID, name), count, values)
+
 
 

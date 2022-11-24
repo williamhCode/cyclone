@@ -103,7 +103,7 @@ cdef class Renderer:
             GL_ARRAY_BUFFER, self.quad_vertices.nbytes, None, GL_DYNAMIC_DRAW
         )
 
-        # 3 position, 4 color, 2 tex_coords, 1 tex_index
+        # 3 position, 4 color, 2 tex_coord, 1 tex_index
         self._set_attrib_pointers(4, [3, 4, 2, 1])
 
         # generate index buffer object and buffer data
