@@ -86,8 +86,8 @@ cdef void shader_create(Shader *self, const char *vs_path, const char *fs_path):
     glAttachShader(self.ID, self.fs_ID)
     glLinkProgram(self.ID)
 
-    cdef char buf[512];
-    snprintf(buf, 512, "[%s, %s]", vs_path, fs_path);
+    cdef char buf[512]
+    snprintf(buf, 512, "[%s, %s]", vs_path, fs_path)
     _checkCompileErrors(self.ID, b"PROGRAM", buf)
 
     free(vShaderCode)

@@ -8,6 +8,7 @@ from engine.libs.glad cimport *
 from engine.libs.cglm cimport *
 
 from engine.shader cimport *
+from engine.texture cimport Texture
 
 import sys
 
@@ -61,6 +62,9 @@ cdef class Renderer:
         unsigned int quad_count
         QuadVertex *quad_vertices
         QuadVertex *quad_vertices_ptr
+
+        GLuint *texture_slots
+        size_t texture_slot_index
 
         # circle attribs
         GLuint circle_vao
@@ -155,6 +159,8 @@ cdef class Renderer:
             GL_ELEMENT_ARRAY_BUFFER, 
             self.MAX_INDICES * sizeof(unsigned int), indices, GL_STATIC_DRAW
         )
+
+        self.texture_slots = <GLuint *>malloc(self.MAX_TEXTURE_SLOTS * sizeof(GLuint))
 
         # circle initialization ----------------------------------------- #
         self.circle_vertices = <CircleVertex *>malloc(self.MAX_VERTICES * sizeof(CircleVertex))
@@ -255,6 +261,19 @@ cdef class Renderer:
         free(indices)
 
 
+    def __del__(self):
+        cdef Shader shader
+        for shader in self.shaders:
+            shader_destroy(&shader)
+
+        free(self.quad_vertices)
+        free(self.circle_vertices)
+        free(self.rectangle_vertices)
+        free(self.line_vertices)
+
+        free(self.texture_slots)
+
+
     def set_size(self, int width, int height):
         cdef mat4 proj_matrix
         glm_ortho(0, width, 0, height, 0, 1, proj_matrix)
@@ -281,6 +300,7 @@ cdef class Renderer:
     cdef void _begin_quad_batch(self):
         self.quad_count = 0
         self.quad_vertices_ptr = self.quad_vertices
+        self.texture_slot_index = 1
 
 
     cdef void _begin_circle_batch(self):
@@ -310,7 +330,7 @@ cdef class Renderer:
             shader_use(&shader)
             shader_set_mat4(&shader, 'u_View', view_matrix)
 
-        # self._begin_quad_batch()
+        self._begin_quad_batch()
         # self._begin_circle_batch()
         self._begin_rectangle_batch()
         # self._begin_line_batch()
@@ -325,7 +345,7 @@ cdef class Renderer:
             self.quad_vertices
         )
 
-        cdef int i
+        cdef size_t i
         for i in range(self.texture_slot_index):
             glActiveTexture(GL_TEXTURE0 + i)
             glBindTexture(GL_TEXTURE_2D, self.texture_slots[i])
@@ -375,7 +395,7 @@ cdef class Renderer:
 
 
     def end(self):
-        # self._end_quad_batch()
+        self._end_quad_batch()
         # self._end_circle_batch()
         self._end_rectangle_batch()
         # self._end_line_batch()
@@ -388,8 +408,76 @@ cdef class Renderer:
             color[:4] = [py_color[0]/255.0, py_color[1]/255.0, py_color[2]/255.0, py_color[3]/255.0]
 
 
-    def draw_texture(self, texture: Texture, position, float rotation=0.0, offset=[0.0, 0.0], bint flipped=False, color=[255, 255, 255, 255]):
-        pass
+    def draw_texture(self, Texture texture, position, float rotation=0.0, offset=[0.0, 0.0], bint flipped=False, color=[255, 255, 255, 255]):
+        cdef GLuint texture_id = texture.texture_id
+        cdef vec2 t_position = [position[0], position[1]]
+        cdef vec2 t_size = [texture.width, texture.height]
+        cdef vec2 t_offset = [offset[0], offset[1]]
+        cdef vec4 t_color
+        self._handle_color(color, t_color)
+
+        self._draw_texture(texture_id, t_position, t_size, rotation, t_offset, flipped, t_color)
+
+
+    cdef void _draw_texture(self, GLuint texture_id, vec2 position, vec2 size, float rotation, vec2 offset, bint flipped, vec4 color):
+        cdef size_t i
+
+        if (self.quad_count >= self.MAX_QUADS or self.texture_slot_index >= self.MAX_TEXTURE_SLOTS):
+            self._end_quad_batch()
+            self._begin_quad_batch()
+
+        cdef float rad_rotation = rotation * math.pi / 180.0
+
+        cdef float texture_index = 0.0
+        for i in range(1, self.texture_slot_index):
+            if (self.texture_slots[i] == texture_id):
+                texture_index = <float>i
+                break
+
+        if (texture_index == 0.0):
+            texture_index = <float>self.texture_slot_index
+            self.texture_slots[self.texture_slot_index] = texture_id
+            self.texture_slot_index += 1
+
+        cdef vec3[4] positions = [
+            [0, 0, 0],
+            [size[0], 0, 0],
+            [size[0], size[1], 0],
+            [0, size[1], 0]
+        ]
+        for i in range(4):
+            positions[i][0] += offset[0]
+            positions[i][1] += offset[1]
+        for i in range(4):
+            glm_vec3_rotate(positions[i], rad_rotation, [0, 0, 1])
+        for i in range(4):
+            positions[i][0] += position[0]
+            positions[i][1] += position[1]
+
+        cdef vec2 tex_coords[4]
+        if (flipped == 0):
+            tex_coords = [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [0, 1]
+            ]
+        else:
+            tex_coords = [
+                [1, 0],
+                [0, 0],
+                [0, 1],
+                [1, 1]
+            ]
+
+        for i in range(4):
+            self.quad_vertices_ptr.position = positions[i]
+            self.quad_vertices_ptr.color = color
+            self.quad_vertices_ptr.tex_coord = tex_coords[i]
+            self.quad_vertices_ptr.tex_index = texture_index
+            self.quad_vertices_ptr += 1
+
+        self.quad_count += 1
 
 
     def draw_circle(self, color, position, float radius, float width = 0.0, float fade = 0.0):
@@ -404,10 +492,10 @@ cdef class Renderer:
         cdef vec2 t_size = [size[0], size[1]]
         cdef vec2 t_offset = [offset[0], offset[1]]
 
-        self._cy_draw_rectangle(t_color, t_position, t_size, rotation, t_offset, width, fade)
+        self._draw_rectangle(t_color, t_position, t_size, rotation, t_offset, width, fade)
 
 
-    cdef void _cy_draw_rectangle(self, vec4 color, vec2 position, vec2 size, float rotation, vec2 offset, float width, float fade):
+    cdef void _draw_rectangle(self, vec4 color, vec2 position, vec2 size, float rotation, vec2 offset, float width, float fade):
         cdef size_t i
 
         if (self.rectangle_count >= self.MAX_QUADS):

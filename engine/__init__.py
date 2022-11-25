@@ -1,4 +1,4 @@
 from . import render
-# from . import texture
-# from . import timer
+from . import texture
+from . import timer
 
