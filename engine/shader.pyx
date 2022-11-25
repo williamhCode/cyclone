@@ -10,7 +10,7 @@ import sys
 import traceback
 
 
-cdef char *read_file(char *filename):
+cdef char *read_file(const char *filename):
     cdef FILE *file = fopen(filename, "r")
 
     if (file == NULL):
@@ -40,7 +40,7 @@ cdef char *read_file(char *filename):
     return out
 
 
-cdef void _checkCompileErrors(GLuint shader, char *compile_type, char *path):
+cdef void _checkCompileErrors(GLuint shader, const char *compile_type, const char *path):
     cdef GLint success
     cdef GLchar infoLog[1024]
     if (strcmp(compile_type, "PROGRAM") != 0):
@@ -64,9 +64,7 @@ cdef void _checkCompileErrors(GLuint shader, char *compile_type, char *path):
                 sys.exit()
 
 
-cdef Shader shader_create(char *vs_path, char *fs_path):
-    cdef Shader self
-
+cdef void shader_create(Shader *self, const char *vs_path, const char *fs_path):
     cdef char *vShaderCode = read_file(vs_path)
     cdef char *fShaderCode = read_file(fs_path)
 
@@ -95,24 +93,22 @@ cdef Shader shader_create(char *vs_path, char *fs_path):
     free(vShaderCode)
     free(fShaderCode)
 
-    return self
 
-
-cdef void shader_destroy(Shader self):
+cdef void shader_destroy(const Shader *self):
     glDeleteProgram(self.ID);
     glDeleteShader(self.vs_ID);
     glDeleteShader(self.fs_ID);
 
 
-cdef void shader_use(Shader self):
+cdef void shader_use(const Shader *self):
     glUseProgram(self.ID);
 
 
-cdef void shader_set_int_array(Shader self, const char *name, GLsizei count, const GLint *values):
+cdef void shader_set_int_array(const Shader *self, const char *name, GLsizei count, const GLint *values):
     glUniform1iv(glGetUniformLocation(self.ID, name), count, values)
 
 
-cdef void shader_set_mat4(Shader self, const char *name, mat4 mat):
+cdef void shader_set_mat4(const Shader *self, const char *name, const mat4 mat):
     glUniformMatrix4fv(glGetUniformLocation(self.ID, name), 1, GL_FALSE, <float *>mat)
 
 

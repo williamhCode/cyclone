@@ -9,7 +9,7 @@ cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
 cdef class Window:
     cdef GLFWwindow* window
 
-    def __init__(self, size, window_name="'Engine Name' Window"):
+    def __init__(self, size, window_name="'Engine Name' Window", vsync=False):
         window_name = window_name.encode()
 
         glfwInit()
@@ -31,7 +31,8 @@ cdef class Window:
 
         glfwSetFramebufferSizeCallback(self.window, framebuffer_size_callback)
 
-        glfwSwapInterval(0)
+        if vsync == False:
+            glfwSwapInterval(0)
 
     def set_title(self, name):
         glfwSetWindowTitle(self.window, name.encode());
