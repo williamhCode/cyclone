@@ -1,8 +1,15 @@
-# 2D-Graphics-Lib
-A 2D batch renderer written in Python, Cython and OpenGL.
+# 2D-Graphics-Lib (trying to come up with an actual name)
+_A 2D batch renderer written in Python, Cython and OpenGL._
 
-### Instructions
-`python setup.py` to build Cython sources. Engine code in 'engine/'.
+## Goal
+There are many great 2D python graphics libraries like pygame, pyglet, and arcade. However, they either lack in performance, or have a steep learning curve
+The purpose of the library is to provide a blazingly fast Python 2D graphics library that is, at the same time, easy to use and pick up. 
 
-__Goal:__ To write a blazingly fast Python 2D graphics library in modern OpenGL(4.1) with the power of Cython.\
-__Furture Plans:__ Use cross platform graphics api such as bgfx for better compatibility. OpenGL is deprecated by Apple, and I don't know how long it will last before they remove OpenGL drivers. In addition, OpenGL drivers on m1 macs are kind of bad (only 16 texture slots).
+The design philosophy is BYO (bring your own), meaning that it only takes care of windowing and drawing, and nothing else. This makes it easy to integrate with external libraries like a physics engine that has their own vector classes, objects, etc., and also makes it a lot more flexible. Plus, why rewrite when there's already awesome libraries out there?
+
+## Building
+`python setup.py` to build Cython sources. Engine code in 'engine/'.  
+
+_Note: currently only builds for macOS_
+
+
