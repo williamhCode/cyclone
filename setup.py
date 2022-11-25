@@ -10,21 +10,21 @@ import platform
 libraries = {
     "Darwin": [
         "glad",
-        "glfw"
+        "glfw",
+        # "cglm"
     ]
 }
 include_dirs = [
     "./engine/libs/include", 
-    # "./engine/libs"
 ]
 library_dirs = {
     "Darwin": ["./engine/libs/shared/Darwin"],
 }
 
-language = "c++"
+language = "c"
 default = ["-w"]
-debug_args = ["-w", "-std=c11", "-O0"]
-release_args = ["-w", "-std=c11", "-O3", "-ffast-math", "-march=native"]
+debug_args = ["-w", "-std=c++11", "-O0"]
+release_args = ["-w", "-std=c++11", "-O3", "-ffast-math", "-march=native"]
 
 args = default
 # args = debug_args

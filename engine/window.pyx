@@ -31,6 +31,11 @@ cdef class Window:
 
         glfwSetFramebufferSizeCallback(self.window, framebuffer_size_callback)
 
+        glfwSwapInterval(0)
+
+    def set_title(self, name):
+        glfwSetWindowTitle(self.window, name.encode());
+
     def set_should_close(self, bint should_close):
         glfwSetWindowShouldClose(self.window, should_close)
 

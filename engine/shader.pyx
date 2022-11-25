@@ -2,11 +2,13 @@ from libc.stdio cimport *
 from libc.string cimport strcmp
 from libc.stdlib cimport malloc, free
 from engine.libs.glad cimport *
+from engine.libs.cglm cimport *
 
 import errno
 import os
 import sys
 import traceback
+
 
 cdef char *read_file(char *filename):
     cdef FILE *file = fopen(filename, "r")
@@ -37,6 +39,7 @@ cdef char *read_file(char *filename):
 
     return out
 
+
 cdef void _checkCompileErrors(GLuint shader, char *compile_type, char *path):
     cdef GLint success
     cdef GLchar infoLog[1024]
@@ -60,7 +63,8 @@ cdef void _checkCompileErrors(GLuint shader, char *compile_type, char *path):
                 traceback.print_exc()
                 sys.exit()
 
-cdef Shader create(char *vs_path, char *fs_path):
+
+cdef Shader shader_create(char *vs_path, char *fs_path):
     cdef Shader self
 
     cdef char *vShaderCode = read_file(vs_path)
@@ -93,16 +97,22 @@ cdef Shader create(char *vs_path, char *fs_path):
 
     return self
 
-cdef void destroy(Shader self):
+
+cdef void shader_destroy(Shader self):
     glDeleteProgram(self.ID);
     glDeleteShader(self.vs_ID);
     glDeleteShader(self.fs_ID);
 
-cdef void use(Shader self):
+
+cdef void shader_use(Shader self):
     glUseProgram(self.ID);
 
-cdef void set_int_array(Shader self, char *name, GLsizei count, const GLint *values):
+
+cdef void shader_set_int_array(Shader self, const char *name, GLsizei count, const GLint *values):
     glUniform1iv(glGetUniformLocation(self.ID, name), count, values)
 
+
+cdef void shader_set_mat4(Shader self, const char *name, mat4 mat):
+    glUniformMatrix4fv(glGetUniformLocation(self.ID, name), 1, GL_FALSE, <float *>mat)
 
 
