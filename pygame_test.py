@@ -71,20 +71,20 @@ def main():
         renderer.clear()
 
 
-        # for j in range(100):
-        #     for i in range(100):
-        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
+        for j in range(300):
+            for i in range(200):
+                renderer.draw_texture(texture_1, (i * 10, j * 10))
 
-        # for i in range(100):
-        #     for j in range(100):
+        # for i in range(300):
+        #     for j in range(200):
         #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 5, width=1, fade=0.5)
 
         # renderer.draw_circle((255, 0, 0, 255), (500, 300), 100, width=10, fade=10)
         # renderer.draw_circle((0, 255, 255, 240), (600, 300), 50, width=0, fade=5)
 
-        for i in range(200):
-            for j in range(300):
-                renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10)
+        # for i in range(200):
+        #     for j in range(300):
+        #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10)
 
         # renderer.draw_rectangle((255, 0, 0, 255), (500, 100), (100, 200), rotation=0, width=30, fade=10)
         # renderer.draw_rectangle((255, 0, 0, 255), (100, 100), (400, 100), rotation=0, width=10, fade=10)
