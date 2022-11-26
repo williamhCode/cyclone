@@ -30,10 +30,13 @@ def main():
         renderer.begin()
         renderer.clear()
 
-        for j in range(300):
-            for i in range(300):
-                renderer.draw_texture(texture_1, (i * 10, j * 10))
-        # renderer.draw_texture(texture_1, (10, 10))
+        # for j in range(300):
+        #     for i in range(200):
+        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
+
+        for i in range(300):
+            for j in range(200):
+                renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 5, width=2, fade=0.5)
 
         # for i in range(300):
         #     for j in range(200):

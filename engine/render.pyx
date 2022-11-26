@@ -331,7 +331,7 @@ cdef class Renderer:
             shader_set_mat4(&shader, 'u_View', view_matrix)
 
         self._begin_quad_batch()
-        # self._begin_circle_batch()
+        self._begin_circle_batch()
         self._begin_rectangle_batch()
         # self._begin_line_batch()
 
@@ -396,7 +396,7 @@ cdef class Renderer:
 
     def end(self):
         self._end_quad_batch()
-        # self._end_circle_batch()
+        self._end_circle_batch()
         self._end_rectangle_batch()
         # self._end_line_batch()
 
@@ -481,7 +481,50 @@ cdef class Renderer:
 
 
     def draw_circle(self, color, position, float radius, float width = 0.0, float fade = 0.0):
-        pass
+        cdef vec4 t_color
+        self._handle_color(color, t_color)
+        cdef vec2 t_position = [position[0], position[1]]
+
+        self._draw_circle(t_color, t_position, radius, width, fade)
+
+
+    cdef void _draw_circle(self, vec4 color, vec2 position, float radius, float width = 0.0, float fade = 0.0):
+        if (self.circle_count >= self.MAX_QUADS):
+            self._end_circle_batch()
+            self._begin_circle_batch()
+
+        cdef vec3[4] positions = [
+            [position[0] - radius, position[1] - radius, 0],
+            [position[0] + radius, position[1] - radius, 0],
+            [position[0] + radius, position[1] + radius, 0],
+            [position[0] - radius, position[1] + radius, 0]
+        ]
+        
+        cdef vec2[4] local_positions = [
+            [-1.0, -1.0],
+            [ 1.0, -1.0],
+            [ 1.0,  1.0],
+            [-1.0,  1.0]
+        ]
+
+        cdef float thickness
+        if width == 0.0:
+            thickness = 1.0
+        else:
+            thickness = width / radius
+
+        fade = fade / radius
+
+        cdef size_t i
+        for i in range(4):
+            self.circle_vertices_ptr.position = positions[i]
+            self.circle_vertices_ptr.local_position = local_positions[i]
+            self.circle_vertices_ptr.color = color
+            self.circle_vertices_ptr.thickness = thickness
+            self.circle_vertices_ptr.fade = fade
+            self.circle_vertices_ptr += 1
+
+        self.circle_count += 1
 
 
     # rectangle functions ----------------------------------- #
