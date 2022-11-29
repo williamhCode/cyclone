@@ -333,7 +333,7 @@ cdef class Renderer:
         self._begin_quad_batch()
         self._begin_circle_batch()
         self._begin_rectangle_batch()
-        # self._begin_line_batch()
+        self._begin_line_batch()
 
 
     # end functions --------------------------------- #
@@ -398,7 +398,7 @@ cdef class Renderer:
         self._end_quad_batch()
         self._end_circle_batch()
         self._end_rectangle_batch()
-        # self._end_line_batch()
+        self._end_line_batch()
 
     # drawing -------------------------------------- #
     cdef void _handle_color(self, py_color, vec4 color):
@@ -589,11 +589,51 @@ cdef class Renderer:
 
 
     def draw_line(self, color, start, end, float width=1.0):
-        pass
+        cdef vec4 t_color
+        self._handle_color(color, t_color)
+        cdef vec2 t_start = [start[0], start[1]]
+        cdef vec2 t_end = [end[0], end[1]]
+
+        self._draw_line(t_color, t_start, t_end, width)
 
 
     def draw_lines(self, color, points, float width=1.0):
-        pass
+        cdef vec4 t_color
+        self._handle_color(color, t_color)
+
+        cdef size_t i
+        cdef vec2 t_start
+        point = points[0]
+        cdef vec2 t_end = [point[0], point[1]]
+        for i in range(1, len(points)):
+            point = points[i]
+            t_start = t_end
+            t_end = [point[0], point[1]]
+            self._draw_line(t_color, t_start, t_end, width)
+
+
+    cdef void _draw_line(self, vec4 color, vec2 start, vec2 end, float width):
+        if (self.line_count >= self.MAX_QUADS):
+            self._end_line_batch()
+            self._begin_line_batch()
+
+        cdef float corner_angle = math.atan2(end[1] - start[1], end[0] - start[0]) + math.pi / 2
+        cdef vec2 corner_offset
+        glm_vec2_rotate([width / 2, 0], corner_angle, corner_offset)
+        cdef vec3[4] positions = [
+            [start[0] + corner_offset[0], start[1] + corner_offset[1], 0],
+            [start[0] - corner_offset[0], start[1] - corner_offset[1], 0],
+            [end[0] - corner_offset[0], end[1] - corner_offset[1], 0],
+            [end[0] + corner_offset[0], end[1] + corner_offset[1], 0],
+        ]
+
+        cdef size_t i
+        for i in range(4):
+            self.line_vertices_ptr.position = positions[i]
+            self.line_vertices_ptr.color = color
+            self.line_vertices_ptr += 1
+
+        self.line_count += 1
 
 
     def draw_lines_miter(self, color, points, float width=1.0):

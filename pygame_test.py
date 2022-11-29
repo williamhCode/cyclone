@@ -71,8 +71,8 @@ def main():
         renderer.clear()
 
 
-        for j in range(100):
-            for i in range(100):
+        for j in range(300):
+            for i in range(200):
                 renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # for i in range(100):

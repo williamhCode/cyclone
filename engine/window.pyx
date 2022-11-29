@@ -9,7 +9,7 @@ cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
 cdef class Window:
     cdef GLFWwindow* window
 
-    def __init__(self, size, window_name="'Engine Name' Window", vsync=False):
+    def __init__(self, size, window_name="'Engine Name' Window", vsync=False, high_dpi=True):
         window_name = window_name.encode()
 
         glfwInit()
@@ -18,6 +18,10 @@ cdef class Window:
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
 
+        if high_dpi == False:
+            glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GL_FALSE)
+
+        # window creation
         self.window = glfwCreateWindow(size[0], size[1], window_name, NULL, NULL)
         if (self.window == NULL):
             print("Failed to create GLFW window")
