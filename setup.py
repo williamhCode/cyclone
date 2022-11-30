@@ -23,8 +23,8 @@ library_dirs = {
 
 language = "c"
 default = ["-w"]
-debug_args = ["-w", "-std=c++11", "-O0"]
-release_args = ["-w", "-std=c++11", "-O3", "-ffast-math", "-march=native"]
+debug_args = ["-w", "-O0"]
+release_args = ["-w", "-O3", "-ffast-math", "-march=native"]
 
 args = default
 # args = debug_args

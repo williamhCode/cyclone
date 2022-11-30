@@ -10,10 +10,13 @@ from engine.libs.cglm cimport *
 from engine.shader cimport *
 from engine.texture cimport Texture
 
-import sys
+import time
 
 
 cdef struct QuadVertex:
+    vec2 local_position
+    vec2 offset
+    float rotation
     vec3 position
     vec4 color
     vec2 tex_coord
@@ -128,18 +131,33 @@ cdef class Renderer:
             GL_ARRAY_BUFFER, self.MAX_VERTICES * sizeof(QuadVertex), NULL, GL_DYNAMIC_DRAW
         )
 
-        # 3 position, 4 color, 2 tex_coord, 1 tex_index
+        # vec2 local_position
+        # vec2 offset
+        # float rotation
+        # vec3 position
+        # vec4 color
+        # vec2 tex_coord
+        # float tex_index
         glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).position)
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).local_position)
 
         glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).color)
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).offset)
 
         glEnableVertexAttribArray(2)
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).tex_coord)
+        glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).rotation)
 
         glEnableVertexAttribArray(3)
-        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).tex_index)
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).position)
+
+        glEnableVertexAttribArray(4)
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).color)
+
+        glEnableVertexAttribArray(5)
+        glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).tex_coord)
+
+        glEnableVertexAttribArray(6)
+        glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).tex_index)
 
         # generate index buffer and buffer data
         cdef unsigned int *indices = <unsigned int *>malloc(self.MAX_INDICES * sizeof(unsigned int))
@@ -439,20 +457,12 @@ cdef class Renderer:
             self.texture_slots[self.texture_slot_index] = texture_id
             self.texture_slot_index += 1
 
-        cdef vec3[4] positions = [
-            [0, 0, 0],
-            [size[0], 0, 0],
-            [size[0], size[1], 0],
-            [0, size[1], 0]
+        cdef vec2[4] local_positions = [
+            [0, 0],
+            [size[0], 0],
+            [size[0], size[1]],
+            [0, size[1]]
         ]
-        for i in range(4):
-            positions[i][0] += offset[0]
-            positions[i][1] += offset[1]
-        for i in range(4):
-            glm_vec3_rotate(positions[i], rad_rotation, [0, 0, 1])
-        for i in range(4):
-            positions[i][0] += position[0]
-            positions[i][1] += position[1]
 
         cdef vec2 tex_coords[4]
         if (flipped == 0):
@@ -470,8 +480,13 @@ cdef class Renderer:
                 [1, 1]
             ]
 
+        cdef vec3 _position = [position[0], position[1], 0.0]
+
         for i in range(4):
-            self.quad_vertices_ptr.position = positions[i]
+            self.quad_vertices_ptr.local_position = local_positions[i]
+            self.quad_vertices_ptr.offset = offset
+            self.quad_vertices_ptr.rotation = rad_rotation
+            self.quad_vertices_ptr.position = _position
             self.quad_vertices_ptr.color = color
             self.quad_vertices_ptr.tex_coord = tex_coords[i]
             self.quad_vertices_ptr.tex_index = texture_index

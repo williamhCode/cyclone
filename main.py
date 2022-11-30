@@ -49,11 +49,10 @@ def main():
         renderer.clear()
 
         # dj = math.sin(time * 5) * 20
-        # for i in range(300):
-        #     for j in range(200):
-        #         renderer.draw_texture(texture_1, (i * 10, j * 10 + dj))
+        for i in range(300):
+            for j in range(300):
+                renderer.draw_texture(texture_1, (i * 10, j * 10))
 
-        # renderer.draw_texture(texture_2, (0, 0))
         # renderer.draw_texture(texture_3, (0, 0))
 
         # for i in range(300):
@@ -64,7 +63,7 @@ def main():
         #     for j in range(200):
         #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
-        spinning_star(renderer, time)
+        # spinning_star(renderer, time)
 
         renderer.end()
 
