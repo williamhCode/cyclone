@@ -63,12 +63,9 @@ def main():
 
         # spinning_star(renderer, time)
 
-
         renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200))
-        # renderer.draw_texture(texture_1, (0, 0))
-        renderer.draw_rectangle((100, 200, 100, 100), (200, 200), (200, 200))
-
-        # renderer.draw_texture(texture_1, (300, 200))
+        renderer.draw_texture(texture_1, (0, 0))
+        renderer.draw_rectangle((100, 200, 100), (200, 200), (200, 200))
 
         renderer.end()
 
