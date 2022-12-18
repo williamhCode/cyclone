@@ -52,11 +52,11 @@ cdef class Renderer:
         unsigned int MAX_TEXTURE_SLOTS
 
         # shaders
-        Shader quad_shader
-        Shader circle_shader
-        Shader rectangle_shader
-        Shader line_shader
-        Shader shaders[4]
+        s_Shader quad_shader
+        s_Shader circle_shader
+        s_Shader rectangle_shader
+        s_Shader line_shader
+        s_Shader shaders[4]
 
         # quad attribs
         GLuint quad_vao
@@ -93,21 +93,26 @@ cdef class Renderer:
         LineVertex *line_vertices
         LineVertex *line_vertices_ptr
 
+        # depth sorting
+        float draw_count
+
 
     def __init__(self):
+        # gl options
+        glEnable(GL_DEPTH_TEST)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
         self.MAX_QUADS = 100000
         self.MAX_VERTICES = self.MAX_QUADS * 4
         self.MAX_INDICES = self.MAX_QUADS * 6
         self.MAX_TEXTURE_SLOTS = 16
 
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
         # shader stuff ----------------------------------------- #
-        shader_create(&self.quad_shader, b'./engine/shaders/quad.vert', b'./engine/shaders/quad.frag')
-        shader_create(&self.circle_shader, b'./engine/shaders/circle.vert', b'./engine/shaders/circle.frag')
-        shader_create(&self.rectangle_shader, b'./engine/shaders/rectangle.vert', b'./engine/shaders/rectangle.frag')
-        shader_create(&self.line_shader, b'./engine/shaders/line.vert', b'./engine/shaders/line.frag')
+        shader_create(&self.quad_shader, './engine/shaders/quad.vert', './engine/shaders/quad.frag')
+        shader_create(&self.circle_shader, './engine/shaders/circle.vert', './engine/shaders/circle.frag')
+        shader_create(&self.rectangle_shader, './engine/shaders/rectangle.vert', './engine/shaders/rectangle.frag')
+        shader_create(&self.line_shader, './engine/shaders/line.vert', './engine/shaders/line.frag')
         self.shaders = [self.quad_shader, self.circle_shader, self.rectangle_shader, self.line_shader]
 
         # set sampler2Ds
@@ -280,7 +285,7 @@ cdef class Renderer:
 
 
     def __del__(self):
-        cdef Shader shader
+        cdef s_Shader shader
         for shader in self.shaders:
             shader_destroy(&shader)
 
@@ -294,11 +299,11 @@ cdef class Renderer:
 
     def set_size(self, int width, int height):
         cdef mat4 proj_matrix
-        glm_ortho(0, width, 0, height, 0, 1, proj_matrix)
-        cdef Shader shader
+        glm_ortho(0, width, 0, height, -1, 1, proj_matrix)
+        cdef s_Shader shader
         for shader in self.shaders:
             shader_use(&shader)
-            shader_set_mat4(&shader, b"u_Proj", proj_matrix)
+            shader_set_mat4(&shader, 'u_Proj', proj_matrix)
 
 
     def set_clear_color(self, color):
@@ -336,22 +341,25 @@ cdef class Renderer:
         self.line_vertices_ptr = self.line_vertices
 
 
-    def begin(self, py_view_matrix=None):
-        cdef mat4 view_matrix
-        if py_view_matrix is not None:
-            py_to_glm_mat4(py_view_matrix, view_matrix)
+    def begin(self, py_view_mat=None):
+        cdef mat4 view_mat
+        if py_view_mat is not None:
+            py_to_glm_mat4(py_view_mat, view_mat)
         else:
-            glm_mat4_identity(view_matrix)
+            glm_mat4_identity(view_mat)
 
-        cdef Shader shader
+        cdef s_Shader shader
         for shader in self.shaders:
             shader_use(&shader)
-            shader_set_mat4(&shader, 'u_View', view_matrix)
+            shader_set_mat4(&shader, 'u_View', view_mat)
 
         self._begin_quad_batch()
         self._begin_circle_batch()
         self._begin_rectangle_batch()
         self._begin_line_batch()
+
+        # depth sorting
+        self.draw_count = 0
 
 
     # end functions --------------------------------- #
@@ -413,6 +421,19 @@ cdef class Renderer:
 
 
     def end(self):
+        cdef mat4 squish_mat
+        cdef vec3 scale_vec
+        if (self.draw_count != 0):
+             scale_vec = [1, 1, 1 / self.draw_count]
+        else:
+             scale_vec = [1, 1, 1]
+        glm_scale_make(squish_mat, scale_vec)
+
+        cdef s_Shader shader
+        for shader in self.shaders:
+            shader_use(&shader)
+            shader_set_mat4(&shader, 'u_Squish', squish_mat)
+
         self._end_quad_batch()
         self._end_circle_batch()
         self._end_rectangle_batch()
@@ -435,6 +456,7 @@ cdef class Renderer:
         self._handle_color(color, t_color)
 
         self._draw_texture(texture_id, t_position, t_size, rotation, t_offset, flipped, t_color)
+        self.draw_count += 1
 
 
     cdef void _draw_texture(self, GLuint texture_id, vec2 position, vec2 size, float rotation, vec2 offset, bint flipped, vec4 color):
@@ -480,7 +502,7 @@ cdef class Renderer:
                 [1, 1]
             ]
 
-        cdef vec3 _position = [position[0], position[1], 0.0]
+        cdef vec3 _position = [position[0], position[1], self.draw_count]
 
         for i in range(4):
             self.quad_vertices_ptr.local_position = local_positions[i]
@@ -501,6 +523,7 @@ cdef class Renderer:
         cdef vec2 t_position = [position[0], position[1]]
 
         self._draw_circle(t_color, t_position, radius, width, fade)
+        self.draw_count += 1
 
 
     cdef void _draw_circle(self, vec4 color, vec2 position, float radius, float width = 0.0, float fade = 0.0):
@@ -509,10 +532,10 @@ cdef class Renderer:
             self._begin_circle_batch()
 
         cdef vec3[4] positions = [
-            [position[0] - radius, position[1] - radius, 0],
-            [position[0] + radius, position[1] - radius, 0],
-            [position[0] + radius, position[1] + radius, 0],
-            [position[0] - radius, position[1] + radius, 0]
+            [position[0] - radius, position[1] - radius, self.draw_count],
+            [position[0] + radius, position[1] - radius, self.draw_count],
+            [position[0] + radius, position[1] + radius, self.draw_count],
+            [position[0] - radius, position[1] + radius, self.draw_count]
         ]
         
         cdef vec2[4] local_positions = [
@@ -551,6 +574,7 @@ cdef class Renderer:
         cdef vec2 t_offset = [offset[0], offset[1]]
 
         self._draw_rectangle(t_color, t_position, t_size, rotation, t_offset, width, fade)
+        self.draw_count += 1
 
 
     cdef void _draw_rectangle(self, vec4 color, vec2 position, vec2 size, float rotation, vec2 offset, float width, float fade):
@@ -563,10 +587,10 @@ cdef class Renderer:
         cdef float rad_rotation = rotation * math.pi / 180.0
 
         cdef vec3[4] positions = [
-            [0, 0, 0],
-            [size[0], 0, 0],
-            [size[0], size[1], 0],
-            [0, size[1], 0]
+            [0, 0, self.draw_count],
+            [size[0], 0, self.draw_count],
+            [size[0], size[1], self.draw_count],
+            [0, size[1], self.draw_count]
         ]
         for i in range(4):
             positions[i][0] += offset[0]
@@ -610,6 +634,7 @@ cdef class Renderer:
         cdef vec2 t_end = [end[0], end[1]]
 
         self._draw_line(t_color, t_start, t_end, width)
+        self.draw_count += 1
 
 
     def draw_lines(self, color, points, float width=1.0):
@@ -626,6 +651,8 @@ cdef class Renderer:
             t_end = [point[0], point[1]]
             self._draw_line(t_color, t_start, t_end, width)
 
+        self.draw_count += 1
+
 
     cdef void _draw_line(self, vec4 color, vec2 start, vec2 end, float width):
         if (self.line_count >= self.MAX_QUADS):
@@ -636,10 +663,10 @@ cdef class Renderer:
         cdef vec2 corner_offset
         glm_vec2_rotate([width / 2, 0], corner_angle, corner_offset)
         cdef vec3[4] positions = [
-            [start[0] + corner_offset[0], start[1] + corner_offset[1], 0],
-            [start[0] - corner_offset[0], start[1] - corner_offset[1], 0],
-            [end[0] - corner_offset[0], end[1] - corner_offset[1], 0],
-            [end[0] + corner_offset[0], end[1] + corner_offset[1], 0],
+            [start[0] + corner_offset[0], start[1] + corner_offset[1], self.draw_count],
+            [start[0] - corner_offset[0], start[1] - corner_offset[1], self.draw_count],
+            [end[0] - corner_offset[0], end[1] - corner_offset[1], self.draw_count],
+            [end[0] + corner_offset[0], end[1] + corner_offset[1], self.draw_count],
         ]
 
         cdef size_t i

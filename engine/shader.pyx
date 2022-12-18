@@ -64,7 +64,7 @@ cdef void _checkCompileErrors(GLuint shader, const char *compile_type, const cha
                 sys.exit()
 
 
-cdef void shader_create(Shader *self, const char *vs_path, const char *fs_path):
+cdef void shader_create(s_Shader *self, const char *vs_path, const char *fs_path):
     cdef char *vShaderCode = read_file(vs_path)
     cdef char *fShaderCode = read_file(fs_path)
 
@@ -94,21 +94,32 @@ cdef void shader_create(Shader *self, const char *vs_path, const char *fs_path):
     free(fShaderCode)
 
 
-cdef void shader_destroy(const Shader *self):
+cdef void shader_destroy(const s_Shader *self):
     glDeleteProgram(self.ID);
     glDeleteShader(self.vs_ID);
     glDeleteShader(self.fs_ID);
 
 
-cdef void shader_use(const Shader *self):
+cdef void shader_use(const s_Shader *self):
     glUseProgram(self.ID);
 
 
-cdef void shader_set_int_array(const Shader *self, const char *name, GLsizei count, const GLint *values):
-    glUniform1iv(glGetUniformLocation(self.ID, name), count, values)
+cdef void shader_set_int_array(const s_Shader *self, const char *name, GLsizei count, const GLint *value):
+    glUniform1iv(glGetUniformLocation(self.ID, name), count, value)
 
 
-cdef void shader_set_mat4(const Shader *self, const char *name, const mat4 mat):
+cdef void shader_set_mat4(const s_Shader *self, const char *name, const mat4 mat):
     glUniformMatrix4fv(glGetUniformLocation(self.ID, name), 1, GL_FALSE, <float *>mat)
 
+
+# cdef class Shader:
+
+#     def __init__(self, str vs_path, str fs_path):
+#         shader_create(&shader, vs_path.encode(), fs_path.encode())
+
+#     def __del__(self):
+#         shader_destroy(&shader)
+
+#     def use(self):
+#         shader_use(&shader)
 

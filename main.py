@@ -28,7 +28,7 @@ def main():
     renderer.set_size(*WIN_SIZE)
 
     texture_1 = Texture("imgs/Flappy Bird_1.png", resize_nearest=False)
-    texture_1.resize(10, 10)
+    # texture_1.resize(10, 10)
     texture_2 = Texture("imgs/test2.jpeg")
     texture_3 = Texture("imgs/test3.jpeg")
 
@@ -49,27 +49,32 @@ def main():
         renderer.clear()
 
         # dj = math.sin(time * 5) * 20
-        for i in range(300):
-            for j in range(300):
-                renderer.draw_texture(texture_1, (i * 10, j * 10))
-
-        # renderer.draw_texture(texture_3, (0, 0))
+        # for i in range(300):
+        #     for j in range(300):
+        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # for i in range(300):
-        #     for j in range(200):
-        #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 5, width=2, fade=0.5)
+            #     for j in range(200):
+                #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 5, width=2, fade=0.5)
 
         # for i in range(300):
-        #     for j in range(200):
-        #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
+            #     for j in range(200):
+                #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
         # spinning_star(renderer, time)
+
+
+        renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200))
+        # renderer.draw_texture(texture_1, (0, 0))
+        renderer.draw_rectangle((100, 200, 100, 100), (200, 200), (200, 200))
+
+        # renderer.draw_texture(texture_1, (300, 200))
 
         renderer.end()
 
         window.update()
 
     window.quit()
-        
+
 if __name__ == '__main__':
     main()
