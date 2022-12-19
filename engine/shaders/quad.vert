@@ -8,9 +8,10 @@ layout (location = 4) in vec4 a_Color;
 layout (location = 5) in vec2 a_TexCoord;
 layout (location = 6) in float a_TexIndex;
 
-uniform mat4 u_Proj;
-uniform mat4 u_View;
-uniform mat4 u_Squish;
+// uniform mat4 u_Proj;
+// uniform mat4 u_View;
+// uniform mat4 u_Squish;
+uniform mat4 u_ProjViewSquish;
 
 out vec4 v_Color;
 out vec2 v_TexCoord;
@@ -27,5 +28,6 @@ void main()
     v_TexCoord = a_TexCoord;
     v_TexIndex = a_TexIndex;
     vec3 world_position = a_Position + vec3(rotate2d(a_Rotation) * (a_LocalPosition + a_Offset), 0.0);
-    gl_Position = u_Proj * u_View * u_Squish * vec4(world_position, 1.0);
+    // gl_Position = u_Proj * u_View * u_Squish * vec4(world_position, 1.0);
+    gl_Position = u_ProjViewSquish * vec4(world_position, 1.0);
 }

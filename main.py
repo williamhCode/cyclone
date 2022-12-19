@@ -23,12 +23,11 @@ def main():
     WIN_SIZE = (1200, 800)
     window = Window(WIN_SIZE, vsync=False)
 
-    renderer = Renderer()
+    renderer = Renderer(*WIN_SIZE)
     renderer.set_clear_color((50, 50, 50, 255))
-    renderer.set_size(*WIN_SIZE)
 
     texture_1 = Texture("imgs/Flappy Bird_1.png", resize_nearest=False)
-    # texture_1.resize(10, 10)
+    texture_1.resize(10, 10)
     texture_2 = Texture("imgs/test2.jpeg")
     texture_3 = Texture("imgs/test3.jpeg")
 
@@ -42,20 +41,36 @@ def main():
         framerate = clock.get_fps()
         window.set_title(f"Running at {framerate :.2f} fps.")
 
-        if window.get_key(constants.KEY_ESCAPE) == constants.PRESS:
-            window.set_should_close(True)
+        # key events
+        for event in window.get_events():
+            if event.action == constants.PRESS:
+                if event.button == constants.MOUSE_BUTTON_LEFT:
+                    print("left pressed!")
+
+                if event.key == constants.KEY_ESCAPE:
+                    window.close()
+
+                if event.key == constants.KEY_T:
+                    print(time)
+
+        # key press, release
+        if window.get_key(constants.KEY_A) == constants.PRESS:
+            print("a!")
+
+        if window.get_mouse_button(constants.MOUSE_BUTTON_RIGHT) == constants.PRESS:
+            print("right held!")
 
         renderer.begin()
         renderer.clear()
 
         # dj = math.sin(time * 5) * 20
-        # for i in range(300):
-        #     for j in range(300):
-        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
+        for i in range(300):
+            for j in range(300):
+                renderer.draw_texture(texture_1, (i * 10, j * 10))
 
-        # for i in range(300):
-            #     for j in range(200):
-                #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 5, width=2, fade=0.5)
+        # for i in range(100):
+        #         for j in range(100):
+        #                 renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 40, width=2, fade=0.5)
 
         # for i in range(300):
             #     for j in range(200):
@@ -63,9 +78,10 @@ def main():
 
         # spinning_star(renderer, time)
 
-        renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200))
-        renderer.draw_texture(texture_1, (0, 0))
-        renderer.draw_rectangle((100, 200, 100), (200, 200), (200, 200))
+        # renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200))
+        # renderer.draw_texture(texture_1, (0, 0))
+        # renderer.draw_texture(texture_1, (100, 0))
+        # renderer.draw_rectangle((100, 200, 100), (200, 200), (200, 200))
 
         renderer.end()
 

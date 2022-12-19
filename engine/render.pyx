@@ -58,6 +58,11 @@ cdef class Renderer:
         s_Shader line_shader
         s_Shader shaders[4]
 
+        # matrices
+        mat4 proj_mat
+        mat4 view_mat
+        mat4 squish_mat
+
         # quad attribs
         GLuint quad_vao
         GLuint quad_vbo
@@ -97,7 +102,9 @@ cdef class Renderer:
         float draw_count
 
 
-    def __init__(self):
+    def __init__(self, int width, int height):
+        self.set_size(width, height)
+
         # gl options
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_BLEND)
@@ -297,13 +304,8 @@ cdef class Renderer:
         free(self.texture_slots)
 
 
-    def set_size(self, int width, int height):
-        cdef mat4 proj_matrix
-        glm_ortho(0, width, 0, height, -1, 1, proj_matrix)
-        cdef s_Shader shader
-        for shader in self.shaders:
-            shader_use(&shader)
-            shader_set_mat4(&shader, 'u_Proj', proj_matrix)
+    cpdef set_size(self, int width, int height):
+        glm_ortho(0, width, 0, height, -1, 1, self.proj_mat)
 
 
     def set_clear_color(self, color):
@@ -342,16 +344,10 @@ cdef class Renderer:
 
 
     def begin(self, py_view_mat=None):
-        cdef mat4 view_mat
         if py_view_mat is not None:
-            py_to_glm_mat4(py_view_mat, view_mat)
+            py_to_glm_mat4(py_view_mat, self.view_mat)
         else:
-            glm_mat4_identity(view_mat)
-
-        cdef s_Shader shader
-        for shader in self.shaders:
-            shader_use(&shader)
-            shader_set_mat4(&shader, 'u_View', view_mat)
+            glm_mat4_identity(self.view_mat)
 
         self._begin_quad_batch()
         self._begin_circle_batch()
@@ -421,18 +417,20 @@ cdef class Renderer:
 
 
     def end(self):
-        cdef mat4 squish_mat
         cdef vec3 scale_vec
         if (self.draw_count != 0):
              scale_vec = [1, 1, 1 / self.draw_count]
         else:
              scale_vec = [1, 1, 1]
-        glm_scale_make(squish_mat, scale_vec)
+        glm_scale_make(self.squish_mat, scale_vec)
+
+        cdef mat4 proj_view_squish_mat
+        glm_mat4_mulN([&self.proj_mat, &self.view_mat, &self.squish_mat], 3, proj_view_squish_mat)
 
         cdef s_Shader shader
         for shader in self.shaders:
             shader_use(&shader)
-            shader_set_mat4(&shader, 'u_Squish', squish_mat)
+            shader_set_mat4(&shader, 'u_ProjViewSquish', proj_view_squish_mat)
 
         self._end_quad_batch()
         self._end_circle_batch()
