@@ -1,7 +1,15 @@
 from engine.libs.glad cimport *
 from engine.libs.glfw cimport *
 
+from engine.render cimport Renderer
 from engine.event import Event
+
+
+cdef void window_size_callback(GLFWwindow* window, int width, int height):
+    cdef Window curr_window
+    for curr_window in windows:
+        if curr_window.window == window:
+            curr_window.renderer.set_size(width, height)
 
 
 cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
@@ -21,11 +29,16 @@ cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int 
         if curr_window.window == window:
             curr_window.key_events.append(Event(-2, button, action))
 
+
 windows = []
 
 cdef class Window:
     cdef GLFWwindow* window
+    cdef Renderer renderer
     cdef object key_events
+
+    cdef float xscale
+    cdef float yscale
 
     def __init__(self, size, window_name="'Engine Name' Window", vsync=False, high_dpi=True):
         window_name = window_name.encode()
@@ -52,6 +65,7 @@ cdef class Window:
             return
 
         # set callbacks
+        glfwSetWindowSizeCallback(self.window, window_size_callback)
         glfwSetFramebufferSizeCallback(self.window, framebuffer_size_callback)
         glfwSetKeyCallback(self.window, key_callback)
         glfwSetMouseButtonCallback(self.window, mouse_button_callback)
@@ -63,7 +77,13 @@ cdef class Window:
         # add window to windows list
         windows.append(self)
 
+        # initalize other variables
+        self.renderer = Renderer(*size)
+
         self.key_events = []
+
+    def get_renderer(self):
+        return self.renderer
 
     def set_title(self, name):
         glfwSetWindowTitle(self.window, name.encode());

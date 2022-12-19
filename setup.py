@@ -1,6 +1,3 @@
-import sys
-sys.argv = [sys.argv[0], "build_ext", "--inplace"]
-
 from setuptools import Extension, setup
 from Cython.Build import cythonize
 import os
@@ -85,6 +82,9 @@ if __name__ == "__main__":
 
 
     setup(
+        name='engine',
+        version='0.1.0',
+        description='A 2d graphics library written in cython',
         ext_modules=cythonize(
             module_list=extensions, 
             annotate=annotate,

@@ -13,94 +13,7 @@ from engine.texture cimport Texture
 import time
 
 
-cdef struct QuadVertex:
-    vec2 local_position
-    vec2 offset
-    float rotation
-    vec3 position
-    vec4 color
-    vec2 tex_coord
-    float tex_index
-
-
-cdef struct CircleVertex:
-    vec3 position
-    vec2 local_position
-    vec4 color
-    float thickness
-    float fade
-
-
-cdef struct RectangleVertex:
-    vec3 position
-    vec2 local_position
-    vec4 color
-    vec2 thickness
-    vec2 fade
-
-
-cdef struct LineVertex:
-    vec3 position
-    vec4 color
-
-
 cdef class Renderer:
-    cdef:
-        unsigned int MAX_QUADS
-        unsigned int MAX_VERTICES
-        unsigned int MAX_INDICES
-        unsigned int MAX_TEXTURE_SLOTS
-
-        # shaders
-        s_Shader quad_shader
-        s_Shader circle_shader
-        s_Shader rectangle_shader
-        s_Shader line_shader
-        s_Shader shaders[4]
-
-        # matrices
-        mat4 proj_mat
-        mat4 view_mat
-        mat4 squish_mat
-
-        # quad attribs
-        GLuint quad_vao
-        GLuint quad_vbo
-        GLuint quad_ebo
-        unsigned int quad_count
-        QuadVertex *quad_vertices
-        QuadVertex *quad_vertices_ptr
-
-        GLuint *texture_slots
-        size_t texture_slot_index
-
-        # circle attribs
-        GLuint circle_vao
-        GLuint circle_vbo
-        GLuint circle_ebo
-        unsigned int circle_count
-        CircleVertex *circle_vertices
-        CircleVertex *circle_vertices_ptr
-
-        # rectangle attribs
-        GLuint rectangle_vao
-        GLuint rectangle_vbo
-        GLuint rectangle_ebo
-        unsigned int rectangle_count
-        RectangleVertex *rectangle_vertices
-        RectangleVertex *rectangle_vertices_ptr
-
-        # line attribs
-        GLuint line_vao
-        GLuint line_vbo
-        GLuint line_ebo
-        unsigned int line_count
-        LineVertex *line_vertices
-        LineVertex *line_vertices_ptr
-
-        # depth sorting
-        float draw_count
-
 
     def __init__(self, int width, int height):
         self.set_size(width, height)
@@ -304,10 +217,6 @@ cdef class Renderer:
         free(self.texture_slots)
 
 
-    cpdef set_size(self, int width, int height):
-        glm_ortho(0, width, 0, height, -1, 1, self.proj_mat)
-
-
     def set_clear_color(self, color):
         glClearColor(
             color[0] / 255.0,
@@ -319,6 +228,10 @@ cdef class Renderer:
 
     def clear(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+
+    cdef void set_size(self, float width, float height):
+        glm_ortho(0, width, 0, height, -10_000_000, 1, self.proj_mat)
 
 
     # begin functions --------------------------------- #
@@ -348,6 +261,14 @@ cdef class Renderer:
             py_to_glm_mat4(py_view_mat, self.view_mat)
         else:
             glm_mat4_identity(self.view_mat)
+
+        cdef mat4 proj_view_mat
+        glm_mat4_mul(self.proj_mat, self.view_mat, proj_view_mat)
+
+        cdef s_Shader shader
+        for shader in self.shaders:
+            shader_use(&shader)
+            shader_set_mat4(&shader, 'u_ProjView', proj_view_mat)
 
         self._begin_quad_batch()
         self._begin_circle_batch()
@@ -417,21 +338,6 @@ cdef class Renderer:
 
 
     def end(self):
-        cdef vec3 scale_vec
-        if (self.draw_count != 0):
-             scale_vec = [1, 1, 1 / self.draw_count]
-        else:
-             scale_vec = [1, 1, 1]
-        glm_scale_make(self.squish_mat, scale_vec)
-
-        cdef mat4 proj_view_squish_mat
-        glm_mat4_mulN([&self.proj_mat, &self.view_mat, &self.squish_mat], 3, proj_view_squish_mat)
-
-        cdef s_Shader shader
-        for shader in self.shaders:
-            shader_use(&shader)
-            shader_set_mat4(&shader, 'u_ProjViewSquish', proj_view_squish_mat)
-
         self._end_quad_batch()
         self._end_circle_batch()
         self._end_rectangle_batch()
