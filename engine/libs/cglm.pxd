@@ -1,6 +1,6 @@
 from libc.stdio cimport *
 
-cdef extern from "cglm/cglm.h" nogil:
+cdef extern from "cglm/cglm.h":
     #cglm_types_h
     ctypedef float[2] vec2
     ctypedef float[3] vec3

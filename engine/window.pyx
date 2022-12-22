@@ -37,9 +37,6 @@ cdef class Window:
     cdef Renderer renderer
     cdef object key_events
 
-    cdef float xscale
-    cdef float yscale
-
     def __init__(self, size, window_name="'Engine Name' Window", vsync=False, high_dpi=True):
         window_name = window_name.encode()
 

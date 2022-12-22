@@ -64,25 +64,25 @@ cdef class Renderer:
         # vec2 tex_coord
         # float tex_index
         glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).local_position)
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&((<QuadVertex *>0).local_position))
 
         glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).offset)
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&((<QuadVertex *>0).offset))
 
         glEnableVertexAttribArray(2)
-        glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).rotation)
+        glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&((<QuadVertex *>0).rotation))
 
         glEnableVertexAttribArray(3)
-        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).position)
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&((<QuadVertex *>0).position))
 
         glEnableVertexAttribArray(4)
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).color)
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&((<QuadVertex *>0).color))
 
         glEnableVertexAttribArray(5)
-        glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).tex_coord)
+        glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&((<QuadVertex *>0).tex_coord))
 
         glEnableVertexAttribArray(6)
-        glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&(<QuadVertex *>0).tex_index)
+        glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(QuadVertex), <void *><size_t>&((<QuadVertex *>0).tex_index))
 
         # generate index buffer and buffer data
         cdef unsigned int *indices = <unsigned int *>malloc(self.MAX_INDICES * sizeof(unsigned int))
@@ -119,19 +119,19 @@ cdef class Renderer:
 
         # 3 position, 2 local_position, 4 color, 1 thickness, 1 fade
         glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&(<CircleVertex *>0).position)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&((<CircleVertex *>0).position))
 
         glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&(<CircleVertex *>0).local_position)
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&((<CircleVertex *>0).local_position))
 
         glEnableVertexAttribArray(2)
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&(<CircleVertex *>0).color)
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&((<CircleVertex *>0).color))
 
         glEnableVertexAttribArray(3)
-        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&(<CircleVertex *>0).thickness)
+        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&((<CircleVertex *>0).thickness))
 
         glEnableVertexAttribArray(4)
-        glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&(<CircleVertex *>0).fade)
+        glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(CircleVertex), <void *><size_t>&((<CircleVertex *>0).fade))
 
         glGenBuffers(1, &self.circle_ebo)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.circle_ebo)
@@ -154,19 +154,19 @@ cdef class Renderer:
 
         # 3 position, 2 local_position, 4 color, 2 thickness, 2 fade
         glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&(<RectangleVertex *>0).position)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&((<RectangleVertex *>0).position))
 
         glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&(<RectangleVertex *>0).local_position)
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&((<RectangleVertex *>0).local_position))
 
         glEnableVertexAttribArray(2)
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&(<RectangleVertex *>0).color)
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&((<RectangleVertex *>0).color))
 
         glEnableVertexAttribArray(3)
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&(<RectangleVertex *>0).thickness)
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&((<RectangleVertex *>0).thickness))
 
         glEnableVertexAttribArray(4)
-        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&(<RectangleVertex *>0).fade)
+        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(RectangleVertex), <void *><size_t>&((<RectangleVertex *>0).fade))
 
         glGenBuffers(1, &self.rectangle_ebo)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.rectangle_ebo)
@@ -189,10 +189,10 @@ cdef class Renderer:
 
         # 3 position, 4 color
         glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(LineVertex), <void *><size_t>&(<LineVertex *>0).position)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(LineVertex), <void *><size_t>&((<LineVertex *>0).position))
 
         glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(LineVertex), <void *><size_t>&(<LineVertex *>0).color)
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(LineVertex), <void *><size_t>&((<LineVertex *>0).color))
 
         glGenBuffers(1, &self.line_ebo)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.line_ebo)
@@ -203,8 +203,10 @@ cdef class Renderer:
 
         free(indices)
 
+    # cdef void set_attibute()
 
-    def __del__(self):
+
+    def __dealloc__(self):
         cdef s_Shader shader
         for shader in self.shaders:
             shader_destroy(&shader)
@@ -231,7 +233,7 @@ cdef class Renderer:
 
 
     cdef void set_size(self, float width, float height):
-        glm_ortho(0, width, 0, height, -10_000_000, 1, self.proj_mat)
+        glm_ortho(0, width, 0, height, -5_000_000, 1, self.proj_mat)
 
 
     # begin functions --------------------------------- #

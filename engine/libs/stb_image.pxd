@@ -1,4 +1,4 @@
-cdef extern from "stb_image.h" nogil:
+cdef extern from "stb_image.h":
     ctypedef unsigned char stbi_uc
 
     void stbi_set_flip_vertically_on_load(int flag_true_if_should_flip)

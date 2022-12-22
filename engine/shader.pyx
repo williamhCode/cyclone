@@ -114,10 +114,10 @@ cdef void shader_set_mat4(const s_Shader *self, const char *name, const mat4 mat
 
 # cdef class Shader:
 
-#     def __init__(self, str vs_path, str fs_path):
+#     def __cinit__(self, str vs_path, str fs_path):
 #         shader_create(&shader, vs_path.encode(), fs_path.encode())
 
-#     def __del__(self):
+#     def __dealloc__(self):
 #         shader_destroy(&shader)
 
 #     def use(self):

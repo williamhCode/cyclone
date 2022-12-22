@@ -1,6 +1,5 @@
 from setuptools import Extension, setup
 from Cython.Build import cythonize
-import os
 import platform
 
 
@@ -8,7 +7,6 @@ libraries = {
     "Darwin": [
         "glad",
         "glfw",
-        # "cglm"
     ]
 }
 include_dirs = [
