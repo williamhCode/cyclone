@@ -203,8 +203,6 @@ cdef class Renderer:
 
         free(indices)
 
-    # cdef void set_attibute()
-
 
     def __dealloc__(self):
         cdef s_Shader shader

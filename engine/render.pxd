@@ -91,7 +91,6 @@ cdef class Renderer:
         # depth sorting
         float draw_count
 
-
     cdef void set_size(self, float width, float height)
 
     cdef void _begin_quad_batch(self)

@@ -4,7 +4,7 @@ from engine.libs.stb_image cimport *
 
 cdef class Texture:
 
-    def __init__(self, filepath, resize_nearest=False):
+    def __init__(self, str filepath, bint resize_nearest=False):
         glGenTextures(1, &self.texture_id)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
 
@@ -29,7 +29,7 @@ cdef class Texture:
 
         stbi_image_free(data)
 
-    def resize(self, width, height):
+    def resize(self, int width, int height):
         self.width = width
         self.height = height
 
