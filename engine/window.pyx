@@ -20,14 +20,14 @@ cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, in
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.key_events.append(Event(key, -2, action))
+            curr_window.key_events.append(Event(key, None, action))
 
 
 cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int mods):
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.key_events.append(Event(-2, button, action))
+            curr_window.key_events.append(Event(None, button, action))
 
 
 windows = []
