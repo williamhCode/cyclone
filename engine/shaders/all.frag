@@ -60,7 +60,7 @@ void main()
             break;
 
         } case 3: {
-
+            o_Color = v_Color;   
             break;
         }
     }

@@ -89,8 +89,9 @@ void main()
             break;
 
         } case 3: {
-
+            gl_Position = u_ProjView * vec4(a_Position, 1.0);
             break;
+
         }
     }
 }

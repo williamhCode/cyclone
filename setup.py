@@ -25,6 +25,11 @@ args = default
 # args = debug_args
 # args = release_args
 
+macros = [
+    ("STB_IMAGE_IMPLEMENTATION", None),
+    ("CGLM_DEFINE_PRINTS", None),
+]
+
 annotate = False
 force = False
 
@@ -75,6 +80,7 @@ if __name__ == "__main__":
             library_dirs=lib_dirs,
             runtime_library_dirs=lib_dirs,
             extra_compile_args=args,
+            define_macros=macros
         )
         extensions.append(ext)
 

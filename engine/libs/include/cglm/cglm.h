@@ -8,8 +8,6 @@
 #ifndef cglm_h
 #define cglm_h
 
-#define CGLM_DEFINE_PRINTS
-
 #include "common.h"
 #include "vec2.h"
 #include "vec3.h"
