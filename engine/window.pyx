@@ -9,11 +9,16 @@ cdef void window_size_callback(GLFWwindow* window, int width, int height):
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.renderer.set_size(width, height)
+            curr_window.width = width
+            curr_window.height = height
 
 
 cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
-    glViewport(0, 0, width, height)
+    cdef Window curr_window
+    for curr_window in windows:
+        if curr_window.window == window:
+            curr_window.framebuffer_width = width
+            curr_window.framebuffer_height = height
 
 
 cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods):
@@ -33,9 +38,6 @@ cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int 
 windows = []
 
 cdef class Window:
-    cdef GLFWwindow* window
-    cdef Renderer renderer
-    cdef object key_events
 
     def __init__(self, size, window_name="'Engine Name' Window", vsync=False, high_dpi=True):
         window_name = window_name.encode()
@@ -51,6 +53,10 @@ cdef class Window:
 
         # window creation
         self.window = glfwCreateWindow(size[0], size[1], window_name, NULL, NULL)
+        self.width = size[0]
+        self.height = size[1]
+        glfwGetFramebufferSize(self.window, &self.framebuffer_width, &self.framebuffer_height);
+
         if (self.window == NULL):
             print("Failed to create GLFW window")
             glfwTerminate()
@@ -75,15 +81,22 @@ cdef class Window:
         windows.append(self)
 
         # initalize other variables
-        self.renderer = Renderer(*size)
+        self.renderer = Renderer(self)
 
         self.key_events = []
+
+    def get_size(self):
+        return (self.width, self.height)
 
     def get_renderer(self):
         return self.renderer
 
-    def set_title(self, name):
-        glfwSetWindowTitle(self.window, name.encode());
+    def set_title(self, str title):
+        self.title = title
+        glfwSetWindowTitle(self.window, title.encode());
+
+    def get_title(self):
+        return self.title
 
     def close(self):
         glfwSetWindowShouldClose(self.window, True)

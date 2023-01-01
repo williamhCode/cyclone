@@ -67,7 +67,8 @@ if __name__ == "__main__":
         ("engine.window", "./engine/window.pyx"),
         ("engine.constants", "./engine/constants.py"),
         ("engine.shader", "./engine/shader.pyx"),
-        ("engine.texture", "./engine/texture.pyx")
+        ("engine.texture", "./engine/texture.pyx"),
+        ("engine.surface", "./engine/surface.pyx")
     ]
 
     for ext_name, ext_path in files:

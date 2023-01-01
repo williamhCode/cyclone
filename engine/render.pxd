@@ -2,6 +2,7 @@ from engine.libs.glad cimport *
 from engine.libs.cglm cimport *
 
 from engine.shader cimport *
+from engine.window cimport Window
 
 
 cdef struct Vertex:
@@ -14,6 +15,8 @@ cdef struct Vertex:
 
 cdef class Renderer:
     cdef:
+        Window window
+
         unsigned int MAX_QUADS
         unsigned int MAX_VERTICES
         unsigned int MAX_INDICES
@@ -38,7 +41,7 @@ cdef class Renderer:
         GLuint *texture_slots
         size_t texture_slot_index
 
-    cdef void set_size(self, float width, float height)
+    cdef void _set_proj_mat(self, float width, float height)
 
     cdef void _begin_batch(self)
 

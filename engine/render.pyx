@@ -9,14 +9,16 @@ from engine.libs.cglm cimport *
 
 from engine.shader cimport *
 from engine.texture cimport Texture
+from engine.surface cimport Surface
+from engine.window cimport Window
 
 import time
 
 
 cdef class Renderer:
 
-    def __init__(self, int width, int height):
-        self.set_size(width, height)
+    def __init__(self, Window window):
+        self.window = window
 
         # gl options
         glEnable(GL_BLEND)
@@ -103,19 +105,17 @@ cdef class Renderer:
 
 
     def set_clear_color(self, color):
-        glClearColor(
-            color[0] / 255.0,
-            color[1] / 255.0,
-            color[2] / 255.0,
-            color[3] / 255.0
-        )
+        cdef vec4 _color
+        self._handle_color(color, _color)
+        glClearColor(_color[0], _color[1], _color[2], _color[3])
     
 
     def clear(self):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT)
+        # glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
 
-    cdef void set_size(self, float width, float height):
+    cdef void _set_proj_mat(self, float width, float height):
         glm_ortho(0, width, 0, height, -1, 1, self.proj_mat)
 
 
@@ -126,11 +126,22 @@ cdef class Renderer:
         self.texture_slot_index = 0
 
 
-    def begin(self, py_view_mat=None):
-        if py_view_mat is not None:
-            py_to_glm_mat4(py_view_mat, self.view_mat)
+    def begin(self, view_matrix=None, Surface surface=None):
+        # set projection matrix
+        if surface is None:
+            self._set_proj_mat(self.window.width, self.window.height)
+            glViewport(0, 0, self.window.framebuffer_width, self.window.framebuffer_height)
+            glBindFramebuffer(GL_FRAMEBUFFER, 0)
         else:
+            self._set_proj_mat(surface.width, surface.height)
+            glViewport(0, 0, surface.width, surface.height)
+            glBindFramebuffer(GL_FRAMEBUFFER, surface.fbo)
+
+        # set view matrix
+        if view_matrix is None:
             glm_mat4_identity(self.view_mat)
+        else:
+            py_to_glm_mat4(view_matrix, self.view_mat)
 
         cdef mat4 proj_view_mat
         glm_mat4_mul(self.proj_mat, self.view_mat, proj_view_mat)

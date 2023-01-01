@@ -2,8 +2,8 @@ from engine.window import Window
 from engine.render import Renderer
 from engine.timer import Timer
 from engine.texture import Texture
+from engine.surface import Surface
 from engine import constants
-from engine import types
 
 import math
 import glm
@@ -14,7 +14,7 @@ def spinning_star(renderer: Renderer, time):
     points = []
 
     start = (570, 400)
-    spin_speed = 2 * math.pi * 0.001
+    spin_speed = 2 * math.pi * 0.000
     edges = 4445
 
     angle = 0
@@ -38,9 +38,11 @@ def main():
     camera = Camera2D(*WIN_SIZE)
 
     texture_1 = Texture("imgs/Flappy Bird_1.png", resize_nearest=True)
-    # texture_1.resize(10, 10)
+    texture_1.resize(10, 10)
     texture_2 = Texture("imgs/test2.jpeg")
     texture_3 = Texture("imgs/test3.jpeg")
+
+    surface = Surface(WIN_SIZE)
 
     clock = Timer()
 
@@ -50,7 +52,7 @@ def main():
 
     time = 0
     while not window.should_close():
-        dt = clock.tick(60)
+        dt = clock.tick()
         time += dt
 
         framerate = clock.get_fps()
@@ -87,7 +89,7 @@ def main():
 
         camera.look_at(glm.vec2(WIN_SIZE) / 2)
 
-        renderer.begin(camera.get_transform())
+        renderer.begin(view_matrix=camera.get_transform(), surface=surface)
         renderer.clear()
 
         # texture test
@@ -117,6 +119,13 @@ def main():
         # renderer.draw_rectangle((200, 100, 100), (250, 250), (200, 200), width=50, fade=10)
         # renderer.draw_texture(texture_1, (300, 300))
         # renderer.draw_circle((100, 200, 100), (450, 450), 100, width=50, fade=10)
+
+        renderer.end()
+
+        renderer.begin()
+        renderer.clear()
+
+        renderer.draw_texture(surface, (0, 0))
 
         renderer.end()
 
