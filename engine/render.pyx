@@ -95,7 +95,7 @@ cdef class Renderer:
         free(indices)
 
 
-    def __dealloc__(self):
+    def __del__(self):
         cdef s_Shader shader
         for shader in self.shaders:
             shader_destroy(&shader)
@@ -127,15 +127,14 @@ cdef class Renderer:
 
 
     def begin(self, view_matrix=None, Surface surface=None):
-        # set projection matrix
         if surface is None:
-            self._set_proj_mat(self.window.width, self.window.height)
-            glViewport(0, 0, self.window.framebuffer_width, self.window.framebuffer_height)
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
+            glViewport(0, 0, self.window.framebuffer_width, self.window.framebuffer_height)
+            self._set_proj_mat(self.window.width, self.window.height)
         else:
-            self._set_proj_mat(surface.width, surface.height)
-            glViewport(0, 0, surface.width, surface.height)
             glBindFramebuffer(GL_FRAMEBUFFER, surface.fbo)
+            glViewport(0, 0, surface.width, surface.height)
+            self._set_proj_mat(surface.width, surface.height)
 
         # set view matrix
         if view_matrix is None:

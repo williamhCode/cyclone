@@ -19,7 +19,7 @@ cdef class Surface(Texture):
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
 
-    def __dealloc__(self):
-        super().__dealloc__()
+    def __del__(self):
+        super().__del__()
         glDeleteFramebuffers(1, &self.fbo)
 

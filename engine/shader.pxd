@@ -4,7 +4,7 @@ from engine.libs.cglm cimport *
 cdef struct s_Shader:
     GLuint ID, vs_ID, fs_ID
 
-cdef void shader_create(s_Shader *self, const char *vs_path, const char *fs_path)
+cdef void shader_create(s_Shader *self, const char *vs_path, const char *fs_path) except *
 
 cdef void shader_destroy(const s_Shader *self)
 

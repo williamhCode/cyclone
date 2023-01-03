@@ -26,10 +26,6 @@ cdef class Renderer:
         s_Shader shader
         s_Shader shaders[1]
 
-        # matrices
-        mat4 proj_mat
-        mat4 view_mat
-
         # Vertex attributes
         GLuint vao
         GLuint vbo
@@ -40,6 +36,10 @@ cdef class Renderer:
 
         GLuint *texture_slots
         size_t texture_slot_index
+
+        # matrices
+        mat4 proj_mat
+        mat4 view_mat
 
     cdef void _set_proj_mat(self, float width, float height)
 

@@ -14,7 +14,7 @@ def spinning_star(renderer: Renderer, time):
     points = []
 
     start = (570, 400)
-    spin_speed = 2 * math.pi * 0.000
+    spin_speed = 2 * math.pi * 0.001
     edges = 4445
 
     angle = 0
@@ -32,7 +32,7 @@ def main():
     WIN_SIZE = (1200, 800)
     window = Window(WIN_SIZE, vsync=False, high_dpi=True)
 
-    renderer: Renderer = window.get_renderer()
+    renderer = window.create_renderer()
     renderer.set_clear_color((50, 50, 50, 255))
 
     camera = Camera2D(*WIN_SIZE)
@@ -42,7 +42,7 @@ def main():
     texture_2 = Texture("imgs/test2.jpeg")
     texture_3 = Texture("imgs/test3.jpeg")
 
-    surface = Surface(WIN_SIZE)
+    test_surface = Surface(WIN_SIZE)
 
     clock = Timer()
 
@@ -89,7 +89,8 @@ def main():
 
         camera.look_at(glm.vec2(WIN_SIZE) / 2)
 
-        renderer.begin(view_matrix=camera.get_transform(), surface=surface)
+        # render to texture (surface)
+        renderer.begin(view_matrix=camera.get_transform(), surface=test_surface)
         renderer.clear()
 
         # texture test
@@ -122,10 +123,11 @@ def main():
 
         renderer.end()
 
+        # render to main screen
         renderer.begin()
         renderer.clear()
 
-        renderer.draw_texture(surface, (0, 0))
+        renderer.draw_texture(test_surface, (0, 0))
 
         renderer.end()
 

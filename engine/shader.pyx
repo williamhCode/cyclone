@@ -10,15 +10,11 @@ import sys
 import traceback
 
 
-cdef char *read_file(const char *filename):
+cdef char *_read_file(const char *filename) except *:
     cdef FILE *file = fopen(filename, "r")
 
     if (file == NULL):
-        try:
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
-        except Exception as e:
-            traceback.print_exc()
-            sys.exit()
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
     fseek(file, 0, SEEK_END)
     cdef int length = ftell(file)
@@ -40,33 +36,25 @@ cdef char *read_file(const char *filename):
     return out
 
 
-cdef void _checkCompileErrors(GLuint shader, const char *compile_type, const char *path):
+cdef void _checkCompileErrors(GLuint shader, const char *compile_type, const char *path) except *:
     cdef GLint success
     cdef GLchar infoLog[1024]
     if (strcmp(compile_type, "PROGRAM") != 0):
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success)
         if (not success):
             glGetShaderInfoLog(shader, 1024, NULL, infoLog)
-            try:
-                raise RuntimeError(f"Error compiling shader at {path.decode()}:\n{infoLog.decode()}")
-            except Exception as e:
-                traceback.print_exc()
-                sys.exit()
+            raise RuntimeError(f"Error compiling shader at {path.decode()}:\n{infoLog.decode()}")
 
     else:
         glGetProgramiv(shader, GL_LINK_STATUS, &success)
         if (not success):
             glGetProgramInfoLog(shader, 1024, NULL, infoLog)
-            try:
-                raise RuntimeError(f"Error linking shader at {path.decode()}:\n{infoLog.decode()}")
-            except Exception as e:
-                traceback.print_exc()
-                sys.exit()
+            raise RuntimeError(f"Error linking shader at {path.decode()}:\n{infoLog.decode()}")
 
 
-cdef void shader_create(s_Shader *self, const char *vs_path, const char *fs_path):
-    cdef char *vShaderCode = read_file(vs_path)
-    cdef char *fShaderCode = read_file(fs_path)
+cdef void shader_create(s_Shader *self, const char *vs_path, const char *fs_path) except *:
+    cdef char *vShaderCode = _read_file(vs_path)
+    cdef char *fShaderCode = _read_file(fs_path)
 
     # vertex shader
     self.vs_ID = glCreateShader(GL_VERTEX_SHADER)
@@ -114,10 +102,10 @@ cdef void shader_set_mat4(const s_Shader *self, const char *name, const mat4 mat
 
 # cdef class Shader:
 
-#     def __cinit__(self, str vs_path, str fs_path):
+#     def __init__(self, str vs_path, str fs_path):
 #         shader_create(&shader, vs_path.encode(), fs_path.encode())
 
-#     def __dealloc__(self):
+#     def __del__(self):
 #         shader_destroy(&shader)
 
 #     def use(self):

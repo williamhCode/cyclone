@@ -2,6 +2,7 @@ from engine.libs.glad cimport *
 from engine.libs.glfw cimport *
 
 from engine.render cimport Renderer
+from engine.surface cimport Surface
 from engine.event import Event
 
 
@@ -39,8 +40,8 @@ windows = []
 
 cdef class Window:
 
-    def __init__(self, size, window_name="'Engine Name' Window", vsync=False, high_dpi=True):
-        window_name = window_name.encode()
+    def __init__(self, size, char *window_name="'Engine Name' Window", bint vsync=False, bint high_dpi=True):
+        # window_name = window_name.encode()
 
         glfwInit()
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4)
@@ -80,16 +81,16 @@ cdef class Window:
         # add window to windows list
         windows.append(self)
 
-        # initalize other variables
-        self.renderer = Renderer(self)
-
         self.key_events = []
 
     def get_size(self):
         return (self.width, self.height)
 
-    def get_renderer(self):
-        return self.renderer
+    def create_renderer(self):
+        return Renderer(self)
+
+    def create_surface(self, size, bint resize_nearest=False, high_dpi=None):
+        pass
 
     def set_title(self, str title):
         self.title = title

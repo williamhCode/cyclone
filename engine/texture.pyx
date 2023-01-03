@@ -20,7 +20,7 @@ cdef class Texture:
 
         stbi_image_free(data)
 
-    def __dealloc__(self):
+    def __del__(self):
         glDeleteTextures(1, &self.texture_id)
 
     # initialize width, height, and resize_nearest before calling this function

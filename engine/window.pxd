@@ -7,7 +7,6 @@ from engine.render cimport Renderer
 cdef class Window:
     cdef:
         GLFWwindow* window
-        Renderer renderer
         object key_events
 
         int width
