@@ -14,7 +14,7 @@ def spinning_star(renderer: Renderer, time):
     points = []
 
     start = (570, 400)
-    spin_speed = 2 * math.pi * 0.001
+    spin_speed = 2 * math.pi * 0.000
     edges = 4445
 
     angle = 0
@@ -30,7 +30,7 @@ def spinning_star(renderer: Renderer, time):
 
 def main():
     WIN_SIZE = (1200, 800)
-    window = Window(WIN_SIZE, vsync=False, high_dpi=True)
+    window = Window(WIN_SIZE, vsync=False, high_dpi=False)
 
     renderer = window.create_renderer()
     renderer.set_clear_color((50, 50, 50, 255))
@@ -48,7 +48,6 @@ def main():
 
     zoom_time = 0
     zoom_factor = 4
-    zoom_factor_log = math.log(zoom_factor)
 
     time = 0
     while not window.should_close():
@@ -68,7 +67,7 @@ def main():
                     window.close()
 
                 if event.key == constants.KEY_T:
-                    print(zoom_time)
+                    print(time)
 
         # key/button being pressed
         if window.get_key(constants.KEY_A) == constants.PRESS:
@@ -78,19 +77,18 @@ def main():
             print("right held!")
 
         if window.get_key(constants.KEY_EQUAL) == constants.PRESS:
-            camera.zoom += zoom_factor ** zoom_time * zoom_factor_log * dt
             zoom_time += dt
-            print(camera.zoom)
+            camera.zoom = zoom_factor ** zoom_time
 
         if window.get_key(constants.KEY_MINUS) == constants.PRESS:
             zoom_time -= dt
-            camera.zoom -= zoom_factor ** zoom_time * zoom_factor_log * dt
-            print(camera.zoom)
+            camera.zoom = zoom_factor ** zoom_time
 
         camera.look_at(glm.vec2(WIN_SIZE) / 2)
 
         # render to texture (surface)
-        renderer.begin(view_matrix=camera.get_transform(), surface=test_surface)
+        renderer.begin(view_matrix=camera.get_transform())
+        # renderer.begin(view_matrix=camera.get_transform(), surface=test_surface)
         renderer.clear()
 
         # texture test
@@ -124,12 +122,12 @@ def main():
         renderer.end()
 
         # render to main screen
-        renderer.begin()
-        renderer.clear()
+        # renderer.begin()
+        # renderer.clear()
 
-        renderer.draw_texture(test_surface, (0, 0))
+        # renderer.draw_texture(test_surface, (0, 0))
 
-        renderer.end()
+        # renderer.end()
 
         window.update()
 

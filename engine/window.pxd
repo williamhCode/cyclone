@@ -9,10 +9,8 @@ cdef class Window:
         GLFWwindow* window
         object key_events
 
-        int width
-        int height
-
-        int framebuffer_width
-        int framebuffer_height
-
         str title
+
+    cdef _get_framebuffer_size(self, int* width, int* height)
+
+    cdef _get_size(self, int* width, int* height)

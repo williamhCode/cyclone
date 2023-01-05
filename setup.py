@@ -65,7 +65,7 @@ if __name__ == "__main__":
     files= [
         ("engine.render", "./engine/render.pyx"),
         ("engine.window", "./engine/window.pyx"),
-        ("engine.constants", "./engine/constants.py"),
+        ("engine.constants", "./engine/constants.pyx"),
         ("engine.shader", "./engine/shader.pyx"),
         ("engine.texture", "./engine/texture.pyx"),
         ("engine.surface", "./engine/surface.pyx")

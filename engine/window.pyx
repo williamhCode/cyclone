@@ -7,43 +7,38 @@ from engine.event import Event
 
 
 cdef void window_size_callback(GLFWwindow* window, int width, int height):
-    cdef Window curr_window
-    for curr_window in windows:
-        if curr_window.window == window:
-            curr_window.width = width
-            curr_window.height = height
+    pass
 
 
 cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
-    cdef Window curr_window
-    for curr_window in windows:
-        if curr_window.window == window:
-            curr_window.framebuffer_width = width
-            curr_window.framebuffer_height = height
+    pass
 
 
 cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods):
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.key_events.append(Event(key, None, action))
+            curr_window.key_events.append(Event(action, key, None))
 
 
 cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int mods):
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.key_events.append(Event(None, button, action))
+            curr_window.key_events.append(Event(action, None, button))
 
 
 windows = []
 
 cdef class Window:
 
-    def __init__(self, size, char *window_name="'Engine Name' Window", bint vsync=False, bint high_dpi=True):
-        # window_name = window_name.encode()
+    def __init__(self, size, str title="'Engine Name' Window", bint vsync=False, bint high_dpi=True):
+        self.title = title
 
-        glfwInit()
+        if (not glfwInit()):
+            raise RuntimeError("Failed to initialize GLFW")
+
+        # window hints
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1)
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
@@ -53,20 +48,13 @@ cdef class Window:
             glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GL_FALSE)
 
         # window creation
-        self.window = glfwCreateWindow(size[0], size[1], window_name, NULL, NULL)
-        self.width = size[0]
-        self.height = size[1]
-        glfwGetFramebufferSize(self.window, &self.framebuffer_width, &self.framebuffer_height);
+        self.window = glfwCreateWindow(size[0], size[1], title.encode(), NULL, NULL)
+        if (not self.window):
+            raise RuntimeError("Failed to create GLFW window")
 
-        if (self.window == NULL):
-            print("Failed to create GLFW window")
-            glfwTerminate()
-            return
         glfwMakeContextCurrent(self.window)
-
         if (not gladLoadGLLoader(<GLADloadproc>glfwGetProcAddress)):
-            print("Failed to initialize GLAD")
-            return
+            raise RuntimeError("Failed to initialize GLAD")
 
         # set callbacks
         glfwSetWindowSizeCallback(self.window, window_size_callback)
@@ -83,8 +71,21 @@ cdef class Window:
 
         self.key_events = []
 
+    cdef _get_framebuffer_size(self, int* width, int* height):
+        glfwGetFramebufferSize(self.window, width, height)
+
+    def get_framebuffer_size(self):
+        cdef int width, height
+        glfwGetFramebufferSize(self.window, &width, &height)
+        return (width, height)
+
+    cdef _get_size(self, int* width, int* height):
+        glfwGetWindowSize(self.window, width, height)
+
     def get_size(self):
-        return (self.width, self.height)
+        cdef int width, height
+        glfwGetWindowSize(self.window, &width, &height)
+        return (width, height)
 
     def create_renderer(self):
         return Renderer(self)
@@ -94,7 +95,7 @@ cdef class Window:
 
     def set_title(self, str title):
         self.title = title
-        glfwSetWindowTitle(self.window, title.encode());
+        glfwSetWindowTitle(self.window, title.encode())
 
     def get_title(self):
         return self.title

@@ -112,7 +112,6 @@ cdef class Renderer:
 
     def clear(self):
         glClear(GL_COLOR_BUFFER_BIT)
-        # glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
 
     cdef void _set_proj_mat(self, float width, float height):
@@ -127,14 +126,20 @@ cdef class Renderer:
 
 
     def begin(self, view_matrix=None, Surface surface=None):
+        cdef int width, height
         if surface is None:
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
-            glViewport(0, 0, self.window.framebuffer_width, self.window.framebuffer_height)
-            self._set_proj_mat(self.window.width, self.window.height)
+
+            self.window._get_framebuffer_size(&width, &height)
+            glViewport(0, 0, width, height)
+
+            self.window._get_size(&width, &height)
+            self._set_proj_mat(width, height)
         else:
             glBindFramebuffer(GL_FRAMEBUFFER, surface.fbo)
             glViewport(0, 0, surface.width, surface.height)
             self._set_proj_mat(surface.width, surface.height)
+        t2 = time.perf_counter()
 
         # set view matrix
         if view_matrix is None:

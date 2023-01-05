@@ -2,6 +2,6 @@ from dataclasses import dataclass
 
 @dataclass(slots=True)
 class Event:
-    key: int
+    action: int
+    key: int | None
     button: int | None
-    action: int | None
