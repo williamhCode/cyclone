@@ -1,5 +1,5 @@
-from engine.libs.glad cimport *
-from engine.libs.cglm cimport *
+from engine.lib.glad cimport *
+from engine.lib.cglm cimport *
 
 cdef struct s_Shader:
     GLuint ID, vs_ID, fs_ID

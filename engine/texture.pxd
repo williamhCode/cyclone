@@ -1,4 +1,4 @@
-from engine.libs.glad cimport *
+from engine.lib.glad cimport *
 
 
 cdef class Texture:

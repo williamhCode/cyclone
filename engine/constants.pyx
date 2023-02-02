@@ -1,4 +1,4 @@
-from engine.libs.glfw cimport *
+from engine.lib.glfw cimport *
 
 VERSION_MAJOR = GLFW_VERSION_MAJOR
 VERSION_MINOR = GLFW_VERSION_MINOR

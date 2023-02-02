@@ -1,5 +1,5 @@
-from engine.libs.glad cimport *
-from engine.libs.glfw cimport *
+from engine.lib.glad cimport *
+from engine.lib.glfw cimport *
 
 from engine.render cimport Renderer
 

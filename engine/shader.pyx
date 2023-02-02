@@ -1,8 +1,8 @@
 from libc.stdio cimport *
 from libc.string cimport strcmp
 from libc.stdlib cimport malloc, free
-from engine.libs.glad cimport *
-from engine.libs.cglm cimport *
+from engine.lib.glad cimport *
+from engine.lib.cglm cimport *
 
 import errno
 import os

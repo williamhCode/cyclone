@@ -1,5 +1,5 @@
-from engine.libs.glad cimport *
-from engine.libs.cglm cimport *
+from engine.lib.glad cimport *
+from engine.lib.cglm cimport *
 
 from engine.shader cimport *
 from engine.window cimport Window

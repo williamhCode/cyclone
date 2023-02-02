@@ -14,7 +14,7 @@ def spinning_star(renderer: Renderer, time):
     points = []
 
     start = (570, 400)
-    spin_speed = 2 * math.pi * 0.000
+    spin_speed = 2 * math.pi * 0.0001
     edges = 4445
 
     angle = 0
@@ -31,6 +31,7 @@ def spinning_star(renderer: Renderer, time):
 def main():
     WIN_SIZE = (1200, 800)
     window = Window(WIN_SIZE, vsync=False, high_dpi=False)
+
 
     renderer = window.create_renderer()
     renderer.set_clear_color((50, 50, 50, 255))
@@ -87,25 +88,25 @@ def main():
         camera.look_at(glm.vec2(WIN_SIZE) / 2)
 
         # render to texture (surface)
-        renderer.begin(view_matrix=camera.get_transform())
-        # renderer.begin(view_matrix=camera.get_transform(), surface=test_surface)
+        # renderer.begin(view_matrix=camera.get_transform())
+        renderer.begin(view_matrix=camera.get_transform(), surface=test_surface)
         renderer.clear()
 
         # texture test
         # dj = math.sin(time * 5) * 20
         # for i in range(300):
-        #     for j in range(300):
-        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
+            #     for j in range(300):
+                #         renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # circle test
         # for i in range(100):
-        #     for j in range(100):
-        #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 40, width=2, fade=0.5)
+            #     for j in range(100):
+                #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 40, width=2, fade=0.5)
 
         # rectangle test
         # for i in range(300):
-        #     for j in range(200):
-        #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
+            #     for j in range(200):
+                #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
         # line test
         spinning_star(renderer, time)
@@ -122,12 +123,12 @@ def main():
         renderer.end()
 
         # render to main screen
-        # renderer.begin()
-        # renderer.clear()
+        renderer.begin()
+        renderer.clear()
 
-        # renderer.draw_texture(test_surface, (0, 0))
+        renderer.draw_texture(test_surface, (0, 0))
 
-        # renderer.end()
+        renderer.end()
 
         window.update()
 
