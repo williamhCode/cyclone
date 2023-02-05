@@ -8,8 +8,7 @@ from engine.lib.glad cimport *
 from engine.lib.cglm cimport *
 
 from engine.shader cimport *
-from engine.texture cimport Texture
-from engine.surface cimport Surface
+from engine.texture cimport Texture, TextureTarget
 from engine.window cimport Window
 
 import time
@@ -125,21 +124,16 @@ cdef class Renderer:
         self.texture_slot_index = 0
 
 
-    def begin(self, view_matrix=None, Surface surface=None):
+    def begin(self, view_matrix=None, TextureTarget target=None):
         cdef int width, height
-        if surface is None:
+        if target is None:
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
-
-            self.window._get_framebuffer_size(&width, &height)
-            glViewport(0, 0, width, height)
-
-            self.window._get_size(&width, &height)
-            self._set_proj_mat(width, height)
+            glViewport(0, 0, self.window.framebuffer_width, self.window.framebuffer_height)
+            self._set_proj_mat(self.window.width, self.window.height)
         else:
-            glBindFramebuffer(GL_FRAMEBUFFER, surface.fbo)
-            glViewport(0, 0, surface.width, surface.height)
-            self._set_proj_mat(surface.width, surface.height)
-        t2 = time.perf_counter()
+            glBindFramebuffer(GL_FRAMEBUFFER, target.fbo)
+            glViewport(0, 0, target.framebuffer_width, target.framebuffer_height)
+            self._set_proj_mat(target.width, target.height)
 
         # set view matrix
         if view_matrix is None:

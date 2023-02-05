@@ -7,10 +7,12 @@ from engine.render cimport Renderer
 cdef class Window:
     cdef:
         GLFWwindow* window
+        bint high_dpi
         object key_events
-
         str title
 
-    cdef _get_framebuffer_size(self, int* width, int* height)
+        int width
+        int height
 
-    cdef _get_size(self, int* width, int* height)
+        int framebuffer_width
+        int framebuffer_height

@@ -1,3 +1,6 @@
+from ._common import Vec2
+
+
 class Texture:
     width: int
     height: int
@@ -6,4 +9,9 @@ class Texture:
     def resize(self, width: int, height: int) -> None: ...
     @property
     def size(self) -> tuple[int, int]: ...
+
+
+class TextureTarget(Texture):
+
+    def __init__(self, size: Vec2, resize_nearest: bool=False) -> None: ...
 

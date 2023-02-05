@@ -2,16 +2,24 @@ from engine.lib.glad cimport *
 from engine.lib.glfw cimport *
 
 from engine.render cimport Renderer
-from engine.surface cimport Surface
+from engine.texture cimport TextureTarget
 from engine.event import Event
 
 
 cdef void window_size_callback(GLFWwindow* window, int width, int height):
-    pass
+    cdef Window curr_window
+    for curr_window in windows:
+        if curr_window.window == window:
+            curr_window.width = width
+            curr_window.height = height
 
 
 cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
-    pass
+    cdef Window curr_window
+    for curr_window in windows:
+        if curr_window.window == window:
+            curr_window.framebuffer_width = width
+            curr_window.framebuffer_height = height
 
 
 cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods):
@@ -34,6 +42,7 @@ cdef class Window:
 
     def __init__(self, size, str title="'Engine Name' Window", bint vsync=False, bint high_dpi=True):
         self.title = title
+        self.high_dpi = high_dpi
 
         if (not glfwInit()):
             raise RuntimeError("Failed to initialize GLFW")
@@ -56,31 +65,32 @@ cdef class Window:
         if (not gladLoadGLLoader(<GLADloadproc>glfwGetProcAddress)):
             raise RuntimeError("Failed to initialize GLAD")
 
+        # fix bug with high_dpi=False not setting the correct framebuffer size
+        glfwPollEvents()
+
         # set callbacks
         glfwSetWindowSizeCallback(self.window, window_size_callback)
         glfwSetFramebufferSizeCallback(self.window, framebuffer_size_callback)
         glfwSetKeyCallback(self.window, key_callback)
         glfwSetMouseButtonCallback(self.window, mouse_button_callback)
 
+        # get initial window size
+        glfwGetWindowSize(self.window, &self.width, &self.height)
+        glfwGetFramebufferSize(self.window, &self.framebuffer_width, &self.framebuffer_height)
+
         # vsync
         if vsync == False:
             glfwSwapInterval(0)
 
-        # add window to windows list
-        windows.append(self)
-
         self.key_events = []
 
-    cdef _get_framebuffer_size(self, int* width, int* height):
-        glfwGetFramebufferSize(self.window, width, height)
+        # add window to windows list
+        windows.append(self)
 
     def get_framebuffer_size(self):
         cdef int width, height
         glfwGetFramebufferSize(self.window, &width, &height)
         return (width, height)
-
-    cdef _get_size(self, int* width, int* height):
-        glfwGetWindowSize(self.window, width, height)
 
     def get_size(self):
         cdef int width, height
@@ -90,7 +100,7 @@ cdef class Window:
     def create_renderer(self):
         return Renderer(self)
 
-    def create_surface(self, size, bint resize_nearest=False, high_dpi=None):
+    def create_texture_target(self, size, bint resize_nearest=False, high_dpi=None):
         pass
 
     def set_title(self, str title):
@@ -107,10 +117,9 @@ cdef class Window:
         return glfwWindowShouldClose(self.window)
 
     def get_events(self):
-        try:
-            return self.key_events.copy()
-        finally:
-            self.key_events = []
+        self.key_events = []
+        glfwPollEvents()
+        return self.key_events
 
     def get_key(self, key):
         return glfwGetKey(self.window, key)
@@ -120,7 +129,6 @@ cdef class Window:
 
     def update(self):
         glfwSwapBuffers(self.window)
-        glfwPollEvents()
 
     def quit(self):
         glfwTerminate()

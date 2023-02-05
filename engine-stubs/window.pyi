@@ -1,5 +1,5 @@
 from engine.render import Renderer
-from engine.surface import Surface
+from engine.texture import TextureTarget
 from engine.event import Event
 from ._common import Vec2
 
@@ -11,7 +11,7 @@ class Window:
 
     def create_renderer(self) -> Renderer: ...
 
-    def create_surface(self, size: Vec2, resize_nearest: bool = False, high_dpi: bool | None = None) -> Surface: ...
+    def create_texture_target(self, size: Vec2, resize_nearest: bool = False, high_dpi: bool | None = None) -> TextureTarget: ...
 
     def set_title(self, title: str) -> None: ...
 
