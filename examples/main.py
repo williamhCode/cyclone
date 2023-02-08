@@ -29,7 +29,7 @@ def spinning_star(renderer: Renderer, time):
 
 def main():
     WIN_SIZE = (1200, 800)
-    window = Window(WIN_SIZE, vsync=False, high_dpi=False)
+    window = Window(WIN_SIZE, vsync=False, high_dpi=True)
 
     renderer = window.create_renderer()
     renderer.set_clear_color((50, 50, 50, 255))
@@ -41,7 +41,8 @@ def main():
     texture_2 = Texture("imgs/test2.jpeg")
     texture_3 = Texture("imgs/test3.jpeg")
 
-    test_target = TextureTarget(window, WIN_SIZE)
+    # test_target = TextureTarget(window, WIN_SIZE)
+    test_target = window.create_texture_target(WIN_SIZE)
 
     clock = Timer()
 
@@ -69,17 +70,17 @@ def main():
                     print(test_target.framebuffer_width, test_target.framebuffer_height)
 
         # key/button being pressed
-        if window.get_key(constants.KEY_A) == constants.PRESS:
+        if window.is_key_pressed(constants.KEY_A):
             print("a!")
 
-        if window.get_mouse_button(constants.MOUSE_BUTTON_RIGHT) == constants.PRESS:
+        if window.is_mouse_button_pressed(constants.MOUSE_BUTTON_LEFT):
             print("right held!")
 
-        if window.get_key(constants.KEY_EQUAL) == constants.PRESS:
+        if window.is_key_pressed(constants.KEY_EQUAL):
             zoom_time += dt
             camera.zoom = zoom_factor ** zoom_time
 
-        if window.get_key(constants.KEY_MINUS) == constants.PRESS:
+        if window.is_key_pressed(constants.KEY_MINUS):
             zoom_time -= dt
             camera.zoom = zoom_factor ** zoom_time
 

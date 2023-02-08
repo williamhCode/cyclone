@@ -70,6 +70,8 @@ cdef class Renderer:
             glEnableVertexAttribArray(i + 3)
             glVertexAttribPointer(i + 3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), <void *><size_t>&((<Vertex *>0).extra_data[i]))
 
+        print(sizeof(Vertex))
+
         # generate index buffer and buffer data
         cdef GLuint *indices = <GLuint *>malloc(self.MAX_INDICES * sizeof(GLuint))
         cdef int offset = 0

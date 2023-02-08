@@ -87,21 +87,17 @@ cdef class Window:
         # add window to windows list
         windows.append(self)
 
-    def get_framebuffer_size(self):
-        cdef int width, height
-        glfwGetFramebufferSize(self.window, &width, &height)
-        return (width, height)
-
     def get_size(self):
-        cdef int width, height
-        glfwGetWindowSize(self.window, &width, &height)
-        return (width, height)
+        return (self.width, self.height)
+
+    def get_framebuffer_size(self):
+        return (self.framebuffer_width, self.framebuffer_height)
 
     def create_renderer(self):
         return Renderer(self)
 
-    def create_texture_target(self, size, bint resize_nearest=False, high_dpi=None):
-        pass
+    def create_texture_target(self, size, bint resize_nearest=False, bint high_dpi=True):
+        return TextureTarget(self, size, resize_nearest, high_dpi)
 
     def set_title(self, str title):
         self.title = title
@@ -121,12 +117,36 @@ cdef class Window:
         glfwPollEvents()
         return self.key_events
 
+    # Input ----------------------------------------------------------
+    # Keys
     def get_key(self, key):
         return glfwGetKey(self.window, key)
 
+    def is_key_pressed(self, key):
+        return glfwGetKey(self.window, key) == GLFW_PRESS
+
+    def is_key_released(self, key):
+        return glfwGetKey(self.window, key) == GLFW_RELEASE
+
+    # Mouse
     def get_mouse_button(self, button):
         return glfwGetMouseButton(self.window, button)
 
+    def is_mouse_button_pressed(self, button):
+        return glfwGetMouseButton(self.window, button) == GLFW_PRESS
+
+    def is_mouse_button_released(self, button):
+        return glfwGetMouseButton(self.window, button) == GLFW_RELEASE
+
+    def get_mouse_position(self):
+        cdef double x, y
+        glfwGetCursorPos(self.window, &x, &y)
+        return (x, y)
+
+    def set_mouse_position(self, x, y):
+        glfwSetCursorPos(self.window, x, y)
+
+    # ----------------------------------------------------------------
     def update(self):
         glfwSwapBuffers(self.window)
 

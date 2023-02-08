@@ -8,7 +8,6 @@ class Rect:
     y: float
     width: float
     height: float
-    
 
 class Camera2D:
 
