@@ -35,7 +35,7 @@ out RECT_OUT
 
 mat2 rotate2d(float a){
     return mat2(cos(a), -sin(a),
-            sin(a), cos(a));
+                sin(a), cos(a));
 }
 
 void main()

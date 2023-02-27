@@ -50,7 +50,7 @@ void main()
         } case 2: {
             vec2 distance = vec2(1.0, 1.0) - abs(v_Rect.RelativeCoord);
             float alpha = smoothstep(0.0, v_Rect.Fade.x, distance.x) *
-                          smoothstep(0.0, v_Rect.Fade.y, distance.y);
+                smoothstep(0.0, v_Rect.Fade.y, distance.y);
             alpha *= max(smoothstep(v_Rect.Thickness.x + v_Rect.Fade.x, v_Rect.Thickness.x, distance.x),
                          smoothstep(v_Rect.Thickness.y + v_Rect.Fade.y, v_Rect.Thickness.y, distance.y));
             alpha = min(1.0, alpha);

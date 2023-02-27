@@ -3,7 +3,8 @@ from engine.lib.glfw cimport *
 
 from engine.render cimport Renderer
 from engine.texture cimport TextureTarget
-from engine.event import Event
+from engine.constants import KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK
+from engine.callback import *
 
 
 cdef void window_size_callback(GLFWwindow* window, int width, int height):
@@ -26,14 +27,21 @@ cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, in
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.key_events.append(Event(action, key, None))
+            curr_window.callbacks.append((KEY_CALLBACK, KeyData(key, scancode, action, mods)))
 
 
 cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int mods):
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.key_events.append(Event(action, None, button))
+            curr_window.callbacks.append((MOUSE_BUTTON_CALLBACK, MouseButtonData(button, action, mods)))
+
+
+cdef void cursor_position_callback(GLFWwindow* window, double xpos, double ypos):
+    cdef Window curr_window
+    for curr_window in windows:
+        if curr_window.window == window:
+            curr_window.callbacks.append((CURSOR_POSITION_CALLBACK, CursorPositionData(xpos, ypos)))
 
 
 windows = []
@@ -73,6 +81,7 @@ cdef class Window:
         glfwSetFramebufferSizeCallback(self.window, framebuffer_size_callback)
         glfwSetKeyCallback(self.window, key_callback)
         glfwSetMouseButtonCallback(self.window, mouse_button_callback)
+        glfwSetCursorPosCallback(self.window, cursor_position_callback)
 
         # get initial window size
         glfwGetWindowSize(self.window, &self.width, &self.height)
@@ -82,7 +91,7 @@ cdef class Window:
         if vsync == False:
             glfwSwapInterval(0)
 
-        self.key_events = []
+        self.callbacks = []
 
         # add window to windows list
         windows.append(self)
@@ -112,10 +121,10 @@ cdef class Window:
     def should_close(self):
         return glfwWindowShouldClose(self.window)
 
-    def get_events(self):
-        self.key_events = []
+    def get_callbacks(self):
+        self.callbacks = []
         glfwPollEvents()
-        return self.key_events
+        return self.callbacks
 
     # Input ----------------------------------------------------------
     # Keys

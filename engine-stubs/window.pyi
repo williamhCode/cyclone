@@ -1,7 +1,6 @@
 from engine.render import Renderer
 from engine.texture import TextureTarget
-from engine.event import Event
-from ._common import Vec2
+from ._common import Vec2, CallbackData
 
 class Window:
     def __init__(self, size: Vec2, window_name: str, vsync: bool = False, high_dpi: bool = True) -> None: ...
@@ -20,7 +19,7 @@ class Window:
 
     def should_close(self) -> bool: ...
 
-    def get_events(self) -> list[Event]: ...
+    def get_callbacks(self) -> list[tuple[int, CallbackData]]: ...
 
     def get_key(self, key: int) -> int: ...
 

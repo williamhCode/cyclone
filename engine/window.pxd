@@ -8,7 +8,7 @@ cdef class Window:
     cdef:
         GLFWwindow* window
         bint high_dpi
-        object key_events
+        object callbacks
         str title
 
         int width

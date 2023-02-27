@@ -41,13 +41,15 @@ def main():
     texture_2 = Texture("imgs/test2.jpeg")
     texture_3 = Texture("imgs/test3.jpeg")
 
-    # test_target = TextureTarget(window, WIN_SIZE)
-    test_target = window.create_texture_target(WIN_SIZE)
+    test_target = TextureTarget(window, WIN_SIZE)
+    # test_target = window.create_texture_target(WIN_SIZE)
 
     clock = Timer()
 
     zoom_time = 0
     zoom_factor = 4
+
+    look_pos = glm.vec2(WIN_SIZE) / 2
 
     time = 0
     while not window.should_close():
@@ -58,22 +60,27 @@ def main():
         window.set_title(f"Running at {framerate :.2f} fps.")
 
         # key events
-        for event in window.get_events():
-            if event.action == constants.PRESS:
-                if event.button == constants.MOUSE_BUTTON_LEFT:
-                    print("left pressed!")
+        for callback, data in window.get_callbacks():
+            if callback == constants.KEY_CALLBACK:
+                if data.action == constants.PRESS:
+                    if data.key == constants.KEY_ESCAPE:
+                        window.close()
+                    if data.key == constants.KEY_T:
+                        print(time)
 
-                if event.key == constants.KEY_ESCAPE:
-                    window.close()
+            if callback == constants.MOUSE_BUTTON_CALLBACK:
+                if data.action == constants.PRESS:
+                    if data.button == constants.MOUSE_BUTTON_LEFT:
+                        print("left pressed!")
 
-                if event.key == constants.KEY_T:
-                    print(test_target.framebuffer_width, test_target.framebuffer_height)
+            if callback == constants.CURSOR_POSITION_CALLBACK:
+                print(data.xpos, data.ypos)
 
         # key/button being pressed
         if window.is_key_pressed(constants.KEY_A):
             print("a!")
 
-        if window.is_mouse_button_pressed(constants.MOUSE_BUTTON_LEFT):
+        if window.is_mouse_button_pressed(constants.MOUSE_BUTTON_RIGHT):
             print("right held!")
 
         if window.is_key_pressed(constants.KEY_EQUAL):
@@ -84,23 +91,29 @@ def main():
             zoom_time -= dt
             camera.zoom = zoom_factor ** zoom_time
 
-        camera.look_at(glm.vec2(WIN_SIZE) / 2)
+        if window.is_key_pressed(constants.KEY_LEFT):
+            look_pos -= glm.vec2(5000 / camera.zoom * dt, 0)
+
+        if window.is_key_pressed(constants.KEY_RIGHT):
+            look_pos += glm.vec2(5000 / camera.zoom * dt, 0)
+
+        camera.look_at(look_pos)
 
         # render to texture target 
-        # renderer.begin(view_matrix=camera.get_transform())
-        renderer.begin(view_matrix=camera.get_transform(), target=test_target)
+        renderer.begin(view_matrix=camera.get_transform())
+        # renderer.begin(view_matrix=camera.get_transform(), target=test_target)
         renderer.clear()
 
         # texture test
-        # dj = math.sin(time * 5) * 20
-        # for i in range(300):
-        #     for j in range(300):
-        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
+        dj = math.sin(time * 5) * 20
+        for i in range(300):
+            for j in range(300):
+                renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # circle test
         # for i in range(100):
-            #     for j in range(100):
-                #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 40, width=2, fade=0.5)
+        #     for j in range(100):
+        #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 40, width=2, fade=0.5)
 
         # rectangle test
         # for i in range(300):
@@ -108,7 +121,7 @@ def main():
                 #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
         # line test
-        spinning_star(renderer, time)
+        # spinning_star(renderer, time)
 
         # layering test
         # renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200), width=20, fade=10)
@@ -122,12 +135,12 @@ def main():
         renderer.end()
 
         # render to main screen
-        renderer.begin()
-        renderer.clear()
+        # renderer.begin()
+        # renderer.clear()
 
-        renderer.draw_texture(test_target, (0, 0))
+        # renderer.draw_texture(test_target, (0, 0))
 
-        renderer.end()
+        # renderer.end()
 
         window.update()
 
