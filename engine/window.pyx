@@ -61,7 +61,7 @@ cdef class Window:
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
 
-        if high_dpi == False:
+        if not high_dpi:
             glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GL_FALSE)
 
         # window creation
@@ -88,7 +88,7 @@ cdef class Window:
         glfwGetFramebufferSize(self.window, &self.framebuffer_width, &self.framebuffer_height)
 
         # vsync
-        if vsync == False:
+        if not vsync:
             glfwSwapInterval(0)
 
         self.callbacks = []
@@ -161,4 +161,3 @@ cdef class Window:
 
     def quit(self):
         glfwTerminate()
-

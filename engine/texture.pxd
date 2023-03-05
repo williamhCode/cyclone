@@ -18,4 +18,3 @@ cdef class RenderTexture(Texture):
         GLuint fbo
         public int framebuffer_width
         public int framebuffer_height
-

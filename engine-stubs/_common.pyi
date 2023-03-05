@@ -1,11 +1,10 @@
 from typing import Protocol, TypeVar
 from callback import *
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 class HasGetItemAndLen(Protocol[T]):
     def __getitem__(self, key: int) -> T: ...
-
     def __len__(self) -> int: ...
 
 Vec2 = tuple[float, float] | list[float] | HasGetItemAndLen[float]

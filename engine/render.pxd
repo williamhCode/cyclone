@@ -8,7 +8,7 @@ from engine.shapes cimport Rectangle
 
 cdef struct Vertex:
     # 0 = texture, 1 = circle, 2 = rectangle, 3 = line
-    float render_type 
+    float render_type
     vec3 position
     vec4 color
     vec4[3] extra_data
@@ -25,7 +25,7 @@ cdef class Renderer:
 
         # shaders
         s_Shader shader
-        s_Shader shaders[1]
+        s_Shader[1] shaders
 
         # Vertex attributes
         GLuint vao

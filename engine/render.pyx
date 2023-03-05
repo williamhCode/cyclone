@@ -1,4 +1,3 @@
-
 cimport cython
 
 from libc cimport math
@@ -12,8 +11,6 @@ from engine.shader cimport *
 from engine.window cimport Window
 from engine.shapes cimport Rectangle
 from engine.texture cimport Texture, RenderTexture
-
-import time
 
 
 cdef class Renderer:
@@ -58,7 +55,7 @@ cdef class Renderer:
         # float render_type
         # vec3 position
         # vec4 color
-        # float[10] extra_data
+        # vec4[3] extra_data
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), <void *><size_t>&((<Vertex *>0).render_type))
 
@@ -87,14 +84,13 @@ cdef class Renderer:
         glGenBuffers(1, &self.ebo)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ebo)
         glBufferData(
-            GL_ELEMENT_ARRAY_BUFFER, 
+            GL_ELEMENT_ARRAY_BUFFER,
             self.MAX_INDICES * sizeof(GLuint), indices, GL_STATIC_DRAW
         )
 
         self.texture_slots = <GLuint *>malloc(self.MAX_TEXTURE_SLOTS * sizeof(GLuint))
 
         free(indices)
-
 
     def __del__(self):
         cdef s_Shader shader
@@ -104,30 +100,23 @@ cdef class Renderer:
         free(self.vertices)
         free(self.texture_slots)
 
-
     def set_clear_color(self, color):
         cdef vec4 _color
         self._handle_color(color, _color)
         glClearColor(_color[0], _color[1], _color[2], _color[3])
-    
 
     def clear(self):
         glClear(GL_COLOR_BUFFER_BIT)
 
-
     cdef void _set_proj_mat(self, float width, float height):
         glm_ortho(0, width, 0, height, -1, 1, self.proj_mat)
 
-
-    # begin functions --------------------------------- #
     cdef void _begin_batch(self):
         self.count = 0
         self.vertices_ptr = self.vertices
         self.texture_slot_index = 0
 
-
     def begin(self, view_matrix=None, RenderTexture texture=None):
-        cdef int width, height
         if texture is None:
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
             glViewport(0, 0, self.window.framebuffer_width, self.window.framebuffer_height)
@@ -153,12 +142,10 @@ cdef class Renderer:
 
         self._begin_batch()
 
-
-    # end functions --------------------------------- #
     cdef void _end_batch(self):
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferSubData(
-            GL_ARRAY_BUFFER, 0, 
+            GL_ARRAY_BUFFER, 0,
             self.count * 4 * sizeof(Vertex),
             self.vertices
         )
@@ -172,20 +159,16 @@ cdef class Renderer:
         glBindVertexArray(self.vao)
         glDrawElements(GL_TRIANGLES, self.count * 6, GL_UNSIGNED_INT, NULL)
 
-
     def end(self):
         self._end_batch()
 
-
-    # drawing -------------------------------------- #
     cdef void _handle_color(self, py_color, vec4 color):
         if len(py_color) == 3:
             color[:4] = [py_color[0]/255.0, py_color[1]/255.0, py_color[2]/255.0, 1.0]
         else:
             color[:4] = [py_color[0]/255.0, py_color[1]/255.0, py_color[2]/255.0, py_color[3]/255.0]
 
-
-    def draw_texture(self, Texture texture, position, float rotation=0.0, offset=(0.0, 0.0), Rectangle region=None, bint flipped=False, color=[255, 255, 255, 255]):
+    def draw_texture(self, Texture texture, position, float rotation=0.0, offset=(0.0, 0.0), Rectangle region=None, bint flipped=False, color=(255, 255, 255, 255)):
         cdef GLuint texture_id = texture.texture_id
         cdef vec2 t_position = [position[0], position[1]]
         cdef vec2 t_size = [texture.width, texture.height]
@@ -194,7 +177,6 @@ cdef class Renderer:
         self._handle_color(color, t_color)
 
         self._draw_texture(texture_id, t_position, t_size, rotation, t_offset, region, flipped, t_color)
-
 
     cdef void _draw_texture(self, GLuint texture_id, vec2 position, vec2 size, float rotation, vec2 offset, Rectangle region, bint flipped, vec4 color):
         cdef size_t i
@@ -217,8 +199,7 @@ cdef class Renderer:
             self.texture_slot_index += 1
 
         cdef vec2[4] local_positions
-
-        cdef vec2 tex_coords[4]
+        cdef vec2[4] tex_coords
         if region is None:
             local_positions = [
                 [0, 0],
@@ -271,7 +252,6 @@ cdef class Renderer:
 
         self.count += 1
 
-
     def draw_circle(self, color, position, float radius, float width = 0.0, float fade = 0.0):
         cdef vec4 t_color
         self._handle_color(color, t_color)
@@ -279,7 +259,6 @@ cdef class Renderer:
 
         self._draw_circle(t_color, t_position, radius, width, fade)
         self.count += 1
-
 
     cdef void _draw_circle(self, vec4 color, vec2 position, float radius, float width = 0.0, float fade = 0.0):
         if self.count >= self.MAX_QUADS:
@@ -292,7 +271,7 @@ cdef class Renderer:
             [position[0] + radius, position[1] + radius, 0.0],
             [position[0] - radius, position[1] + radius, 0.0]
         ]
-        
+
         cdef vec2[4] local_positions = [
             [-1.0, -1.0],
             [ 1.0, -1.0],
@@ -320,7 +299,6 @@ cdef class Renderer:
 
         self.count += 1
 
-
     # rectangle functions ----------------------------------- #
     def draw_rectangle(self, color, position, size, float rotation=0.0, offset=(0.0, 0.0), float width=0.0, float fade=0.0):
         cdef vec4 t_color
@@ -331,7 +309,6 @@ cdef class Renderer:
 
         self._draw_rectangle(t_color, t_position, t_size, rotation, t_offset, width, fade)
         self.count += 1
-
 
     cdef void _draw_rectangle(self, vec4 color, vec2 position, vec2 size, float rotation, vec2 offset, float width, float fade):
         cdef size_t i
@@ -348,7 +325,7 @@ cdef class Renderer:
             [size[0], size[1]],
             [0, size[1]],
         ]
-        
+
         cdef vec2[4] relative_coords = [
             [-1.0, -1.0],
             [ 1.0, -1.0],
@@ -380,7 +357,6 @@ cdef class Renderer:
 
         self.count += 1
 
-
     def draw_line(self, color, start, end, float width=1.0):
         cdef vec4 t_color
         self._handle_color(color, t_color)
@@ -389,7 +365,6 @@ cdef class Renderer:
 
         self._draw_line(t_color, t_start, t_end, width)
         self.count += 1
-
 
     def draw_lines(self, color, points, float width=1.0):
         cdef vec4 t_color
@@ -406,7 +381,6 @@ cdef class Renderer:
             self._draw_line(t_color, t_start, t_end, width)
 
         self.count += 1
-
 
     cdef void _draw_line(self, vec4 color, vec2 start, vec2 end, float width):
         if self.count >= self.MAX_QUADS:
@@ -432,7 +406,6 @@ cdef class Renderer:
 
         self.count += 1
 
-
     def draw_lines_miter(self, color, points, float width=1.0):
         pass
 
@@ -445,4 +418,3 @@ cdef void py_to_glm_mat4(py_mat, mat4 mat):
     for i in range(4):
         for j in range(4):
             mat[i][j] = py_mat[i][j]
-

@@ -6,7 +6,6 @@ MOUSE_BUTTON_CALLBACK = 1
 CURSOR_POSITION_CALLBACK = 2
 
 # glfw constants -------------
-
 # key/button states
 RELEASE = GLFW_RELEASE
 PRESS = GLFW_PRESS

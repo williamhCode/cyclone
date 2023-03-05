@@ -13,8 +13,3 @@ cdef void shader_use(const s_Shader *self)
 cdef void shader_set_int_array(const s_Shader *self, const char *name, GLsizei count, const GLint *values)
 
 cdef void shader_set_mat4(const s_Shader *self, const char *name, const mat4 mat)
-
-
-# cdef class Shader:
-#     cdef s_Shader shader
-

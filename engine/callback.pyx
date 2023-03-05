@@ -1,5 +1,3 @@
-cimport cython
-
 cdef class KeyData:
 
     def __init__(self, int key, int scancode, int action, int mods):

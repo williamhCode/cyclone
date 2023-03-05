@@ -26,7 +26,7 @@ def spinning_star(renderer: Renderer, time):
         points.append((x, y))
 
     renderer.draw_lines((255, 0, 0, 255), points, 0.01)
-                                                      
+
 
 def main():
     WIN_SIZE = (1200, 800)
@@ -87,11 +87,11 @@ def main():
 
         if window.is_key_pressed(constants.KEY_EQUAL):
             zoom_time += dt
-            camera.zoom = zoom_factor ** zoom_time
+            camera.zoom = zoom_factor**zoom_time
 
         if window.is_key_pressed(constants.KEY_MINUS):
             zoom_time -= dt
-            camera.zoom = zoom_factor ** zoom_time
+            camera.zoom = zoom_factor**zoom_time
 
         if window.is_key_pressed(constants.KEY_LEFT):
             look_pos -= glm.vec2(5000 / camera.zoom * dt, 0)
@@ -101,7 +101,7 @@ def main():
 
         camera.look_at(look_pos)
 
-        # render to texture target 
+        # render to texture target
         renderer.begin(view_matrix=camera.get_transform())
         # renderer.begin(view_matrix=camera.get_transform(), target=test_target)
         renderer.clear()
@@ -123,8 +123,8 @@ def main():
 
         # rectangle test
         # for i in range(300):
-            #     for j in range(200):
-                #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
+        #     for j in range(200):
+        #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
         # line test
         # spinning_star(renderer, time)
@@ -152,5 +152,6 @@ def main():
 
     window.quit()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
