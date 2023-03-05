@@ -2,7 +2,7 @@ from engine.lib.glad cimport *
 from engine.lib.glfw cimport *
 
 from engine.render cimport Renderer
-from engine.texture cimport TextureTarget
+from engine.texture cimport RenderTexture
 from engine.constants import KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK
 from engine.callback import *
 
@@ -52,7 +52,7 @@ cdef class Window:
         self.title = title
         self.high_dpi = high_dpi
 
-        if (not glfwInit()):
+        if not glfwInit():
             raise RuntimeError("Failed to initialize GLFW")
 
         # window hints
@@ -66,11 +66,11 @@ cdef class Window:
 
         # window creation
         self.window = glfwCreateWindow(size[0], size[1], title.encode(), NULL, NULL)
-        if (not self.window):
+        if not self.window:
             raise RuntimeError("Failed to create GLFW window")
 
         glfwMakeContextCurrent(self.window)
-        if (not gladLoadGLLoader(<GLADloadproc>glfwGetProcAddress)):
+        if not gladLoadGLLoader(<GLADloadproc>glfwGetProcAddress):
             raise RuntimeError("Failed to initialize GLAD")
 
         # fix bug with high_dpi=False not setting the correct framebuffer size
@@ -105,8 +105,8 @@ cdef class Window:
     def create_renderer(self):
         return Renderer(self)
 
-    def create_texture_target(self, size, bint resize_nearest=False, bint high_dpi=True):
-        return TextureTarget(self, size, resize_nearest, high_dpi)
+    def create_render_texture(self, size, bint resize_nearest=False, bint high_dpi=True):
+        return RenderTexture(self, size, resize_nearest, high_dpi)
 
     def set_title(self, str title):
         self.title = title

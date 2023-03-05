@@ -1,3 +1,4 @@
+
 cimport cython
 
 from libc cimport math
@@ -8,8 +9,9 @@ from engine.lib.glad cimport *
 from engine.lib.cglm cimport *
 
 from engine.shader cimport *
-from engine.texture cimport Texture, TextureTarget
 from engine.window cimport Window
+from engine.shapes cimport Rectangle
+from engine.texture cimport Texture, RenderTexture
 
 import time
 
@@ -124,16 +126,16 @@ cdef class Renderer:
         self.texture_slot_index = 0
 
 
-    def begin(self, view_matrix=None, TextureTarget target=None):
+    def begin(self, view_matrix=None, RenderTexture texture=None):
         cdef int width, height
-        if target is None:
+        if texture is None:
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
             glViewport(0, 0, self.window.framebuffer_width, self.window.framebuffer_height)
             self._set_proj_mat(self.window.width, self.window.height)
         else:
-            glBindFramebuffer(GL_FRAMEBUFFER, target.fbo)
-            glViewport(0, 0, target.framebuffer_width, target.framebuffer_height)
-            self._set_proj_mat(target.width, target.height)
+            glBindFramebuffer(GL_FRAMEBUFFER, texture.fbo)
+            glViewport(0, 0, texture.framebuffer_width, texture.framebuffer_height)
+            self._set_proj_mat(texture.width, texture.height)
 
         # set view matrix
         if view_matrix is None:
@@ -177,13 +179,13 @@ cdef class Renderer:
 
     # drawing -------------------------------------- #
     cdef void _handle_color(self, py_color, vec4 color):
-        if (len(py_color) == 3):
+        if len(py_color) == 3:
             color[:4] = [py_color[0]/255.0, py_color[1]/255.0, py_color[2]/255.0, 1.0]
         else:
             color[:4] = [py_color[0]/255.0, py_color[1]/255.0, py_color[2]/255.0, py_color[3]/255.0]
 
 
-    def draw_texture(self, Texture texture, position, float rotation=0.0, offset=(0.0, 0.0), bint flipped=False, color=[255, 255, 255, 255]):
+    def draw_texture(self, Texture texture, position, float rotation=0.0, offset=(0.0, 0.0), Rectangle region=None, bint flipped=False, color=[255, 255, 255, 255]):
         cdef GLuint texture_id = texture.texture_id
         cdef vec2 t_position = [position[0], position[1]]
         cdef vec2 t_size = [texture.width, texture.height]
@@ -191,13 +193,13 @@ cdef class Renderer:
         cdef vec4 t_color
         self._handle_color(color, t_color)
 
-        self._draw_texture(texture_id, t_position, t_size, rotation, t_offset, flipped, t_color)
+        self._draw_texture(texture_id, t_position, t_size, rotation, t_offset, region, flipped, t_color)
 
 
-    cdef void _draw_texture(self, GLuint texture_id, vec2 position, vec2 size, float rotation, vec2 offset, bint flipped, vec4 color):
+    cdef void _draw_texture(self, GLuint texture_id, vec2 position, vec2 size, float rotation, vec2 offset, Rectangle region, bint flipped, vec4 color):
         cdef size_t i
 
-        if (self.count >= self.MAX_QUADS or self.texture_slot_index >= self.MAX_TEXTURE_SLOTS):
+        if self.count >= self.MAX_QUADS or self.texture_slot_index >= self.MAX_TEXTURE_SLOTS:
             self._end_batch()
             self._begin_batch()
 
@@ -205,24 +207,26 @@ cdef class Renderer:
 
         cdef float texture_index = -1.0
         for i in range(self.texture_slot_index):
-            if (self.texture_slots[i] == texture_id):
+            if self.texture_slots[i] == texture_id:
                 texture_index = <float>i
                 break
 
-        if (texture_index == -1.0):
+        if texture_index == -1.0:
             texture_index = <float>self.texture_slot_index
             self.texture_slots[self.texture_slot_index] = texture_id
             self.texture_slot_index += 1
 
-        cdef vec2[4] local_positions = [
-            [0, 0],
-            [size[0], 0],
-            [size[0], size[1]],
-            [0, size[1]]
-        ]
+        cdef vec2[4] local_positions
 
         cdef vec2 tex_coords[4]
-        if (flipped == 0):
+        if region is None:
+            local_positions = [
+                [0, 0],
+                [size[0], 0],
+                [size[0], size[1]],
+                [0, size[1]]
+            ]
+
             tex_coords = [
                 [0, 0],
                 [1, 0],
@@ -230,11 +234,26 @@ cdef class Renderer:
                 [0, 1]
             ]
         else:
-            tex_coords = [
-                [1, 0],
+            local_positions = [
                 [0, 0],
-                [0, 1],
-                [1, 1]
+                [region.width, 0],
+                [region.width, region.height],
+                [0, region.height]
+            ]
+
+            tex_coords = [
+                [region.x / size[0], region.y / size[1]],
+                [(region.x + region.width) / size[0], region.y / size[1]],
+                [(region.x + region.width) / size[0], (region.y + region.height) / size[1]],
+                [region.x / size[0], (region.y + region.height) / size[1]]
+            ]
+
+        if flipped:
+            tex_coords = [
+                tex_coords[1],
+                tex_coords[0],
+                tex_coords[3],
+                tex_coords[2]
             ]
 
         cdef vec3 _position = [position[0], position[1], 0.0]
@@ -263,7 +282,7 @@ cdef class Renderer:
 
 
     cdef void _draw_circle(self, vec4 color, vec2 position, float radius, float width = 0.0, float fade = 0.0):
-        if (self.count >= self.MAX_QUADS):
+        if self.count >= self.MAX_QUADS:
             self._end_batch()
             self._begin_batch()
 
@@ -317,7 +336,7 @@ cdef class Renderer:
     cdef void _draw_rectangle(self, vec4 color, vec2 position, vec2 size, float rotation, vec2 offset, float width, float fade):
         cdef size_t i
 
-        if (self.count >= self.MAX_QUADS):
+        if self.count >= self.MAX_QUADS:
             self._end_batch()
             self._begin_batch()
 
@@ -390,7 +409,7 @@ cdef class Renderer:
 
 
     cdef void _draw_line(self, vec4 color, vec2 start, vec2 end, float width):
-        if (self.count >= self.MAX_QUADS):
+        if self.count >= self.MAX_QUADS:
             self._end_batch()
             self._begin_batch()
 

@@ -1,7 +1,8 @@
 from engine.window import Window
 from engine.render import Renderer
 from engine.timer import Timer
-from engine.texture import Texture, TextureTarget
+from engine.texture import Texture, RenderTexture
+from engine.shapes import Rectangle
 from engine import constants
 
 import math
@@ -25,7 +26,7 @@ def spinning_star(renderer: Renderer, time):
         points.append((x, y))
 
     renderer.draw_lines((255, 0, 0, 255), points, 0.01)
-    # renderer.draw_lines((255, 0, 0, 255), points, 1)
+                                                      
 
 def main():
     WIN_SIZE = (1200, 800)
@@ -38,10 +39,11 @@ def main():
 
     texture_1 = Texture("imgs/Flappy Bird_1.png", resize_nearest=True)
     texture_1.resize(10, 10)
-    texture_2 = Texture("imgs/test2.jpeg")
-    texture_3 = Texture("imgs/test3.jpeg")
+    texture_2 = Texture("imgs/Flappy Bird_1.png", resize_nearest=True)
+    # texture_3 = Texture("imgs/test2.jpeg")
+    # texture_4 = Texture("imgs/test3.jpeg")
 
-    test_target = TextureTarget(window, WIN_SIZE)
+    test_target = RenderTexture(window, WIN_SIZE)
     # test_target = window.create_texture_target(WIN_SIZE)
 
     clock = Timer()
@@ -53,7 +55,7 @@ def main():
 
     time = 0
     while not window.should_close():
-        dt = clock.tick()
+        dt = clock.tick(60)
         time += dt
 
         framerate = clock.get_fps()
@@ -105,10 +107,14 @@ def main():
         renderer.clear()
 
         # texture test
-        dj = math.sin(time * 5) * 20
-        for i in range(300):
-            for j in range(300):
-                renderer.draw_texture(texture_1, (i * 10, j * 10))
+        # dt = math.sin(time * 5) * 20
+        # for i in range(300):
+        #     for j in range(300):
+        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
+
+        # texture region test
+        renderer.draw_texture(texture_2, (0, 0), region=Rectangle(0, 0, 100, 100))
+        renderer.draw_texture(texture_2, (100, 0))
 
         # circle test
         # for i in range(100):

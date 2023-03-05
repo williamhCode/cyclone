@@ -27,6 +27,7 @@ files= [
     ("engine.shader", "engine/shader.pyx"),
     ("engine.texture", "engine/texture.pyx"),
     ("engine.callback", "engine/callback.pyx"),
+    ("engine.shapes", "engine/shapes.pyx"),
 ]
 
 # stubs

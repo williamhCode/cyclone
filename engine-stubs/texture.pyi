@@ -12,7 +12,7 @@ class Texture:
     def size(self) -> tuple[int, int]: ...
 
 
-class TextureTarget(Texture):
+class RenderTexture(Texture):
     framebuffer_width: int
     framebuffer_height: int
 

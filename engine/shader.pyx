@@ -13,7 +13,7 @@ import traceback
 cdef char *_read_file(const char *filename) except *:
     cdef FILE *file = fopen(filename, "r")
 
-    if (file == NULL):
+    if file == NULL:
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
     fseek(file, 0, SEEK_END)
@@ -23,9 +23,9 @@ cdef char *_read_file(const char *filename) except *:
     cdef char *out = <char *>malloc(sizeof(char) * (length + 1))
     cdef char c
     cdef int i = 0
-    while (True):
+    while True:
         c = fgetc(file)
-        if (c == EOF):
+        if c == EOF:
             break
         out[i] = c
         i += 1
@@ -39,15 +39,15 @@ cdef char *_read_file(const char *filename) except *:
 cdef void _checkCompileErrors(GLuint shader, const char *compile_type, const char *path) except *:
     cdef GLint success
     cdef GLchar infoLog[1024]
-    if (strcmp(compile_type, "PROGRAM") != 0):
+    if strcmp(compile_type, "PROGRAM") != 0:
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success)
-        if (not success):
+        if not success:
             glGetShaderInfoLog(shader, 1024, NULL, infoLog)
             raise RuntimeError(f"Error compiling shader at {path.decode()}:\n{infoLog.decode()}")
 
     else:
         glGetProgramiv(shader, GL_LINK_STATUS, &success)
-        if (not success):
+        if not success:
             glGetProgramInfoLog(shader, 1024, NULL, infoLog)
             raise RuntimeError(f"Error linking shader at {path.decode()}:\n{infoLog.decode()}")
 

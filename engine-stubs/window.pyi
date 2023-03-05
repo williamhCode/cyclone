@@ -1,5 +1,6 @@
 from engine.render import Renderer
-from engine.texture import TextureTarget
+from engine.texture import RenderTexture
+from engine.event import *
 from ._common import Vec2, CallbackData
 
 class Window:
@@ -9,7 +10,7 @@ class Window:
 
     def create_renderer(self) -> Renderer: ...
 
-    def create_texture_target(self, size: Vec2, resize_nearest: bool = False, high_dpi: bool = True) -> TextureTarget: ...
+    def create_texture_target(self, size: Vec2, resize_nearest: bool = False, high_dpi: bool = True) -> RenderTexture: ...
 
     def set_title(self, title: str) -> None: ...
 

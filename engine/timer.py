@@ -12,8 +12,13 @@ class Timer:
         if fps != None:
             frame_cap = 1 / fps
 
-            while True:
+            # time_2 = time.perf_counter()
+            # self.unprocessed += time_2 - self.time
+            # self.time = time_2
+            # time.sleep(max(0, frame_cap - self.unprocessed))
+            # self.unprocessed -= frame_cap
 
+            while True:
                 if self.unprocessed >= frame_cap:
                     self.unprocessed -= frame_cap
                     break
@@ -22,7 +27,7 @@ class Timer:
                 self.unprocessed += time_2 - self.time
                 self.time = time_2
 
-                time.sleep(0.00005)
+                time.sleep(0.0001)
 
         if self.unprocessed > 0.1:
             self.unprocessed -= 0.1

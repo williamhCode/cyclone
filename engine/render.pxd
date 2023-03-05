@@ -3,6 +3,7 @@ from engine.lib.cglm cimport *
 
 from engine.shader cimport *
 from engine.window cimport Window
+from engine.shapes cimport Rectangle
 
 
 cdef struct Vertex:
@@ -49,7 +50,7 @@ cdef class Renderer:
 
     cdef void _handle_color(self, py_color, vec4 color)
 
-    cdef void _draw_texture(self, GLuint texture_id, vec2 position, vec2 size, float rotation, vec2 offset, bint flipped, vec4 color)
+    cdef void _draw_texture(self, GLuint texture_id, vec2 position, vec2 size, float rotation, vec2 offset, Rectangle region, bint flipped, vec4 color)
 
     cdef void _draw_circle(self, vec4 color, vec2 position, float radius, float width = *, float fade = *)
 

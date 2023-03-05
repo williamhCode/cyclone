@@ -1,5 +1,3 @@
-
-
 cdef class KeyData:
     cdef:
         public int key

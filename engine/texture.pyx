@@ -15,7 +15,7 @@ cdef class Texture:
         cdef unsigned char *data = stbi_load(filepath.encode(), &self.width, &self.height, &n, 4)
 
         # create texture
-        if (data):
+        if data:
             self._generate_texture(data, self.width, self.height)
         else:
             raise RuntimeError(f"Failed to load texture at {filepath}")
@@ -32,7 +32,7 @@ cdef class Texture:
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        if (self.resize_nearest):
+        if self.resize_nearest:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         else:
@@ -51,7 +51,7 @@ cdef class Texture:
         return (self.width, self.height)
 
 
-cdef class TextureTarget(Texture):
+cdef class RenderTexture(Texture):
 
     def __init__(self, Window window, size, bint resize_nearest=False, bint high_dpi=True):
         self.resize_nearest = resize_nearest

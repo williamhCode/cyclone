@@ -13,7 +13,7 @@ cdef class Texture:
     cdef _generate_texture(self, unsigned char *data, int width, int height)
 
 
-cdef class TextureTarget(Texture):
+cdef class RenderTexture(Texture):
     cdef:
         GLuint fbo
         public int framebuffer_width
