@@ -1,5 +1,5 @@
 cdef class Rectangle:
-    
+
     def __init__(self, float x, float y, float width, float height):
         self.x = x
         self.y = y
@@ -13,4 +13,3 @@ cdef class Rectangle:
     @property
     def size(self):
         return self.width, self.height
-

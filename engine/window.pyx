@@ -3,7 +3,9 @@ from engine.lib.glfw cimport *
 
 from engine.render cimport Renderer
 from engine.texture cimport RenderTexture
-from engine.constants import KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK
+from engine.constants import (
+    KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK
+)
 from engine.callback import *
 
 
@@ -27,28 +29,40 @@ cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, in
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.callbacks.append((KEY_CALLBACK, KeyData(key, scancode, action, mods)))
+            curr_window.callbacks.append(
+                (KEY_CALLBACK, KeyData(key, scancode, action, mods))
+            )
 
 
 cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int mods):
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.callbacks.append((MOUSE_BUTTON_CALLBACK, MouseButtonData(button, action, mods)))
+            curr_window.callbacks.append(
+                (MOUSE_BUTTON_CALLBACK, MouseButtonData(button, action, mods))
+            )
 
 
 cdef void cursor_position_callback(GLFWwindow* window, double xpos, double ypos):
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
-            curr_window.callbacks.append((CURSOR_POSITION_CALLBACK, CursorPositionData(xpos, ypos)))
+            curr_window.callbacks.append(
+                (CURSOR_POSITION_CALLBACK, CursorPositionData(xpos, ypos))
+            )
 
 
 windows = []
 
 cdef class Window:
 
-    def __init__(self, size, str title="'Engine Name' Window", bint vsync=False, bint high_dpi=True):
+    def __init__(
+        self,
+        size,
+        str title="'Engine Name' Window",
+        bint vsync=False,
+        bint high_dpi=True
+    ):
         self.title = title
         self.high_dpi = high_dpi
 
@@ -85,7 +99,9 @@ cdef class Window:
 
         # get initial window size
         glfwGetWindowSize(self.window, &self.width, &self.height)
-        glfwGetFramebufferSize(self.window, &self.framebuffer_width, &self.framebuffer_height)
+        glfwGetFramebufferSize(
+            self.window, &self.framebuffer_width, &self.framebuffer_height
+        )
 
         # vsync
         if not vsync:
@@ -105,7 +121,9 @@ cdef class Window:
     def create_renderer(self):
         return Renderer(self)
 
-    def create_render_texture(self, size, bint resize_nearest=False, bint high_dpi=True):
+    def create_render_texture(
+        self, size, bint resize_nearest=False, bint high_dpi=True
+    ):
         return RenderTexture(self, size, resize_nearest, high_dpi)
 
     def set_title(self, str title):

@@ -34,23 +34,31 @@ cdef char *_read_file(const char *filename) except *:
     return out
 
 
-cdef void _checkCompileErrors(GLuint shader, const char *compile_type, const char *path) except *:
+cdef void _checkCompileErrors(
+    GLuint shader, const char *compile_type, const char *path
+) except *:
     cdef GLint success
     cdef GLchar infoLog[1024]
     if strcmp(compile_type, "PROGRAM") != 0:
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success)
         if not success:
             glGetShaderInfoLog(shader, 1024, NULL, infoLog)
-            raise RuntimeError(f"Error compiling shader at {path.decode()}:\n{infoLog.decode()}")
+            raise RuntimeError(
+                f"Error compiling shader at {path.decode()}:\n{infoLog.decode()}"
+            )
 
     else:
         glGetProgramiv(shader, GL_LINK_STATUS, &success)
         if not success:
             glGetProgramInfoLog(shader, 1024, NULL, infoLog)
-            raise RuntimeError(f"Error linking shader at {path.decode()}:\n{infoLog.decode()}")
+            raise RuntimeError(
+                f"Error linking shader at {path.decode()}:\n{infoLog.decode()}"
+            )
 
 
-cdef void shader_create(s_Shader *self, const char *vs_path, const char *fs_path) except *:
+cdef void shader_create(
+    s_Shader *self, const char *vs_path, const char *fs_path
+) except *:
     cdef char *vShaderCode = _read_file(vs_path)
     cdef char *fShaderCode = _read_file(fs_path)
 
@@ -90,7 +98,9 @@ cdef void shader_use(const s_Shader *self):
     glUseProgram(self.ID)
 
 
-cdef void shader_set_int_array(const s_Shader *self, const char *name, GLsizei count, const GLint *value):
+cdef void shader_set_int_array(
+    const s_Shader *self, const char *name, GLsizei count, const GLint *value
+):
     glUniform1iv(glGetUniformLocation(self.ID, name), count, value)
 
 

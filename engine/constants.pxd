@@ -1,4 +1,4 @@
 # cdef:
-#     public int KEY_CALLBACK
-#     public int MOUSE_BUTTON_CALLBACK
-#     public int CURSOR_POSITION_CALLBACK
+#     int CY_KEY_CALLBACK = 0
+#     int CY_MOUSE_BUTTON_CALLBACK = 1
+#     int CY_CURSOR_POSITION_CALLBACK = 2

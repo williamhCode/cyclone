@@ -46,7 +46,7 @@ macros = [
 
 # compiler -------------------------------------
 language = "c"
-default = ["-w"]
+default_args = ["-w"]
 debug_args = ["-w", "-O0"]
 release_args = ["-w", "-O3", "-ffast-math", "-march=native"]
 args = debug_args

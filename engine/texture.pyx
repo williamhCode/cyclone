@@ -12,7 +12,9 @@ cdef class Texture:
         # load data from filapath
         stbi_set_flip_vertically_on_load(1)
         cdef int n
-        cdef unsigned char *data = stbi_load(filepath.encode(), &self.width, &self.height, &n, 4)
+        cdef unsigned char *data = stbi_load(
+            filepath.encode(), &self.width, &self.height, &n, 4
+        )
 
         # create texture
         if data:
@@ -39,7 +41,9 @@ cdef class Texture:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data)
+        glTexImage2D(
+            GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data
+        )
         glGenerateMipmap(GL_TEXTURE_2D)
 
     def resize(self, int width, int height):
@@ -53,15 +57,21 @@ cdef class Texture:
 
 cdef class RenderTexture(Texture):
 
-    def __init__(self, Window window, size, bint resize_nearest=False, bint high_dpi=True):
+    def __init__(
+        self, Window window, size, bint resize_nearest=False, bint high_dpi=True
+    ):
         self.resize_nearest = resize_nearest
         self.width = size[0]
         self.height = size[1]
 
         # if high_dpi is True, use the window's size to framebuffer_size scale
         if high_dpi:
-            self.framebuffer_width = self.width * window.framebuffer_width // window.width
-            self.framebuffer_height = self.height * window.framebuffer_height // window.height
+            self.framebuffer_width = (
+                self.width * window.framebuffer_width // window.width
+            )
+            self.framebuffer_height = (
+                self.height * window.framebuffer_height // window.height
+            )
         else:
             self.framebuffer_width = self.width
             self.framebuffer_height = self.height
@@ -73,7 +83,9 @@ cdef class RenderTexture(Texture):
         glBindFramebuffer(GL_FRAMEBUFFER, self.fbo)
 
         # attach texture to framebuffer
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.texture_id, 0)
+        glFramebufferTexture2D(
+            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.texture_id, 0
+        )
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
 

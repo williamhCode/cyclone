@@ -28,7 +28,9 @@ cdef class Renderer:
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &self.MAX_TEXTURE_SLOTS)
 
         # shader stuff ----------------------------------------- #
-        shader_create(&self.shader, './engine/shaders/all.vert', './engine/shaders/all.frag')
+        shader_create(
+            &self.shader, './engine/shaders/all.vert', './engine/shaders/all.frag'
+        )
         self.shaders = [self.shader]
 
         # set sampler2Ds
@@ -57,17 +59,45 @@ cdef class Renderer:
         # vec4 color
         # vec4[3] extra_data
         glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), <void *><size_t>&((<Vertex *>0).render_type))
+        glVertexAttribPointer(
+            0,
+            1,
+            GL_FLOAT,
+            GL_FALSE,
+            sizeof(Vertex),
+            <void *><size_t>&((<Vertex *>0).render_type)
+        )
 
         glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), <void *><size_t>&((<Vertex *>0).position))
+        glVertexAttribPointer(
+            1,
+            3,
+            GL_FLOAT,
+            GL_FALSE,
+            sizeof(Vertex),
+            <void *><size_t>&((<Vertex *>0).position)
+        )
 
         glEnableVertexAttribArray(2)
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), <void *><size_t>&((<Vertex *>0).color))
+        glVertexAttribPointer(
+            2,
+            4,
+            GL_FLOAT,
+            GL_FALSE,
+            sizeof(Vertex),
+            <void *><size_t>&((<Vertex *>0).color)
+        )
 
         for i in range(3):
             glEnableVertexAttribArray(i + 3)
-            glVertexAttribPointer(i + 3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), <void *><size_t>&((<Vertex *>0).extra_data[i]))
+            glVertexAttribPointer(
+                i + 3,
+                4,
+                GL_FLOAT,
+                GL_FALSE,
+                sizeof(Vertex),
+                <void *><size_t>&((<Vertex *>0).extra_data[i])
+            )
 
         # generate index buffer and buffer data
         cdef GLuint *indices = <GLuint *>malloc(self.MAX_INDICES * sizeof(GLuint))
@@ -119,7 +149,9 @@ cdef class Renderer:
     def begin(self, view_matrix=None, RenderTexture texture=None):
         if texture is None:
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
-            glViewport(0, 0, self.window.framebuffer_width, self.window.framebuffer_height)
+            glViewport(
+                0, 0, self.window.framebuffer_width, self.window.framebuffer_height
+            )
             self._set_proj_mat(self.window.width, self.window.height)
         else:
             glBindFramebuffer(GL_FRAMEBUFFER, texture.fbo)
@@ -164,11 +196,27 @@ cdef class Renderer:
 
     cdef void _handle_color(self, py_color, vec4 color):
         if len(py_color) == 3:
-            color[:4] = [py_color[0]/255.0, py_color[1]/255.0, py_color[2]/255.0, 1.0]
+            color[:4] = [
+                py_color[0] / 255.0, py_color[1] / 255.0, py_color[2] / 255.0, 1.0
+            ]
         else:
-            color[:4] = [py_color[0]/255.0, py_color[1]/255.0, py_color[2]/255.0, py_color[3]/255.0]
+            color[:4] = [
+                py_color[0] / 255.0,
+                py_color[1] / 255.0,
+                py_color[2] / 255.0,
+                py_color[3] / 255.0
+            ]
 
-    def draw_texture(self, Texture texture, position, float rotation=0.0, offset=(0.0, 0.0), Rectangle region=None, bint flipped=False, color=(255, 255, 255, 255)):
+    def draw_texture(
+        self,
+        Texture texture,
+        position,
+        float rotation=0.0,
+        offset=(0.0, 0.0),
+        Rectangle region=None,
+        bint flipped=False,
+        color=(255, 255, 255, 255)
+    ):
         cdef GLuint texture_id = texture.texture_id
         cdef vec2 t_position = [position[0], position[1]]
         cdef vec2 t_size = [texture.width, texture.height]
@@ -176,12 +224,27 @@ cdef class Renderer:
         cdef vec4 t_color
         self._handle_color(color, t_color)
 
-        self._draw_texture(texture_id, t_position, t_size, rotation, t_offset, region, flipped, t_color)
+        self._draw_texture(
+            texture_id, t_position, t_size, rotation, t_offset, region, flipped, t_color
+        )
 
-    cdef void _draw_texture(self, GLuint texture_id, vec2 position, vec2 size, float rotation, vec2 offset, Rectangle region, bint flipped, vec4 color):
+    cdef void _draw_texture(
+        self,
+        GLuint texture_id,
+        vec2 position,
+        vec2 size,
+        float rotation,
+        vec2 offset,
+        Rectangle region,
+        bint flipped,
+        vec4 color
+    ):
         cdef size_t i
 
-        if self.count >= self.MAX_QUADS or self.texture_slot_index >= self.MAX_TEXTURE_SLOTS:
+        if (
+            self.count >= self.MAX_QUADS
+            or self.texture_slot_index >= self.MAX_TEXTURE_SLOTS
+        ):
             self._end_batch()
             self._begin_batch()
 
@@ -225,7 +288,8 @@ cdef class Renderer:
             tex_coords = [
                 [region.x / size[0], region.y / size[1]],
                 [(region.x + region.width) / size[0], region.y / size[1]],
-                [(region.x + region.width) / size[0], (region.y + region.height) / size[1]],
+                [(region.x + region.width) / size[0],
+                 (region.y + region.height) / size[1]],
                 [region.x / size[0], (region.y + region.height) / size[1]]
             ]
 
@@ -252,7 +316,14 @@ cdef class Renderer:
 
         self.count += 1
 
-    def draw_circle(self, color, position, float radius, float width = 0.0, float fade = 0.0):
+    def draw_circle(
+        self,
+        color,
+        position,
+        float radius,
+        float width = 0.0,
+        float fade = 0.0
+    ):
         cdef vec4 t_color
         self._handle_color(color, t_color)
         cdef vec2 t_position = [position[0], position[1]]
@@ -260,7 +331,14 @@ cdef class Renderer:
         self._draw_circle(t_color, t_position, radius, width, fade)
         self.count += 1
 
-    cdef void _draw_circle(self, vec4 color, vec2 position, float radius, float width = 0.0, float fade = 0.0):
+    cdef void _draw_circle(
+            self,
+            vec4 color,
+            vec2 position,
+            float radius,
+            float width = 0.0,
+            float fade = 0.0
+    ):
         if self.count >= self.MAX_QUADS:
             self._end_batch()
             self._begin_batch()
@@ -274,9 +352,9 @@ cdef class Renderer:
 
         cdef vec2[4] local_positions = [
             [-1.0, -1.0],
-            [ 1.0, -1.0],
-            [ 1.0,  1.0],
-            [-1.0,  1.0]
+            [1.0, -1.0],
+            [1.0, 1.0],
+            [-1.0, 1.0]
         ]
 
         cdef float thickness
@@ -300,17 +378,37 @@ cdef class Renderer:
         self.count += 1
 
     # rectangle functions ----------------------------------- #
-    def draw_rectangle(self, color, position, size, float rotation=0.0, offset=(0.0, 0.0), float width=0.0, float fade=0.0):
+    def draw_rectangle(
+        self,
+        color,
+        position,
+        size,
+        float rotation=0.0,
+        offset=(0.0, 0.0),
+        float width=0.0,
+        float fade=0.0
+    ):
         cdef vec4 t_color
         self._handle_color(color, t_color)
         cdef vec2 t_position = [position[0], position[1]]
         cdef vec2 t_size = [size[0], size[1]]
         cdef vec2 t_offset = [offset[0], offset[1]]
 
-        self._draw_rectangle(t_color, t_position, t_size, rotation, t_offset, width, fade)
+        self._draw_rectangle(
+            t_color, t_position, t_size, rotation, t_offset, width, fade
+        )
         self.count += 1
 
-    cdef void _draw_rectangle(self, vec4 color, vec2 position, vec2 size, float rotation, vec2 offset, float width, float fade):
+    cdef void _draw_rectangle(
+        self,
+        vec4 color,
+        vec2 position,
+        vec2 size,
+        float rotation,
+        vec2 offset,
+        float width,
+        float fade
+    ):
         cdef size_t i
 
         if self.count >= self.MAX_QUADS:
@@ -328,9 +426,9 @@ cdef class Renderer:
 
         cdef vec2[4] relative_coords = [
             [-1.0, -1.0],
-            [ 1.0, -1.0],
-            [ 1.0,  1.0],
-            [-1.0,  1.0]
+            [1.0, -1.0],
+            [1.0, 1.0],
+            [-1.0, 1.0]
         ]
 
         cdef vec2 thickness
@@ -387,7 +485,10 @@ cdef class Renderer:
             self._end_batch()
             self._begin_batch()
 
-        cdef float corner_angle = math.atan2(end[1] - start[1], end[0] - start[0]) + math.pi / 2
+        cdef float corner_angle = (
+            math.atan2(end[1] - start[1], end[0] - start[0]) + math.pi / 2
+        )
+
         cdef vec2 corner_offset
         glm_vec2_rotate([width / 2, 0], corner_angle, corner_offset)
         cdef vec3[4] positions = [

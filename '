@@ -101,15 +101,15 @@ def main():
         camera.look_at(look_pos)
 
         # render to texture target
-        # renderer.begin(view_matrix=camera.get_transform())
-        renderer.begin(view_matrix=camera.get_transform(), texture=test_target)
+        renderer.begin(view_matrix=camera.get_transform())
+        # renderer.begin(view_matrix=camera.get_transform(), target=test_target)
         renderer.clear()
 
         # texture test
         # dt = math.sin(time * 5) * 20
-        for i in range(300):
-            for j in range(300):
-                renderer.draw_texture(texture_1, (i * 10, j * 10))
+        # for i in range(300):
+        #     for j in range(300):
+        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # texture region test
         # renderer.draw_texture(texture_2, (0, 0), region=Rectangle(0, 0, 100, 100))
@@ -118,7 +118,7 @@ def main():
         # circle test
         # for i in range(100):
         #     for j in range(100):
-        #         renderer.draw_circle((255, 255, 0, 255), (i * 20, j * 20), 10, width=1, fade=0.1)
+        #         renderer.draw_circle((255, 255, 0, 255), (i * 10, j * 10), 40, width=2, fade=0.5)
 
         # rectangle test
         # for i in range(300):
@@ -126,26 +126,26 @@ def main():
         #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
         # line test
-        # spinning_star(renderer, time)
+        spinning_star(renderer, time)
 
         # layering test
         # renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200), width=20, fade=10)
-        # renderer.draw_texture(texture_2, (150, 150))
+        # renderer.draw_texture(texture_1, (150, 150))
         # renderer.draw_circle((100, 200, 100), (300, 300), 100, width=50, fade=10)
 
         # renderer.draw_rectangle((200, 100, 100), (250, 250), (200, 200), width=50, fade=10)
-        # renderer.draw_texture(texture_2, (300, 300))
+        # renderer.draw_texture(texture_1, (300, 300))
         # renderer.draw_circle((100, 200, 100), (450, 450), 100, width=50, fade=10)
 
         renderer.end()
 
         # render to main screen
-        renderer.begin()
-        renderer.clear()
+        # renderer.begin()
+        # renderer.clear()
 
-        renderer.draw_texture(test_target, (0, 0))
+        # renderer.draw_texture(test_target, (0, 0))
 
-        renderer.end()
+        # renderer.end()
 
         window.update()
 

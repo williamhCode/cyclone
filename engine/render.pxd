@@ -50,11 +50,37 @@ cdef class Renderer:
 
     cdef void _handle_color(self, py_color, vec4 color)
 
-    cdef void _draw_texture(self, GLuint texture_id, vec2 position, vec2 size, float rotation, vec2 offset, Rectangle region, bint flipped, vec4 color)
+    cdef void _draw_texture(
+        self,
+        GLuint texture_id,
+        vec2 position,
+        vec2 size,
+        float rotation,
+        vec2 offset,
+        Rectangle region,
+        bint flipped,
+        vec4 color
+    )
 
-    cdef void _draw_circle(self, vec4 color, vec2 position, float radius, float width = *, float fade = *)
+    cdef void _draw_circle(
+        self,
+        vec4 color,
+        vec2 position,
+        float radius,
+        float width = *,
+        float fade = *
+    )
 
-    cdef void _draw_rectangle(self, vec4 color, vec2 position, vec2 size, float rotation, vec2 offset, float width, float fade)
+    cdef void _draw_rectangle(
+        self,
+        vec4 color,
+        vec2 position,
+        vec2 size,
+        float rotation,
+        vec2 offset,
+        float width,
+        float fade
+    )
 
     cdef void _draw_line(self, vec4 color, vec2 start, vec2 end, float width)
 
