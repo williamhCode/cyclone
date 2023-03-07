@@ -1,4 +1,4 @@
-# 2D-Graphics-Lib (trying to come up with an actual name)
+# Cyclone 2d Graphics Library
 _A 2D batch renderer written in Python, Cython and OpenGL._
 
 ## Goal
