@@ -4,10 +4,10 @@ from OpenGL.GL import *
 import glm
 from glm import vec2
 
-import engine.timer as timer
+import cyclone.timer as timer
 import math
 
-from engine.render import Renderer
+from cyclone.render import Renderer
 
 from dataclasses import dataclass
 

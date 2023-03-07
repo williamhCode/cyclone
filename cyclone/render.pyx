@@ -4,13 +4,13 @@ from libc cimport math
 from libc.stdio cimport *
 from libc.stdlib cimport malloc, free
 
-from engine.lib.glad cimport *
-from engine.lib.cglm cimport *
+from cyclone.lib.glad cimport *
+from cyclone.lib.cglm cimport *
 
-from engine.shader cimport *
-from engine.window cimport Window
-from engine.shapes cimport Rectangle
-from engine.texture cimport Texture, RenderTexture
+from cyclone.shader cimport *
+from cyclone.window cimport Window
+from cyclone.shapes cimport Rectangle
+from cyclone.texture cimport Texture, RenderTexture
 
 
 cdef class Renderer:
@@ -29,7 +29,7 @@ cdef class Renderer:
 
         # shader stuff ----------------------------------------- #
         shader_create(
-            &self.shader, './engine/shaders/all.vert', './engine/shaders/all.frag'
+            &self.shader, './cyclone/shaders/all.vert', './cyclone/shaders/all.frag'
         )
         self.shaders = [self.shader]
 
@@ -317,12 +317,7 @@ cdef class Renderer:
         self.count += 1
 
     def draw_circle(
-        self,
-        color,
-        position,
-        float radius,
-        float width = 0.0,
-        float fade = 0.0
+        self, color, position, float radius, float width = 0.0, float fade = 0.0
     ):
         cdef vec4 t_color
         self._handle_color(color, t_color)
@@ -332,12 +327,12 @@ cdef class Renderer:
         self.count += 1
 
     cdef void _draw_circle(
-            self,
-            vec4 color,
-            vec2 position,
-            float radius,
-            float width = 0.0,
-            float fade = 0.0
+        self,
+        vec4 color,
+        vec2 position,
+        float radius,
+        float width = 0.0,
+        float fade = 0.0
     ):
         if self.count >= self.MAX_QUADS:
             self._end_batch()

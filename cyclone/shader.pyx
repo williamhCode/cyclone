@@ -1,8 +1,8 @@
 from libc.stdio cimport *
 from libc.string cimport strcmp
 from libc.stdlib cimport malloc, free
-from engine.lib.glad cimport *
-from engine.lib.cglm cimport *
+from cyclone.lib.glad cimport *
+from cyclone.lib.cglm cimport *
 
 import errno
 import os
@@ -10,7 +10,6 @@ import os
 
 cdef char *_read_file(const char *filename) except *:
     cdef FILE *file = fopen(filename, "r")
-
     if file == NULL:
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
@@ -39,7 +38,7 @@ cdef void _checkCompileErrors(
 ) except *:
     cdef GLint success
     cdef GLchar infoLog[1024]
-    if strcmp(compile_type, "PROGRAM") != 0:
+    if not strcmp(compile_type, "PROGRAM") == 0:
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success)
         if not success:
             glGetShaderInfoLog(shader, 1024, NULL, infoLog)

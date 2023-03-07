@@ -2,12 +2,13 @@ from setuptools import Extension, setup
 from Cython.Build import cythonize
 from pathlib import Path
 import platform
+import os
 
 # platform specific ----------------------------
 system = platform.system()
 
 platform_library_dirs = {
-    "Darwin": ["engine/lib/shared/Darwin"],
+    "Darwin": ["cyclone/lib/shared/Darwin"],
 }
 library_dirs = platform_library_dirs[system]
 
@@ -20,22 +21,34 @@ platform_libraries = {
 libraries = platform_libraries[system]
 
 # general --------------------------------------
-files= [
-    ("engine.render", "engine/render.pyx"),
-    ("engine.window", "engine/window.pyx"),
-    ("engine.constants", "engine/constants.pyx"),
-    ("engine.shader", "engine/shader.pyx"),
-    ("engine.texture", "engine/texture.pyx"),
-    ("engine.callback", "engine/callback.pyx"),
-    ("engine.shapes", "engine/shapes.pyx"),
-]
+files = []
+for path, dirs, file_names in os.walk("cyclone"):
+    for file_name in file_names:
+        if file_name.endswith("pyx"):
+            ext_path = "{0}/{1}".format(path, file_name)
+            ext_name = (
+                ext_path
+                .replace("", "")
+                .replace("/", ".")
+                .replace(".pyx", "")
+            )
+            files.append((ext_name, ext_path))
+# files= [
+#     ("cyclone.render", "cyclone/render.pyx"),
+#     ("cyclone.window", "cyclone/window.pyx"),
+#     ("cyclone.constants", "cyclone/constants.pyx"),
+#     ("cyclone.shader", "cyclone/shader.pyx"),
+#     ("cyclone.texture", "cyclone/texture.pyx"),
+#     ("cyclone.callbacks", "cyclone/callbacks.pyx"),
+#     ("cyclone.shapes", "cyclone/shapes.pyx"),
+# ]
 
 # stubs
-# packages = ["engine-stubs"]
-# package_data = {"engine-stubs": ["*.pyi"]}
+# packages = ["cyclone-stubs"]
+# package_data = {"cyclone-stubs": ["*.pyi"]}
 
 include_dirs = [
-    "engine/lib/include", 
+    "cyclone/lib/include", 
 ]
 
 macros = [
@@ -73,7 +86,7 @@ for ext_name, ext_path in files:
     extensions.append(ext)
 
 setup(
-    name='engine',
+    name='cyclone',
     version='0.1.0',
     description='A 2d graphics library written in cython',
     ext_modules=cythonize(
@@ -88,26 +101,5 @@ setup(
     # include_package_data=True,
 )
 
-# export DYLD_FALLBACK_LIBRARY_PATH=/Users/williamhou/Documents/Coding/Personal-coding/2D-Graphics-Lib/engine/lib/shared/Darwin
+# export DYLD_FALLBACK_LIBRARY_PATH=/Users/williamhou/Documents/Coding/Personal-coding/2D-Graphics-Lib/cyclone/lib/shared/Darwin
 
-# for path, dirs, file_names in os.walk("."):
-#     for file_name in file_names:
-#         if file_name.endswith("pyx"):
-#             ext_path = "{0}/{1}".format(path, file_name)
-#             ext_name = (
-#                 ext_path
-#                 .replace("", "")
-#                 .replace("/", ".")
-#                 .replace(".pyx", "")
-#             )
-#             ext = Extension(
-#                 name=ext_name, 
-#                 sources=[ext_path], 
-#                 libraries=libraries,
-#                 language=language,
-#                 include_dirs=include_dirs,
-#                 library_dirs=lib_dirs,
-#                 runtime_library_dirs=lib_dirs,
-#                 extra_compile_args=args,
-#             )
-#             extensions.append(ext)

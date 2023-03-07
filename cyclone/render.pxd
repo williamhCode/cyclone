@@ -1,9 +1,9 @@
-from engine.lib.glad cimport *
-from engine.lib.cglm cimport *
+from cyclone.lib.glad cimport *
+from cyclone.lib.cglm cimport *
 
-from engine.shader cimport *
-from engine.window cimport Window
-from engine.shapes cimport Rectangle
+from cyclone.shader cimport *
+from cyclone.window cimport Window
+from cyclone.shapes cimport Rectangle
 
 
 cdef struct Vertex:

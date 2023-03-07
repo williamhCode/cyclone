@@ -1,12 +1,12 @@
-from engine.lib.glad cimport *
-from engine.lib.glfw cimport *
+from cyclone.lib.glad cimport *
+from cyclone.lib.glfw cimport *
 
-from engine.render cimport Renderer
-from engine.texture cimport RenderTexture
-from engine.constants import (
+from cyclone.render cimport Renderer
+from cyclone.texture cimport RenderTexture
+from cyclone.constants import (
     KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK
 )
-from engine.callback import *
+from cyclone.callback import *
 
 
 cdef void window_size_callback(GLFWwindow* window, int width, int height):
@@ -59,7 +59,7 @@ cdef class Window:
     def __init__(
         self,
         size,
-        str title="'Engine Name' Window",
+        str title="Cyclone Window",
         bint vsync=False,
         bint high_dpi=True
     ):

@@ -1,16 +1,18 @@
-from engine.lib.glad cimport *
+from cyclone.lib.glad cimport *
 
-from engine.window cimport Window
+from cyclone.window cimport Window
 
 
 cdef class Texture:
     cdef:
         GLuint texture_id
+        int orig_width
+        int orig_height
         public int width
         public int height
         public bint resize_nearest
 
-    cdef _generate_texture(self, unsigned char *data, int width, int height)
+    cdef void _generate_texture(self, unsigned char *data, int width, int height)
 
 
 cdef class RenderTexture(Texture):

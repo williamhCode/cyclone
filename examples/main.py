@@ -1,9 +1,9 @@
-from engine.window import Window
-from engine.render import Renderer
-from engine.timer import Timer
-from engine.texture import Texture, RenderTexture
-from engine.shapes import Rectangle
-from engine import constants
+from cyclone.window import Window
+from cyclone.render import Renderer
+from cyclone.timer import Timer
+from cyclone.texture import Texture, RenderTexture
+from cyclone.shapes import Rectangle
+from cyclone import constants
 
 import math
 import glm
@@ -107,9 +107,9 @@ def main():
 
         # texture test
         # dt = math.sin(time * 5) * 20
-        for i in range(300):
-            for j in range(300):
-                renderer.draw_texture(texture_1, (i * 10, j * 10))
+        # for i in range(300):
+        #     for j in range(300):
+        #         renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # texture region test
         # renderer.draw_texture(texture_2, (0, 0), region=Rectangle(0, 0, 100, 100))
@@ -126,7 +126,7 @@ def main():
         #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
         # line test
-        # spinning_star(renderer, time)
+        spinning_star(renderer, time)
 
         # layering test
         # renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200), width=20, fade=10)

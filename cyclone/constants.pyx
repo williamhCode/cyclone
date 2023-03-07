@@ -1,4 +1,4 @@
-from engine.lib.glfw cimport *
+from cyclone.lib.glfw cimport *
 
 # library constants
 KEY_CALLBACK = 0

@@ -8,7 +8,7 @@ The purpose of the library is to provide a blazingly fast Python 2D graphics lib
 The design philosophy is BYO (bring your own), meaning that it only takes care of windowing and drawing, and nothing else. This makes it easy to integrate with external libraries like a physics engine that has their own vector classes, objects, etc., and also makes it a lot more flexible. Plus, why rewrite when there's already awesome libraries out there?
 
 ## Building
-`python setup.py` to build Cython sources. Engine code in 'engine/'.  
+`python setup.py` to build Cython sources. Engine code in 'cyclone/'.  
 
 _Note: currently only builds for macOS_
 

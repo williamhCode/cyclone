@@ -1,7 +1,7 @@
-from engine.lib.glad cimport *
-from engine.lib.glfw cimport *
+from cyclone.lib.glad cimport *
+from cyclone.lib.glfw cimport *
 
-from engine.render cimport Renderer
+from cyclone.render cimport Renderer
 
 
 cdef class Window:

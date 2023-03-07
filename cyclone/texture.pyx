@@ -1,7 +1,7 @@
-from engine.lib.glad cimport *
-from engine.lib.stb_image cimport *
+from cyclone.lib.glad cimport *
+from cyclone.lib.stb_image cimport *
 
-from engine.window import Window
+from cyclone.window import Window
 
 
 cdef class Texture:
@@ -15,6 +15,8 @@ cdef class Texture:
         cdef unsigned char *data = stbi_load(
             filepath.encode(), &self.width, &self.height, &n, 4
         )
+        self.orig_width = self.width
+        self.orig_height = self.height
 
         # create texture
         if data:
@@ -28,7 +30,7 @@ cdef class Texture:
         glDeleteTextures(1, &self.texture_id)
 
     # initialize width, height, and resize_nearest before calling this function
-    cdef _generate_texture(self, unsigned char *data, int width, int height):
+    cdef void _generate_texture(self, unsigned char *data, int width, int height):
         glGenTextures(1, &self.texture_id)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
 
@@ -45,6 +47,10 @@ cdef class Texture:
             GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data
         )
         glGenerateMipmap(GL_TEXTURE_2D)
+
+    def reset_size(self):
+        self.width = self.orig_width
+        self.height = self.orig_height
 
     def resize(self, int width, int height):
         self.width = width
@@ -63,6 +69,8 @@ cdef class RenderTexture(Texture):
         self.resize_nearest = resize_nearest
         self.width = size[0]
         self.height = size[1]
+        self.orig_width = self.width
+        self.orig_height = self.height
 
         # if high_dpi is True, use the window's size to framebuffer_size scale
         if high_dpi:
