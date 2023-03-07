@@ -16,7 +16,7 @@ cdef class Renderer:
 
         # shader stuff ----------------------------------------- #
         shader_create(
-            &self.shader, './cyclone/shaders/all.vert', './cyclone/shaders/all.frag'
+            &self.shader, 'cyclone/shaders/all.vert', 'cyclone/shaders/all.frag'
         )
         self.shaders = [self.shader]
 
