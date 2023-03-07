@@ -1,5 +1,10 @@
+from libc.stdio cimport *
+from libc.string cimport strcmp
+from libc.stdlib cimport malloc, free
+
 from cyclone.lib.glad cimport *
 from cyclone.lib.cglm cimport *
+
 
 cdef struct s_Shader:
     GLuint ID, vs_ID, fs_ID

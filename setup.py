@@ -25,15 +25,11 @@ files = []
 for path, dirs, file_names in os.walk("cyclone"):
     for file_name in file_names:
         if file_name.endswith("pyx"):
-            ext_path = "{0}/{1}".format(path, file_name)
-            ext_name = (
-                ext_path
-                .replace("", "")
-                .replace("/", ".")
-                .replace(".pyx", "")
-            )
+            ext_path = f"{path}/{file_name}"
+            ext_name = ext_path.replace("/", ".").replace(".pyx", "")
             files.append((ext_name, ext_path))
-# files= [
+
+# files = [
 #     ("cyclone.render", "cyclone/render.pyx"),
 #     ("cyclone.window", "cyclone/window.pyx"),
 #     ("cyclone.constants", "cyclone/constants.pyx"),

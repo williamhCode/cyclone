@@ -1,9 +1,3 @@
-from cyclone.lib.glad cimport *
-from cyclone.lib.stb_image cimport *
-
-from cyclone.window import Window
-
-
 cdef class Texture:
 
     def __init__(self, str filepath, bint resize_nearest=False):

@@ -1,5 +1,3 @@
-from cyclone.lib.glfw cimport *
-
 # library constants
 KEY_CALLBACK = 0
 MOUSE_BUTTON_CALLBACK = 1

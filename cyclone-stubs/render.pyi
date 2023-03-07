@@ -1,6 +1,6 @@
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
-from ._common import Vec2, Mat4, Color
+from ._common import Vec2, Mat4, Color, Region
 
 class Renderer:
     def __init__(self) -> None: ...
@@ -17,6 +17,16 @@ class Renderer:
         rotation: float = 0.0,
         offset: Vec2 = (0.0, 0.0),
         region: Rectangle = None,
+        flipped: bool = False,
+        color: Color = (255, 255, 255, 255),
+    ) -> None: ...
+    def draw_texture_region(
+        self,
+        texture: Texture,
+        position: Vec2,
+        region: Region,
+        rotation: float = 0.0,
+        offset: Vec2 = (0.0, 0.0),
         flipped: bool = False,
         color: Color = (255, 255, 255, 255),
     ) -> None: ...

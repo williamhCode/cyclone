@@ -1,18 +1,5 @@
 cimport cython
 
-from libc cimport math
-from libc.stdio cimport *
-from libc.stdlib cimport malloc, free
-
-from cyclone.lib.glad cimport *
-from cyclone.lib.cglm cimport *
-
-from cyclone.shader cimport *
-from cyclone.window cimport Window
-from cyclone.shapes cimport Rectangle
-from cyclone.texture cimport Texture, RenderTexture
-
-
 cdef class Renderer:
 
     def __init__(self, Window window):
@@ -213,7 +200,6 @@ cdef class Renderer:
         position,
         float rotation=0.0,
         offset=(0.0, 0.0),
-        Rectangle region=None,
         bint flipped=False,
         color=(255, 255, 255, 255)
     ):
@@ -225,17 +211,50 @@ cdef class Renderer:
         self._handle_color(color, t_color)
 
         self._draw_texture(
-            texture_id, t_position, t_size, rotation, t_offset, region, flipped, t_color
+            texture_id, t_position, NULL, t_size, rotation, t_offset, flipped, t_color
+        )
+
+    def draw_texture_region(
+        self,
+        Texture texture,
+        position,
+        region,
+        float rotation=0.0,
+        offset=(0.0, 0.0),
+        bint flipped=False,
+        color=(255, 255, 255, 255)
+    ):
+        cdef GLuint texture_id = texture.texture_id
+        cdef vec2 t_position = [position[0], position[1]]
+        cdef vec4 t_region
+        if isinstance(region, Rectangle):
+            t_region = [region.x, region.y, region.width, region.height]
+        else:
+            t_region = [region[0], region[1], region[2], region[3]]
+        cdef vec2 t_size = [texture.width, texture.height]
+        cdef vec2 t_offset = [offset[0], offset[1]]
+        cdef vec4 t_color
+        self._handle_color(color, t_color)
+
+        self._draw_texture(
+            texture_id,
+            t_position,
+            t_region,
+            t_size,
+            rotation,
+            t_offset,
+            flipped,
+            t_color
         )
 
     cdef void _draw_texture(
         self,
         GLuint texture_id,
         vec2 position,
+        vec4 region,
         vec2 size,
         float rotation,
         vec2 offset,
-        Rectangle region,
         bint flipped,
         vec4 color
     ):
@@ -263,7 +282,7 @@ cdef class Renderer:
 
         cdef vec2[4] local_positions
         cdef vec2[4] tex_coords
-        if region is None:
+        if region is NULL:
             local_positions = [
                 [0, 0],
                 [size[0], 0],
@@ -280,17 +299,17 @@ cdef class Renderer:
         else:
             local_positions = [
                 [0, 0],
-                [region.width, 0],
-                [region.width, region.height],
-                [0, region.height]
+                [region[2], 0],
+                [region[2], region[3]],
+                [0, region[3]]
             ]
 
             tex_coords = [
-                [region.x / size[0], region.y / size[1]],
-                [(region.x + region.width) / size[0], region.y / size[1]],
-                [(region.x + region.width) / size[0],
-                 (region.y + region.height) / size[1]],
-                [region.x / size[0], (region.y + region.height) / size[1]]
+                [region[0] / size[0], region[1] / size[1]],
+                [(region[0] + region[2]) / size[0], region[1] / size[1]],
+                [(region[0] + region[2]) / size[0],
+                 (region[1] + region[3]) / size[1]],
+                [region[0] / size[0], (region[1] + region[3]) / size[1]]
             ]
 
         if flipped:

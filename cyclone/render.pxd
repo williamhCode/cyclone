@@ -1,8 +1,12 @@
+from libc cimport math
+from libc.stdlib cimport malloc, free
+
 from cyclone.lib.glad cimport *
 from cyclone.lib.cglm cimport *
 
 from cyclone.shader cimport *
 from cyclone.window cimport Window
+from cyclone.texture cimport Texture, RenderTexture
 from cyclone.shapes cimport Rectangle
 
 
@@ -54,10 +58,10 @@ cdef class Renderer:
         self,
         GLuint texture_id,
         vec2 position,
+        vec4 region,
         vec2 size,
         float rotation,
         vec2 offset,
-        Rectangle region,
         bint flipped,
         vec4 color
     )

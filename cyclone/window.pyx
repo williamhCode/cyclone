@@ -1,12 +1,6 @@
-from cyclone.lib.glad cimport *
-from cyclone.lib.glfw cimport *
-
-from cyclone.render cimport Renderer
-from cyclone.texture cimport RenderTexture
 from cyclone.constants import (
     KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK
 )
-from cyclone.callback import *
 
 
 cdef void window_size_callback(GLFWwindow* window, int width, int height):

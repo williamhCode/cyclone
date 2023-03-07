@@ -1,4 +1,5 @@
 from cyclone.lib.glad cimport *
+from cyclone.lib.stb_image cimport *
 
 from cyclone.window cimport Window
 
