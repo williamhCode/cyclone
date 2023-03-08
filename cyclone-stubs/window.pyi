@@ -1,6 +1,5 @@
 from cyclone.render import Renderer
 from cyclone.texture import RenderTexture
-from cyclone.event import *
 from ._common import Vec2, CallbackData
 
 class Window:

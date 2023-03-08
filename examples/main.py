@@ -26,6 +26,7 @@ def spinning_star(renderer: Renderer, time):
         points.append((x, y))
 
     renderer.draw_lines((255, 0, 0, 255), points, 0.01)
+    # renderer.draw_lines((255, 0, 0, 255), points, 1)
 
 def main():
     WIN_SIZE = (1200, 800)
@@ -112,8 +113,8 @@ def main():
         #         renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # texture region test
-        renderer.draw_texture_region(texture_2, (0, 0), Rectangle(0, 0, 100, 100))
-        renderer.draw_texture_region(texture_2, (100, 0), (0, 0, 100, 100))
+        # renderer.draw_texture_region(texture_2, (0, 0), Rectangle(0, 0, 100, 100))
+        # renderer.draw_texture_region(texture_2, (100, 0), (0, 0, 100, 100))
         # renderer.draw_texture(texture_2, (100, 0))
 
         # circle test
@@ -127,7 +128,7 @@ def main():
         #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
         # line test
-        # spinning_star(renderer, time)
+        spinning_star(renderer, time)
 
         # layering test
         # renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200), width=20, fade=10)

@@ -1,5 +1,5 @@
 from typing import Protocol, TypeVar
-from callback import *
+from callbacks import *
 from shapes import Rectangle
 
 T = TypeVar("T")
