@@ -8,7 +8,11 @@ import os
 system = platform.system()
 
 platform_library_dirs = {
-    "Darwin": ["cyclone/lib/shared/Darwin", "build/glfw/src"],
+    "Darwin": [
+        "cyclone/lib/shared/Darwin",
+        "build/glfw/src",
+        "build/glad/src",
+    ],
 }
 library_dirs = platform_library_dirs[system]
 
@@ -46,6 +50,7 @@ for path, dirs, file_names in os.walk("cyclone"):
 include_dirs = [
     "cyclone/lib/include",
     "deps/glfw/include",
+    "deps/glad/include",
 ]
 
 macros = [
