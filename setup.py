@@ -8,7 +8,7 @@ import os
 system = platform.system()
 
 platform_library_dirs = {
-    "Darwin": ["cyclone/lib/shared/Darwin"],
+    "Darwin": ["cyclone/lib/shared/Darwin", "build/glfw/src"],
 }
 library_dirs = platform_library_dirs[system]
 
@@ -44,7 +44,8 @@ for path, dirs, file_names in os.walk("cyclone"):
 # package_data = {"cyclone-stubs": ["*.pyi"]}
 
 include_dirs = [
-    "cyclone/lib/include", 
+    "cyclone/lib/include",
+    "deps/glfw/include",
 ]
 
 macros = [
@@ -69,8 +70,8 @@ quiet = False
 extensions = []
 for ext_name, ext_path in files:
     ext = Extension(
-        name=ext_name, 
-        sources=[ext_path], 
+        name=ext_name,
+        sources=[ext_path],
         include_dirs=include_dirs,
         define_macros=macros,
         library_dirs=library_dirs,
@@ -82,13 +83,13 @@ for ext_name, ext_path in files:
     extensions.append(ext)
 
 setup(
-    name='cyclone',
-    version='0.1.0',
-    description='A 2d graphics library written in cython',
+    name="cyclone",
+    version="0.1.0",
+    description="A 2d graphics library written in cython",
     ext_modules=cythonize(
-        module_list=extensions, 
+        module_list=extensions,
         annotate=annotate,
-        compiler_directives={'language_level' : "3"},
+        compiler_directives={"language_level": "3"},
         force=force,
         quiet=quiet,
     ),
@@ -98,4 +99,3 @@ setup(
 )
 
 # export DYLD_FALLBACK_LIBRARY_PATH=/Users/williamhou/Documents/Coding/Personal-coding/2D-Graphics-Lib/cyclone/lib/shared/Darwin
-
