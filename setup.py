@@ -3,17 +3,6 @@ import os
 from Cython.Build import cythonize
 from setuptools import Extension, setup
 
-# platform specific ----------------------------
-
-library_dirs = [
-    "lib",
-]
-
-libraries = [
-    "glad",
-    "glfw",
-]
-
 # general --------------------------------------
 files = []
 for path, dirs, file_names in os.walk("cyclone"):
@@ -30,6 +19,15 @@ include_dirs = [
     "deps/stb",
 ]
 
+library_dirs = [
+    "lib",
+]
+
+libraries = [
+    "glad",
+    "glfw",
+]
+
 macros = [
     ("STB_IMAGE_IMPLEMENTATION", None),
     ("CGLM_DEFINE_PRINTS", None),
@@ -38,14 +36,14 @@ macros = [
 
 # compiler -------------------------------------
 language = "c"
-default_args = ["-w"]
-debug_args = ["-w", "-O0"]
-release_args = ["-w", "-O3", "-ffast-math", "-march=native"]
+default_args = ["-std=c17", "-w",]
+debug_args = ["-std=c17", "-w", "-O0"]
+release_args = ["-std=c17", "-w", "-O3", "-ffast-math", "-march=native"]
 args = debug_args
 
 # cythonize options
 annotate = False
-force = True
+force = False
 quiet = False
 
 # setup ----------------------------------------
