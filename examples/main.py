@@ -6,12 +6,13 @@ from cyclone.shapes import Rectangle
 from cyclone import constants
 
 import math
+import random
 import glm
 from examples.camera import Camera2D
 
 
 def spinning_star(renderer: Renderer, time):
-    points = []
+    # points = []
 
     start = (570, 400)
     spin_speed = 2 * math.pi * 0.0001
@@ -19,14 +20,30 @@ def spinning_star(renderer: Renderer, time):
 
     angle = 0
     angle_diff = 2 * math.pi / edges * int(edges / 2)
+    prev_point = None
     for _ in range(edges + 1):
         angle += angle_diff
         x = math.cos((time) * spin_speed + angle) * 300 + start[0]
         y = math.sin((time) * spin_speed + angle) * 300 + start[1]
-        points.append((x, y))
+        # points.append((x, y))
+        if prev_point is not None:
+            color = (
+                random.randint(0, 255),
+                random.randint(0, 255),
+                random.randint(0, 255),
+                255,
+            )
+            renderer.draw_line(color, prev_point, (x, y), 0.01)
+        prev_point = (x, y)
 
-    renderer.draw_lines((255, 0, 0, 255), points, 0.01)
-    # renderer.draw_lines((255, 0, 0, 255), points, 1)
+    # points_1 = points[: edges // 3 + 1]
+    # points_2 = points[edges // 3 : edges // 3 * 2 + 1]
+    # points_3 = points[edges // 3 * 2 :]
+    # renderer.draw_lines((255, 0, 0, 255), points_1, 0.01)
+    # renderer.draw_lines((0, 255, 0, 255), points_2, 0.01)
+    # renderer.draw_lines((0, 0, 255, 255), points_3, 0.01)
+    # renderer.draw_lines((255, 255, 255, 255), points, 0.01)
+
 
 def main():
     WIN_SIZE = (1200, 800)
@@ -55,7 +72,7 @@ def main():
 
     time = 0
     while not window.should_close():
-        dt = clock.tick()
+        dt = clock.tick(60)
         time += dt
 
         framerate = clock.get_fps()
@@ -102,8 +119,8 @@ def main():
         camera.look_at(look_pos)
 
         # render to texture target
-        # renderer.begin(view_matrix=camera.get_transform())
-        renderer.begin(view_matrix=camera.get_transform(), texture=test_target)
+        renderer.begin(view_matrix=camera.get_transform())
+        # renderer.begin(view_matrix=camera.get_transform(), texture=test_target)
         renderer.clear()
 
         # texture test
@@ -142,12 +159,12 @@ def main():
         renderer.end()
 
         # render to main screen
-        renderer.begin()
-        renderer.clear()
+        # renderer.begin()
+        # renderer.clear()
 
-        renderer.draw_texture(test_target, (0, 0))
+        # renderer.draw_texture(test_target, (0, 0))
 
-        renderer.end()
+        # renderer.end()
 
         window.update()
 

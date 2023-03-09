@@ -5,4 +5,4 @@ cdef extern from "stb_image.h":
 
     stbi_uc *stbi_load(const char *filename, int *x, int *y, int *num_channels_in_file, int num_desired_channels)
 
-    void stbi_image_free (void *retval_from_stbi_load)
+    void stbi_image_free(void *retval_from_stbi_load)

@@ -62,7 +62,7 @@ args = debug_args
 
 # cythonize options
 annotate = False
-force = False
+force = True
 quiet = False
 
 # setup ----------------------------------------
