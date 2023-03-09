@@ -6,8 +6,8 @@ cdef class Rectangle:
         self.width = width
         self.height = height
 
-    def __iter__(self):
-        return iter((self.x, self.y, self.width, self.height))
+    def __getitem__(self, i):
+        return (self.x, self.y, self.width, self.height)[i]
 
     @property
     def position(self):

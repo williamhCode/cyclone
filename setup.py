@@ -53,12 +53,12 @@ for ext_name, ext_path in files:
         name=ext_name,
         sources=[ext_path],
         include_dirs=include_dirs,
-        define_macros=macros,
         library_dirs=library_dirs,
         libraries=libraries,
+        define_macros=macros,
         runtime_library_dirs=library_dirs,
-        extra_compile_args=args,
         language=language,
+        extra_compile_args=args,
     )
     extensions.append(ext)
 
