@@ -1,27 +1,18 @@
-from setuptools import Extension, setup
-from Cython.Build import cythonize
-from pathlib import Path
-import platform
 import os
 
+from Cython.Build import cythonize
+from setuptools import Extension, setup
+
 # platform specific ----------------------------
-system = platform.system()
 
-platform_library_dirs = {
-    "Darwin": [
-        "cyclone/lib/shared/Darwin",
-        "build/glfw/src",
-    ],
-}
-library_dirs = platform_library_dirs[system]
+library_dirs = [
+    "lib",
+]
 
-platform_libraries = {
-    "Darwin": [
-        "glad",
-        "glfw",
-    ]
-}
-libraries = platform_libraries[system]
+libraries = [
+    "glad",
+    "glfw",
+]
 
 # general --------------------------------------
 files = []
@@ -31,20 +22,6 @@ for path, dirs, file_names in os.walk("cyclone"):
             ext_path = f"{path}/{file_name}"
             ext_name = ext_path.replace("/", ".").replace(".pyx", "")
             files.append((ext_name, ext_path))
-
-# files = [
-#     ("cyclone.render", "cyclone/render.pyx"),
-#     ("cyclone.window", "cyclone/window.pyx"),
-#     ("cyclone.constants", "cyclone/constants.pyx"),
-#     ("cyclone.shader", "cyclone/shader.pyx"),
-#     ("cyclone.texture", "cyclone/texture.pyx"),
-#     ("cyclone.callbacks", "cyclone/callbacks.pyx"),
-#     ("cyclone.shapes", "cyclone/shapes.pyx"),
-# ]
-
-# stubs
-# packages = ["cyclone-stubs"]
-# package_data = {"cyclone-stubs": ["*.pyi"]}
 
 include_dirs = [
     "deps/glfw/include",
@@ -81,7 +58,7 @@ for ext_name, ext_path in files:
         define_macros=macros,
         library_dirs=library_dirs,
         libraries=libraries,
-        # runtime_library_dirs=library_dirs,
+        runtime_library_dirs=library_dirs,
         extra_compile_args=args,
         language=language,
     )
@@ -98,9 +75,4 @@ setup(
         force=force,
         quiet=quiet,
     ),
-    # packages=packages,
-    # package_data=package_data,
-    # include_package_data=True,
 )
-
-# export DYLD_FALLBACK_LIBRARY_PATH=/Users/williamhou/Documents/Coding/Personal-coding/2D-Graphics-Lib/cyclone/lib/shared/Darwin
