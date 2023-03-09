@@ -10,10 +10,9 @@ build/
 dist/
 *.egg-info/
 *.spec
-*.c
-*.cpp
-*.html
-*.so
+cyclone/*.c
+cyclone/*.so
+cyclone/*.html
 
 # cmake
 CMakeLists.txt.user
