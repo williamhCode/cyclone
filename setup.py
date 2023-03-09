@@ -11,7 +11,6 @@ platform_library_dirs = {
     "Darwin": [
         "cyclone/lib/shared/Darwin",
         "build/glfw/src",
-        "build/glad/src",
     ],
 }
 library_dirs = platform_library_dirs[system]
@@ -48,9 +47,10 @@ for path, dirs, file_names in os.walk("cyclone"):
 # package_data = {"cyclone-stubs": ["*.pyi"]}
 
 include_dirs = [
-    "cyclone/lib/include",
     "deps/glfw/include",
     "deps/glad/include",
+    "deps/cglm/include",
+    "deps/stb",
 ]
 
 macros = [

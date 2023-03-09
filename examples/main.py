@@ -14,7 +14,7 @@ from examples.camera import Camera2D
 def spinning_star(renderer: Renderer, time):
     # points = []
 
-    start = (570, 400)
+    start = (600, 400)
     spin_speed = 2 * math.pi * 0.0001
     edges = 4445
 
