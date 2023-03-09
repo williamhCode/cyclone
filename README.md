@@ -7,9 +7,25 @@ The purpose of the library is to provide a blazingly fast Python 2D graphics lib
 
 The library is built with simplicity and modularity in mind. It takes care of windowing, displaying things on the screen, and only a few other things that are useful for making a 2D game.
 
-## Building
-`python setup.py build_ext --inplace` to build Cython sources.
+## Contributing
+#### Install Python Modules
+```
+pip install -r requirements.txt
+```
 
-_Note: currently only builds for macOS_
+#### Build C Library Dependencies
+Make sure CMake is installed, shared object files should end up in `lib/`.
+```
+cmake .
+cmake --build .
+```
 
+#### Install Library in Dev Mode
+```
+pip install -e .
+```
 
+#### Build Project
+```
+python setup.py build_ext --inplace
+```
