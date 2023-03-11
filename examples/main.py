@@ -11,6 +11,17 @@ import random
 import glm
 from examples.camera import Camera2D
 
+colors = []
+for _ in range(4446):
+    colors.append(
+        (
+            random.randint(0, 255),
+            random.randint(0, 255),
+            random.randint(0, 255),
+            255,
+        )
+    )
+
 
 def spinning_star(renderer: Renderer, time):
     # points = []
@@ -22,19 +33,19 @@ def spinning_star(renderer: Renderer, time):
     angle = 0
     angle_diff = 2 * math.pi / edges * int(edges / 2)
     prev_point = None
-    for _ in range(edges + 1):
+    for i in range(edges + 1):
         angle += angle_diff
         x = math.cos((time) * spin_speed + angle) * 300 + start[0]
         y = math.sin((time) * spin_speed + angle) * 300 + start[1]
         # points.append((x, y))
         if prev_point is not None:
-            color = (
-                random.randint(0, 255),
-                random.randint(0, 255),
-                random.randint(0, 255),
-                255,
-            )
-            renderer.draw_line(color, prev_point, (x, y), 0.01)
+            # color = (
+            #     random.randint(0, 255),
+            #     random.randint(0, 255),
+            #     random.randint(0, 255),
+            #     255,
+            # )
+            renderer.draw_line(colors[i], prev_point, (x, y), 0.01)
         prev_point = (x, y)
 
     # points_1 = points[: edges // 3 + 1]
@@ -60,8 +71,8 @@ def main():
     # texture_3 = Texture("imgs/test2.jpeg")
     # texture_4 = Texture("imgs/test3.jpeg")
 
-    test_target = RenderTexture(window, WIN_SIZE)
-    # test_target = window.create_texture_target(WIN_SIZE)
+    # render_texture = RenderTexture(window, WIN_SIZE)
+    render_texture = window.create_render_texture(WIN_SIZE)
 
     clock = Timer()
 
@@ -71,7 +82,9 @@ def main():
     look_pos = glm.vec2(WIN_SIZE) / 2
 
     time = 0
-    while not window.is_closed():
+
+    close_window = False
+    while not close_window:
         dt = clock.tick(60)
         time += dt
 
@@ -81,12 +94,12 @@ def main():
         # key events
         for callback, data in window.get_callbacks():
             if callback == constants.WINDOW_CLOSE_CALLBACK:
-                window.close()
+                close_window = True
 
             if callback == constants.KEY_CALLBACK:
                 if data.action == constants.PRESS:
                     if data.key == constants.KEY_ESCAPE:
-                        window.close()
+                        close_window = True
                     if data.key == constants.KEY_T:
                         print(time)
 
@@ -113,17 +126,23 @@ def main():
             zoom_time -= dt
             camera.zoom = zoom_factor**zoom_time
 
+        if window.is_key_pressed(constants.KEY_UP):
+            look_pos += glm.vec2(0, 3000 / camera.zoom * dt)
+
+        if window.is_key_pressed(constants.KEY_DOWN):
+            look_pos -= glm.vec2(0, 3000 / camera.zoom * dt)
+
         if window.is_key_pressed(constants.KEY_LEFT):
-            look_pos -= glm.vec2(5000 / camera.zoom * dt, 0)
+            look_pos -= glm.vec2(3000 / camera.zoom * dt, 0)
 
         if window.is_key_pressed(constants.KEY_RIGHT):
-            look_pos += glm.vec2(5000 / camera.zoom * dt, 0)
+            look_pos += glm.vec2(3000 / camera.zoom * dt, 0)
 
         camera.look_at(look_pos)
 
-        # render to texture target
+        # render to texture
         renderer.begin(view_matrix=camera.get_transform())
-        # renderer.begin(view_matrix=camera.get_transform(), texture=test_target)
+        # renderer.begin(view_matrix=camera.get_transform(), texture=render_texture)
         renderer.clear((50, 50, 50, 255))
 
         # texture test
@@ -165,12 +184,13 @@ def main():
         # renderer.begin()
         # renderer.clear()
 
-        # renderer.draw_texture(test_target, (0, 0))
+        # renderer.draw_texture(render_texture, (0, 0))
 
         # renderer.end()
 
         window.update()
 
+    window.destroy()
 
 if __name__ == "__main__":
     main()

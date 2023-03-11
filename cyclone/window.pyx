@@ -114,8 +114,6 @@ cdef class Window:
         # add window to windows list
         windows.append(self)
 
-        self.closed = False
-
     cdef void make_context_current(self):
         glfwMakeContextCurrent(self.window)
 
@@ -145,9 +143,6 @@ cdef class Window:
         callback = self.callbacks.copy()
         self.callbacks = []
         return callback
-
-    def update(self):
-        glfwSwapBuffers(self.window)
 
     # Input ----------------------------------------------------------
     # Keys
@@ -179,12 +174,16 @@ cdef class Window:
         glfwSetCursorPos(self.window, x, y)
 
     # ----------------------------------------------------------------
-    def is_closed(self):
-        return self.closed
+    def update(self):
+        glfwSwapBuffers(self.window)
 
-    def close(self):
+    def destroy(self):
+        if self.window == NULL:
+            return
+
         glfwDestroyWindow(self.window)
-        self.closed = True
+        self.window = NULL
+
         windows.remove(self)
         if len(windows) == 0:
             glfwTerminate()

@@ -5,6 +5,7 @@ cdef class Renderer:
 
     def __init__(self, Window window):
         self.window = window
+        self.window.make_context_current()
 
         # gl options
         glEnable(GL_BLEND)

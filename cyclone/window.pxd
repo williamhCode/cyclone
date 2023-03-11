@@ -12,7 +12,6 @@ cdef class Window:
         bint high_dpi
         object callbacks
         str title
-        bint closed
 
         int width
         int height
