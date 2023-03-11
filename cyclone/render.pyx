@@ -118,12 +118,23 @@ cdef class Renderer:
         free(self.vertices)
         free(self.texture_slots)
 
-    def set_clear_color(self, color):
+    cdef void _handle_color(self, py_color, vec4 color):
+        if len(py_color) == 3:
+            color[:4] = [
+                py_color[0] / 255.0, py_color[1] / 255.0, py_color[2] / 255.0, 1.0
+            ]
+        else:
+            color[:4] = [
+                py_color[0] / 255.0,
+                py_color[1] / 255.0,
+                py_color[2] / 255.0,
+                py_color[3] / 255.0
+            ]
+
+    def clear(self, color):
         cdef vec4 _color
         self._handle_color(color, _color)
         glClearColor(_color[0], _color[1], _color[2], _color[3])
-
-    def clear(self):
         glClear(GL_COLOR_BUFFER_BIT)
 
     cdef void _set_proj_mat(self, float width, float height):
@@ -135,6 +146,7 @@ cdef class Renderer:
         self.texture_slot_index = 0
 
     def begin(self, view_matrix=None, RenderTexture texture=None):
+        self.window.make_context_current()
         if texture is None:
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
             glViewport(
@@ -181,19 +193,6 @@ cdef class Renderer:
 
     def end(self):
         self._end_batch()
-
-    cdef void _handle_color(self, py_color, vec4 color):
-        if len(py_color) == 3:
-            color[:4] = [
-                py_color[0] / 255.0, py_color[1] / 255.0, py_color[2] / 255.0, 1.0
-            ]
-        else:
-            color[:4] = [
-                py_color[0] / 255.0,
-                py_color[1] / 255.0,
-                py_color[2] / 255.0,
-                py_color[3] / 255.0
-            ]
 
     def draw_texture(
         self,

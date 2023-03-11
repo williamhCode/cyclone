@@ -46,13 +46,13 @@ cdef class Renderer:
         mat4 proj_mat
         mat4 view_mat
 
+    cdef void _handle_color(self, py_color, vec4 color)
+
     cdef void _set_proj_mat(self, float width, float height)
 
     cdef void _begin_batch(self)
 
     cdef void _end_batch(self)
-
-    cdef void _handle_color(self, py_color, vec4 color)
 
     cdef void _draw_texture(
         self,

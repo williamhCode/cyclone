@@ -12,9 +12,12 @@ cdef class Window:
         bint high_dpi
         object callbacks
         str title
+        bint closed
 
         int width
         int height
 
         int framebuffer_width
         int framebuffer_height
+
+    cdef void make_context_current(self)

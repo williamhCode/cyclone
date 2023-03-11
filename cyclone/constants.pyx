@@ -2,6 +2,7 @@
 KEY_CALLBACK = 0
 MOUSE_BUTTON_CALLBACK = 1
 CURSOR_POSITION_CALLBACK = 2
+WINDOW_CLOSE_CALLBACK = 3
 
 # glfw constants -------------
 # key/button states

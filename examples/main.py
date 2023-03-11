@@ -51,7 +51,6 @@ def main():
     window = Window(WIN_SIZE, vsync=False, high_dpi=True)
 
     renderer = window.create_renderer()
-    renderer.set_clear_color((50, 50, 50, 255))
 
     camera = Camera2D(*WIN_SIZE)
 
@@ -72,7 +71,7 @@ def main():
     look_pos = glm.vec2(WIN_SIZE) / 2
 
     time = 0
-    while not window.should_close():
+    while not window.is_closed():
         dt = clock.tick(60)
         time += dt
 
@@ -81,6 +80,9 @@ def main():
 
         # key events
         for callback, data in window.get_callbacks():
+            if callback == constants.WINDOW_CLOSE_CALLBACK:
+                window.close()
+
             if callback == constants.KEY_CALLBACK:
                 if data.action == constants.PRESS:
                     if data.key == constants.KEY_ESCAPE:
@@ -122,7 +124,7 @@ def main():
         # render to texture target
         renderer.begin(view_matrix=camera.get_transform())
         # renderer.begin(view_matrix=camera.get_transform(), texture=test_target)
-        renderer.clear()
+        renderer.clear((50, 50, 50, 255))
 
         # texture test
         # dt = math.sin(time * 5) * 20
@@ -168,8 +170,6 @@ def main():
         # renderer.end()
 
         window.update()
-
-    window.quit()
 
 
 if __name__ == "__main__":

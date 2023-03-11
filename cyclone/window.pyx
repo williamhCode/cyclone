@@ -1,5 +1,5 @@
 from cyclone.constants import (
-    KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK
+    KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK, WINDOW_CLOSE_CALLBACK
 )
 
 
@@ -46,6 +46,13 @@ cdef void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
             )
 
 
+cdef void window_close_callback(GLFWwindow* window):
+    cdef Window curr_window
+    for curr_window in windows:
+        if curr_window.window == window:
+            curr_window.callbacks.append((WINDOW_CLOSE_CALLBACK, None))
+
+
 windows = []
 
 cdef class Window:
@@ -90,6 +97,7 @@ cdef class Window:
         glfwSetKeyCallback(self.window, key_callback)
         glfwSetMouseButtonCallback(self.window, mouse_button_callback)
         glfwSetCursorPosCallback(self.window, cursor_position_callback)
+        glfwSetWindowCloseCallback(self.window, window_close_callback)
 
         # get initial window size
         glfwGetWindowSize(self.window, &self.width, &self.height)
@@ -105,6 +113,11 @@ cdef class Window:
 
         # add window to windows list
         windows.append(self)
+
+        self.closed = False
+
+    cdef void make_context_current(self):
+        glfwMakeContextCurrent(self.window)
 
     def get_size(self):
         return (self.width, self.height)
@@ -127,16 +140,14 @@ cdef class Window:
     def get_title(self):
         return self.title
 
-    def close(self):
-        glfwSetWindowShouldClose(self.window, True)
-
-    def should_close(self):
-        return glfwWindowShouldClose(self.window)
-
     def get_callbacks(self):
-        self.callbacks = []
         glfwPollEvents()
-        return self.callbacks
+        callback = self.callbacks.copy()
+        self.callbacks = []
+        return callback
+
+    def update(self):
+        glfwSwapBuffers(self.window)
 
     # Input ----------------------------------------------------------
     # Keys
@@ -168,8 +179,12 @@ cdef class Window:
         glfwSetCursorPos(self.window, x, y)
 
     # ----------------------------------------------------------------
-    def update(self):
-        glfwSwapBuffers(self.window)
+    def is_closed(self):
+        return self.closed
 
-    def quit(self):
-        glfwTerminate()
+    def close(self):
+        glfwDestroyWindow(self.window)
+        self.closed = True
+        windows.remove(self)
+        if len(windows) == 0:
+            glfwTerminate()
