@@ -3,7 +3,7 @@ cimport cython
 
 cdef class Renderer:
 
-    def __init__(self, Window window):
+    def __init__(self, Window window not None):
         self.window = window
         self.window.make_context_current()
 
@@ -197,7 +197,7 @@ cdef class Renderer:
 
     def draw_texture(
         self,
-        Texture texture,
+        Texture texture not None,
         position,
         float rotation=0.0,
         offset=(0.0, 0.0),
@@ -217,7 +217,7 @@ cdef class Renderer:
 
     def draw_texture_region(
         self,
-        Texture texture,
+        Texture texture not None,
         position,
         region,
         float rotation=0.0,

@@ -58,7 +58,11 @@ cdef class Texture:
 cdef class RenderTexture(Texture):
 
     def __init__(
-        self, Window window, size, bint resize_nearest=False, bint high_dpi=True
+        self,
+        Window window not None,
+        size,
+        bint resize_nearest=False,
+        bint high_dpi=True
     ):
         self.resize_nearest = resize_nearest
         self.width = size[0]
