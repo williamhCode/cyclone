@@ -7,7 +7,7 @@ The purpose of the library is to provide a blazingly fast Python 2D graphics lib
 
 The library is built with simplicity and modularity in mind. It takes care of windowing and input, everything you need for 2d rendering, and things useful for game dev. However, you can opt out of using built-in data types, and use other libraries for math related stuff (vectors, shapes and collisions).
 
-Features: 
+### Features: 
 - multiple windows
 - high-dpi support (macos)
 - fancy primitive rendering
@@ -52,7 +52,7 @@ cmake --build .
 pip install -e .
 ```
 
-#### Build Project
+#### Build Cyclone
 ```
 python setup.py build_ext --inplace
 ```
