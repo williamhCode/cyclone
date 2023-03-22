@@ -12,7 +12,7 @@ The library is built with simplicity and modularity in mind. It takes care of wi
 - high-dpi support (macos)
 - fancy primitive rendering
 - texture rendering with built-in rotation/offset
-- reduces cpu load by offloading as much calculations to GPU (python is slow and hard to parallelize)
+- minimizes cpu load by offloading as much calculations to GPU (python is slow and hard to parallelize)
 - blazingly fast
 
 ## Todo
