@@ -7,6 +7,33 @@ The purpose of the library is to provide a blazingly fast Python 2D graphics lib
 
 The library is built with simplicity and modularity in mind. It takes care of windowing and input, everything you need for 2d rendering, and things useful for game dev. However, you can opt out of using built-in data types, and use other libraries for math related stuff (vectors, shapes and collisions).
 
+Features: 
+- multiple windows
+- high-dpi support (macos)
+- fancy primitive rendering
+- texture rendering with built-in rotation/offset
+- reduces cpu load by offloading as much calculations to GPU (python is slow and hard to parallelize)
+- blazingly fast
+
+## Todo
+- [ ] rendering
+  - [x] textures
+  - [x] circles
+  - [x] rectangles
+  - [x] lines
+  - [ ] polygons
+  - [x] render texture (framebuffer)
+  - [ ] fonts
+  - [ ] blend options
+  - [ ] custom shaders
+- [ ] windowing
+  - [x] keyboard and mouse input
+  - [x] multi window
+  - [ ] more window options (fullscreen, resizable, etc.)
+- [ ] extras
+  - [ ] vector/matrix classes
+  - [ ] simple shapes collision detection
+
 ## Contributing
 #### Install Python Modules
 ```
