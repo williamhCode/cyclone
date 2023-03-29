@@ -1,7 +1,5 @@
 cimport cython
 
-from cyclone._utils import set_lib_dir
-
 cdef class Renderer:
 
     def __init__(self, Window window not None):
@@ -18,10 +16,7 @@ cdef class Renderer:
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &self.MAX_TEXTURE_SLOTS)
 
         # shader stuff ----------------------------------------- #
-        with set_lib_dir():
-            shader_create(
-                &self.shader, 'cyclone/shaders/all.vert', 'cyclone/shaders/all.frag'
-            )
+        shader_create(&self.shader, "shaders/all.vert", "shaders/all.frag")
         self.shaders = [self.shader]
 
         # set sampler2Ds
@@ -31,7 +26,7 @@ cdef class Renderer:
         cdef size_t i
         for i in range(self.MAX_TEXTURE_SLOTS):
             values[i] = i
-        shader_set_int_array(&self.shader, 'u_Textures', self.MAX_TEXTURE_SLOTS, values)
+        shader_set_int_array(&self.shader, "u_Textures", self.MAX_TEXTURE_SLOTS, values)
         free(values)
 
         # initialization ----------------------------------------- #
@@ -174,7 +169,7 @@ cdef class Renderer:
         cdef s_Shader shader
         for shader in self.shaders:
             shader_use(&shader)
-            shader_set_mat4(&shader, 'u_ProjView', proj_view_mat)
+            shader_set_mat4(&shader, "u_ProjView", proj_view_mat)
 
         self._begin_batch()
 

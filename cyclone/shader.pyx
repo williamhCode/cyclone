@@ -1,32 +1,44 @@
-import errno
-import os
-
+# import errno
+# import os
+from importlib.resources import files
 
 cdef char *_read_file(const char *filename) except *:
-    cdef FILE *file = fopen(filename, "r")
-    if file == NULL:
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), filename.decode()
-        )
+    data = files("cyclone").joinpath(filename.decode()).read_bytes()
 
-    fseek(file, 0, SEEK_END)
-    cdef int length = ftell(file)
-    fseek(file, 0, SEEK_SET)
-
-    cdef char *out = <char *>malloc(sizeof(char) * (length + 1))
+    cdef char *out = <char *>malloc(sizeof(char) * (len(data) + 1))
+    cdef int i
     cdef char c
-    cdef int i = 0
-    while True:
-        c = fgetc(file)
-        if c == EOF:
-            break
+    for i, c in enumerate(data):
         out[i] = c
-        i += 1
-    out[i] = b'\0'
-
-    fclose(file)
+    out[len(data)] = b'\0'
 
     return out
+
+# cdef char *_read_file(const char *filename) except *:
+#     cdef FILE *file = fopen(filename, "r")
+#     if file == NULL:
+#         raise FileNotFoundError(
+#             errno.ENOENT, os.strerror(errno.ENOENT), filename.decode()
+#         )
+
+#     fseek(file, 0, SEEK_END)
+#     cdef int length = ftell(file)
+#     fseek(file, 0, SEEK_SET)
+
+#     cdef char *out = <char *>malloc(sizeof(char) * (length + 1))
+#     cdef char c
+#     cdef int i = 0
+#     while True:
+#         c = fgetc(file)
+#         if c == EOF:
+#             break
+#         out[i] = c
+#         i += 1
+#     out[i] = b'\0'
+
+#     fclose(file)
+
+#     return out
 
 
 cdef void _checkCompileErrors(
@@ -54,20 +66,20 @@ cdef void _checkCompileErrors(
 cdef void shader_create(
     s_Shader *self, const char *vs_path, const char *fs_path
 ) except *:
-    cdef char *vShaderCode = _read_file(vs_path)
-    cdef char *fShaderCode = _read_file(fs_path)
+    cdef char *vs_code = _read_file(vs_path)
+    cdef char *fs_code = _read_file(fs_path)
 
     # vertex shader
     self.vs_ID = glCreateShader(GL_VERTEX_SHADER)
-    glShaderSource(self.vs_ID, 1, &vShaderCode, NULL)
+    glShaderSource(self.vs_ID, 1, &vs_code, NULL)
     glCompileShader(self.vs_ID)
-    _checkCompileErrors(self.vs_ID, b"VERTEX", vs_path)
+    _checkCompileErrors(self.vs_ID, "VERTEX", vs_path)
 
     # fragment shader
     self.fs_ID = glCreateShader(GL_FRAGMENT_SHADER)
-    glShaderSource(self.fs_ID, 1, &fShaderCode, NULL)
+    glShaderSource(self.fs_ID, 1, &fs_code, NULL)
     glCompileShader(self.fs_ID)
-    _checkCompileErrors(self.fs_ID, b"FRAGMENT", fs_path)
+    _checkCompileErrors(self.fs_ID, "FRAGMENT", fs_path)
 
     # shader program
     self.ID = glCreateProgram()
@@ -77,10 +89,10 @@ cdef void shader_create(
 
     cdef char buf[512]
     snprintf(buf, 512, "[%s, %s]", vs_path, fs_path)
-    _checkCompileErrors(self.ID, b"PROGRAM", buf)
+    _checkCompileErrors(self.ID, "PROGRAM", buf)
 
-    free(vShaderCode)
-    free(fShaderCode)
+    free(vs_code)
+    free(fs_code)
 
 
 cdef void shader_destroy(const s_Shader *self):

@@ -4,6 +4,7 @@ from cyclone.timer import Timer
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
 from cyclone import constants as const
+from cyclone import callbacks
 
 import math
 import random
@@ -64,13 +65,17 @@ def main():
     camera = Camera2D(*WIN_SIZE)
 
     texture_1 = Texture("imgs/Flappy Bird_1.png", resize_nearest=True)
-    texture_1.resize(10, 10)
+    texture_1.size = 10, 10
     texture_2 = Texture("imgs/Flappy Bird_1.png", resize_nearest=True)
+    texture_2.size = 50, 40
     # texture_3 = Texture("imgs/test2.jpeg")
     # texture_4 = Texture("imgs/test3.jpeg")
 
     # render_texture = RenderTexture(window, WIN_SIZE)
     render_texture = window.create_render_texture(WIN_SIZE)
+
+    rect = Rectangle(0, 0, 100, 100)
+    rect.size = (100, 100)
 
     clock = Timer()
 
@@ -106,8 +111,8 @@ def main():
                     if data.button == const.MOUSE_BUTTON_LEFT:
                         print("left pressed!")
 
-            if callback == const.CURSOR_POSITION_CALLBACK:
-                print(data.xpos, data.ypos)
+            # if callback == const.CURSOR_POSITION_CALLBACK:
+                # print(data.xpos, data.ypos)
 
         # key/button being pressed
         if window.key_pressed(const.KEY_A):
@@ -152,10 +157,10 @@ def main():
         # texture region test
         renderer.draw_texture_region(texture_2, (0, 0), (0, 0, 500, 500))
         renderer.draw_texture_region(
-            texture_2, (0, 0), Rectangle(0, 0, 180, 180), color=(0, 255, 0, 255)
+            texture_2, (100, 100), Rectangle(100, 100, 300, 300), color=(0, 255, 0, 255)
         )
         renderer.draw_texture_region(
-            texture_2, (50, 50), (50, 50, 100, 100), color=(255, 0, 0, 255)
+            texture_2, (200, 200), (200, 200, 100, 100), color=(255, 0, 0, 255)
         )
 
         # circle test

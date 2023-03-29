@@ -46,13 +46,14 @@ cdef class Texture:
         self.width = self.orig_width
         self.height = self.orig_height
 
-    def resize(self, int width, int height):
-        self.width = width
-        self.height = height
-
     @property
     def size(self):
         return (self.width, self.height)
+
+    @size.setter
+    def size(self, size):
+        self.width = size[0]
+        self.height = size[1]
 
 
 cdef class RenderTexture(Texture):

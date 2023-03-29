@@ -2,6 +2,7 @@
 KEY_CALLBACK: int
 MOUSE_BUTTON_CALLBACK: int
 CURSOR_POSITION_CALLBACK: int
+WINDOW_CLOSE_CALLBACK: int
 
 # glfw constants -------------
 # key/button states

@@ -1,15 +1,16 @@
 import os
+from os import path
 from glob import glob
 
 from Cython.Build import cythonize
-from setuptools import Extension, setup
+from setuptools import Extension, setup, find_namespace_packages
 
 # general --------------------------------------
 files = []
-for path, dirs, file_names in os.walk("cyclone"):
-    for file_name in file_names:
-        if file_name.endswith("pyx"):
-            ext_path = f"{path}/{file_name}"
+for dirpath, _, filenames in os.walk("cyclone"):
+    for filename in filenames:
+        if filename.endswith("pyx"):
+            ext_path = path.join(dirpath, filename)
             ext_name = ext_path.replace("/", ".").replace(".pyx", "")
             files.append((ext_name, ext_path))
 
@@ -65,14 +66,13 @@ for ext_name, ext_path in files:
 
 packages = [
     "cyclone",
+    "cyclone.shaders",
 ]
 
-package_data={"cyclone": ["shaders/*"]}
+package_data = {"cyclone.shaders": ["*"]}
 
-data_files=[
-    ("lib", glob("lib/*"))
-]
-    
+data_files = [("lib", glob("lib/*"))]
+
 setup(
     name="cyclone",
     version="0.1.0",
