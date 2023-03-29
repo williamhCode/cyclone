@@ -1,7 +1,6 @@
 cimport cython
 
-from cyclone.utils import set_cwd
-from pathlib import Path
+from cyclone._utils import set_lib_dir
 
 cdef class Renderer:
 
@@ -19,7 +18,7 @@ cdef class Renderer:
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &self.MAX_TEXTURE_SLOTS)
 
         # shader stuff ----------------------------------------- #
-        with set_cwd(Path(__file__).parent.parent):
+        with set_lib_dir():
             shader_create(
                 &self.shader, 'cyclone/shaders/all.vert', 'cyclone/shaders/all.frag'
             )

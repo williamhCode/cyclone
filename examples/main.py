@@ -4,7 +4,6 @@ from cyclone.timer import Timer
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
 from cyclone import constants as const
-from cyclone import callbacks
 
 import math
 import random

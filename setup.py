@@ -2,7 +2,7 @@ import os
 from glob import glob
 
 from Cython.Build import cythonize
-from setuptools import Extension, setup, find_packages
+from setuptools import Extension, setup
 
 # general --------------------------------------
 files = []
@@ -77,9 +77,6 @@ setup(
     name="cyclone",
     version="0.1.0",
     description="Python 2D Graphics Library",
-    packages=packages,
-    package_data=package_data,
-    data_files=data_files,
     ext_modules=cythonize(
         module_list=extensions,
         annotate=annotate,
@@ -87,4 +84,7 @@ setup(
         force=force,
         quiet=quiet,
     ),
+    packages=packages,
+    package_data=package_data,
+    data_files=data_files,
 )
