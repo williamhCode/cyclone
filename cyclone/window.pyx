@@ -42,7 +42,10 @@ cdef void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
     for curr_window in windows:
         if curr_window.window == window:
             curr_window.callbacks.append(
-                (CURSOR_POSITION_CALLBACK, CursorPositionData(xpos, ypos))
+                (
+                    CURSOR_POSITION_CALLBACK,
+                    CursorPositionData(xpos, curr_window.height - ypos)
+                )
             )
 
 
@@ -117,6 +120,14 @@ cdef class Window:
     cdef void make_context_current(self):
         glfwMakeContextCurrent(self.window)
 
+    def should_close(self):
+        if self.window == NULL:
+            return True
+        return glfwWindowShouldClose(self.window)
+
+    def set_should_close(self, bint value):
+        glfwSetWindowShouldClose(self.window, value)
+
     def get_size(self):
         return (self.width, self.height)
 
@@ -149,28 +160,30 @@ cdef class Window:
     def get_key(self, key):
         return glfwGetKey(self.window, key)
 
-    def is_key_pressed(self, key):
+    def key_pressed(self, key):
         return glfwGetKey(self.window, key) == GLFW_PRESS
 
-    def is_key_released(self, key):
+    def key_released(self, key):
         return glfwGetKey(self.window, key) == GLFW_RELEASE
 
     # Mouse
     def get_mouse_button(self, button):
         return glfwGetMouseButton(self.window, button)
 
-    def is_mouse_button_pressed(self, button):
+    def mouse_button_pressed(self, button):
         return glfwGetMouseButton(self.window, button) == GLFW_PRESS
 
-    def is_mouse_button_released(self, button):
+    def mouse_button_released(self, button):
         return glfwGetMouseButton(self.window, button) == GLFW_RELEASE
 
-    def get_mouse_position(self):
+    def get_cursor_position(self):
         cdef double x, y
         glfwGetCursorPos(self.window, &x, &y)
+        y = self.height - y
         return (x, y)
 
-    def set_mouse_position(self, x, y):
+    def set_cursor_position(self, double x, double y):
+        y = self.height - y
         glfwSetCursorPos(self.window, x, y)
 
     # ----------------------------------------------------------------
@@ -179,7 +192,7 @@ cdef class Window:
 
     def destroy(self):
         if self.window == NULL:
-            return
+            raise RuntimeError(f"Window '{self.title}' already destroyed")
 
         glfwDestroyWindow(self.window)
         self.window = NULL

@@ -1,7 +1,8 @@
 import os
+from glob import glob
 
 from Cython.Build import cythonize
-from setuptools import Extension, setup
+from setuptools import Extension, setup, find_packages
 
 # general --------------------------------------
 files = []
@@ -36,7 +37,7 @@ macros = [
 
 # compiler -------------------------------------
 language = "c"
-default_args = ["-std=c17", "-w",]
+default_args = ["-std=c17", "-w"]
 debug_args = ["-std=c17", "-w", "-O0"]
 release_args = ["-std=c17", "-w", "-O3", "-ffast-math", "-march=native"]
 args = debug_args
@@ -65,7 +66,10 @@ for ext_name, ext_path in files:
 setup(
     name="cyclone",
     version="0.1.0",
-    description="A 2d graphics library written in cython",
+    description="Python 2D Graphics Library",
+    packages=find_packages(),
+    # include_package_data=True,
+    data_files=[("lib", glob("lib/*"))],
     ext_modules=cythonize(
         module_list=extensions,
         annotate=annotate,

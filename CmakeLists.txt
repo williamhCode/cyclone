@@ -11,3 +11,4 @@ add_subdirectory(deps/glfw deps/glfw/build)
 # build glad as shared library
 add_library(glad SHARED deps/glad/src/glad.c)
 target_include_directories(glad PUBLIC deps/glad/include)
+

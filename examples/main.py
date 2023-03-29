@@ -3,24 +3,24 @@ from cyclone.render import Renderer
 from cyclone.timer import Timer
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
-from cyclone import constants
+from cyclone import constants as const
 from cyclone import callbacks
 
 import math
 import random
 import glm
-from examples.camera import Camera2D
+from camera import Camera2D
 
-colors = []
-for _ in range(4446):
-    colors.append(
-        (
-            random.randint(0, 255),
-            random.randint(0, 255),
-            random.randint(0, 255),
-            255,
-        )
-    )
+# colors = []
+# for _ in range(4446):
+#     colors.append(
+#         (
+#             random.randint(0, 255),
+#             random.randint(0, 255),
+#             random.randint(0, 255),
+#             255,
+#         )
+#     )
 
 
 def spinning_star(renderer: Renderer, time):
@@ -39,13 +39,13 @@ def spinning_star(renderer: Renderer, time):
         y = math.sin((time) * spin_speed + angle) * 300 + start[1]
         # points.append((x, y))
         if prev_point is not None:
-            # color = (
-            #     random.randint(0, 255),
-            #     random.randint(0, 255),
-            #     random.randint(0, 255),
-            #     255,
-            # )
-            renderer.draw_line(colors[i], prev_point, (x, y), 0.01)
+            color = (
+                random.randint(0, 255),
+                random.randint(0, 255),
+                random.randint(0, 255),
+                255,
+            )
+            renderer.draw_line(color, prev_point, (x, y), 0.01)
         prev_point = (x, y)
 
     # points_1 = points[: edges // 3 + 1]
@@ -60,7 +60,6 @@ def spinning_star(renderer: Renderer, time):
 def main():
     WIN_SIZE = (1200, 800)
     window = Window(WIN_SIZE, vsync=False, high_dpi=True)
-
     renderer = window.create_renderer()
 
     camera = Camera2D(*WIN_SIZE)
@@ -93,49 +92,49 @@ def main():
 
         # key events
         for callback, data in window.get_callbacks():
-            if callback == constants.WINDOW_CLOSE_CALLBACK:
+            if callback == const.WINDOW_CLOSE_CALLBACK:
                 close_window = True
 
-            if callback == constants.KEY_CALLBACK:
-                if data.action == constants.PRESS:
-                    if data.key == constants.KEY_ESCAPE:
+            if callback == const.KEY_CALLBACK:
+                if data.action == const.PRESS:
+                    if data.key == const.KEY_ESCAPE:
                         close_window = True
-                    if data.key == constants.KEY_T:
+                    if data.key == const.KEY_T:
                         print(time)
 
-            if callback == constants.MOUSE_BUTTON_CALLBACK:
-                if data.action == constants.PRESS:
-                    if data.button == constants.MOUSE_BUTTON_LEFT:
+            if callback == const.MOUSE_BUTTON_CALLBACK:
+                if data.action == const.PRESS:
+                    if data.button == const.MOUSE_BUTTON_LEFT:
                         print("left pressed!")
 
-            if callback == constants.CURSOR_POSITION_CALLBACK:
+            if callback == const.CURSOR_POSITION_CALLBACK:
                 print(data.xpos, data.ypos)
 
         # key/button being pressed
-        if window.is_key_pressed(constants.KEY_A):
+        if window.key_pressed(const.KEY_A):
             print("a!")
 
-        if window.is_mouse_button_pressed(constants.MOUSE_BUTTON_RIGHT):
+        if window.mouse_button_pressed(const.MOUSE_BUTTON_RIGHT):
             print("right held!")
 
-        if window.is_key_pressed(constants.KEY_EQUAL):
+        if window.key_pressed(const.KEY_EQUAL):
             zoom_time += dt
             camera.zoom = zoom_factor**zoom_time
 
-        if window.is_key_pressed(constants.KEY_MINUS):
+        if window.key_pressed(const.KEY_MINUS):
             zoom_time -= dt
             camera.zoom = zoom_factor**zoom_time
 
-        if window.is_key_pressed(constants.KEY_UP):
+        if window.key_pressed(const.KEY_UP):
             look_pos += glm.vec2(0, 3000 / camera.zoom * dt)
 
-        if window.is_key_pressed(constants.KEY_DOWN):
+        if window.key_pressed(const.KEY_DOWN):
             look_pos -= glm.vec2(0, 3000 / camera.zoom * dt)
 
-        if window.is_key_pressed(constants.KEY_LEFT):
+        if window.key_pressed(const.KEY_LEFT):
             look_pos -= glm.vec2(3000 / camera.zoom * dt, 0)
 
-        if window.is_key_pressed(constants.KEY_RIGHT):
+        if window.key_pressed(const.KEY_RIGHT):
             look_pos += glm.vec2(3000 / camera.zoom * dt, 0)
 
         camera.look_at(look_pos)
@@ -152,9 +151,13 @@ def main():
         #         renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # texture region test
-        # renderer.draw_texture_region(texture_2, (0, 0), Rectangle(0, 0, 100, 100))
-        # renderer.draw_texture_region(texture_2, (100, 0), (0, 0, 100, 100))
-        # renderer.draw_texture(texture_2, (100, 0))
+        renderer.draw_texture_region(texture_2, (0, 0), (0, 0, 500, 500))
+        renderer.draw_texture_region(
+            texture_2, (0, 0), Rectangle(0, 0, 180, 180), color=(0, 255, 0, 255)
+        )
+        renderer.draw_texture_region(
+            texture_2, (50, 50), (50, 50, 100, 100), color=(255, 0, 0, 255)
+        )
 
         # circle test
         # for i in range(100):
@@ -167,7 +170,7 @@ def main():
         #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
         # line test
-        spinning_star(renderer, time)
+        # spinning_star(renderer, time)
 
         # layering test
         # renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200), width=20, fade=10)
@@ -191,6 +194,7 @@ def main():
         window.update()
 
     window.destroy()
+
 
 if __name__ == "__main__":
     main()

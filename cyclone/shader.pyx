@@ -5,7 +5,9 @@ import os
 cdef char *_read_file(const char *filename) except *:
     cdef FILE *file = fopen(filename, "r")
     if file == NULL:
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+        raise FileNotFoundError(
+            errno.ENOENT, os.strerror(errno.ENOENT), filename.decode()
+        )
 
     fseek(file, 0, SEEK_END)
     cdef int length = ftell(file)

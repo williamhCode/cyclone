@@ -1,5 +1,7 @@
 cimport cython
 
+from cyclone.util import set_cwd
+from pathlib import Path
 
 cdef class Renderer:
 
@@ -17,13 +19,15 @@ cdef class Renderer:
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &self.MAX_TEXTURE_SLOTS)
 
         # shader stuff ----------------------------------------- #
-        shader_create(
-            &self.shader, 'cyclone/shaders/all.vert', 'cyclone/shaders/all.frag'
-        )
+        with set_cwd(Path(__file__).parent.parent):
+            shader_create(
+                &self.shader, 'cyclone/shaders/all.vert', 'cyclone/shaders/all.frag'
+            )
         self.shaders = [self.shader]
 
         # set sampler2Ds
         shader_use(&self.shader)
+
         cdef GLint *values = <GLint *>malloc(self.MAX_TEXTURE_SLOTS * sizeof(GLint))
         cdef size_t i
         for i in range(self.MAX_TEXTURE_SLOTS):
@@ -283,6 +287,7 @@ cdef class Renderer:
 
         cdef vec2[4] local_positions
         cdef vec2[4] tex_coords
+        cdef float left, right, top, bottom
         if region is NULL:
             local_positions = [
                 [0, 0],
@@ -305,12 +310,17 @@ cdef class Renderer:
                 [0, region[3]]
             ]
 
+            # region = [x, y, width, height]
+            left = region[0] / size[0]
+            right = (region[0] + region[2]) / size[0]
+            bottom = region[1] / size[1]
+            top = (region[1] + region[3]) / size[1]
+
             tex_coords = [
-                [region[0] / size[0], region[1] / size[1]],
-                [(region[0] + region[2]) / size[0], region[1] / size[1]],
-                [(region[0] + region[2]) / size[0],
-                 (region[1] + region[3]) / size[1]],
-                [region[0] / size[0], (region[1] + region[3]) / size[1]]
+                [left, bottom],
+                [right, bottom],
+                [right, top],
+                [left, top]
             ]
 
         if flipped:
