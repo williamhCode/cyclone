@@ -63,13 +63,23 @@ for ext_name, ext_path in files:
     )
     extensions.append(ext)
 
+packages = [
+    "cyclone",
+]
+
+package_data={"cyclone": ["shaders/*"]}
+
+data_files=[
+    ("lib", glob("lib/*"))
+]
+    
 setup(
     name="cyclone",
     version="0.1.0",
     description="Python 2D Graphics Library",
-    packages=find_packages(),
-    # include_package_data=True,
-    data_files=[("lib", glob("lib/*"))],
+    packages=packages,
+    package_data=package_data,
+    data_files=data_files,
     ext_modules=cythonize(
         module_list=extensions,
         annotate=annotate,

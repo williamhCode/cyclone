@@ -1,6 +1,6 @@
 cimport cython
 
-from cyclone.util import set_cwd
+from cyclone.utils import set_cwd
 from pathlib import Path
 
 cdef class Renderer:
