@@ -3,7 +3,7 @@ from cyclone.constants import (
 )
 
 
-cdef void window_size_callback(GLFWwindow* window, int width, int height):
+cdef void window_size_callback(GLFWwindow* window, int width, int height) noexcept:
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
@@ -11,7 +11,7 @@ cdef void window_size_callback(GLFWwindow* window, int width, int height):
             curr_window.height = height
 
 
-cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
+cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height) noexcept:
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
@@ -19,7 +19,7 @@ cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height):
             curr_window.framebuffer_height = height
 
 
-cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods):
+cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept:
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
@@ -28,7 +28,7 @@ cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, in
             )
 
 
-cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int mods):
+cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) noexcept:
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
@@ -37,7 +37,7 @@ cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int 
             )
 
 
-cdef void cursor_position_callback(GLFWwindow* window, double xpos, double ypos):
+cdef void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) noexcept:
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
@@ -49,7 +49,7 @@ cdef void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
             )
 
 
-cdef void window_close_callback(GLFWwindow* window):
+cdef void window_close_callback(GLFWwindow* window) noexcept:
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:

@@ -3,6 +3,8 @@ from cyclone.lib.stb_image cimport *
 
 from cyclone.window cimport Window
 
+from libc.stdio cimport *
+
 
 cdef class Texture:
     cdef:
@@ -11,10 +13,8 @@ cdef class Texture:
         int orig_height
         public int width
         public int height
-        public bint resize_nearest
 
-    cdef void _generate_texture(self, unsigned char *data, int width, int height)
-
+    cdef update_data(self, unsigned char *data)
 
 cdef class RenderTexture(Texture):
     cdef:

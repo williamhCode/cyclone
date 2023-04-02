@@ -1,36 +1,54 @@
-cdef class Texture:
+def load(str filepath, bint resize_nearest=False):
+    stbi_set_flip_vertically_on_load(1)
 
-    def __init__(self, str filepath, bint resize_nearest=False):
-        self.resize_nearest = resize_nearest
+    cdef int width, height, n
+    cdef unsigned char *data = stbi_load(filepath.encode(), &width, &height, &n, 4)
 
-        # load data from filapath
-        stbi_set_flip_vertically_on_load(1)
-        cdef int n
-        cdef unsigned char *data = stbi_load(
-            filepath.encode(), &self.width, &self.height, &n, 4
-        )
-        self.orig_width = self.width
-        self.orig_height = self.height
+    # p_data = list(data[200000 * 4:200010 * 4])
+    # print(p_data)
 
-        # create texture
-        if data:
-            self._generate_texture(data, self.width, self.height)
-        else:
-            raise RuntimeError(f"Failed to load texture at {filepath}")
+    # py_data = data
+    # p_data = list(py_data[200000 * 4:200010 * 4])
+    # print(p_data)
 
+    if data == NULL:
+        texture = None
+        raise RuntimeError(f"Failed to load texture at {filepath}")
+    else:
+        texture = Texture(width, height, data, resize_nearest, filepath)
+        texture.update_data(data)
         stbi_image_free(data)
 
-    def __del__(self):
-        glDeleteTextures(1, &self.texture_id)
+    return texture
 
-    # initialize width, height, and resize_nearest before calling this function
-    cdef void _generate_texture(self, unsigned char *data, int width, int height):
+
+cdef class Texture:
+
+    def __init__(
+        self, int width, int height, bytes py_data=None, bint resize_nearest=False
+        , str path=None
+    ):
+        self.width = width
+        self.height = height
+        self.orig_width = width
+        self.orig_height = height
+
+        cdef unsigned char *data
+        if py_data is None:
+            data = NULL
+        else:
+            data = py_data
+
+        # p_data = list(data[200000 * 4:200010 * 4])
+        # print(p_data)
+
+        # generate texture
         glGenTextures(1, &self.texture_id)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-        if self.resize_nearest:
+        if resize_nearest:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         else:
@@ -41,6 +59,15 @@ cdef class Texture:
             GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data
         )
         glGenerateMipmap(GL_TEXTURE_2D)
+
+    cdef update_data(self, unsigned char *data):
+        glBindTexture(GL_TEXTURE_2D, self.texture_id)
+        glTexSubImage2D(
+            GL_TEXTURE_2D, 0, 0, 0, self.width, self.height, GL_RGBA, GL_UNSIGNED_BYTE, data
+        )
+
+    def __del__(self):
+        glDeleteTextures(1, &self.texture_id)
 
     def reset_size(self):
         self.width = self.orig_width
@@ -65,11 +92,7 @@ cdef class RenderTexture(Texture):
         bint resize_nearest=False,
         bint high_dpi=True
     ):
-        self.resize_nearest = resize_nearest
-        self.width = size[0]
-        self.height = size[1]
-        self.orig_width = self.width
-        self.orig_height = self.height
+        # super().__init__(size[0], size[1], None, resize_nearest)
 
         # if high_dpi is True, use the window's size to framebuffer_size scale
         if high_dpi:
@@ -82,8 +105,6 @@ cdef class RenderTexture(Texture):
         else:
             self.framebuffer_width = self.width
             self.framebuffer_height = self.height
-
-        self._generate_texture(NULL, self.framebuffer_width, self.framebuffer_height)
 
         # setup framebuffer
         glGenFramebuffers(1, &self.fbo)
