@@ -144,18 +144,18 @@ cdef class Renderer:
         self.vertices_ptr = self.vertices
         self.texture_slot_index = 0
 
-    def begin(self, view_matrix=None, RenderTexture texture=None):
+    def begin(self, view_matrix=None, RenderTexture target=None):
         self.window.make_context_current()
-        if texture is None:
+        if target is None:
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
             glViewport(
                 0, 0, self.window.framebuffer_width, self.window.framebuffer_height
             )
             self._set_proj_mat(self.window.width, self.window.height)
         else:
-            glBindFramebuffer(GL_FRAMEBUFFER, texture.fbo)
-            glViewport(0, 0, texture.framebuffer_width, texture.framebuffer_height)
-            self._set_proj_mat(texture.width, texture.height)
+            glBindFramebuffer(GL_FRAMEBUFFER, target.fbo)
+            glViewport(0, 0, target.framebuffer_width, target.framebuffer_height)
+            self._set_proj_mat(target.width, target.height)
 
         # set view matrix
         if view_matrix is None:

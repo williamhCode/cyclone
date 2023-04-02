@@ -2,7 +2,7 @@
 # import os
 from importlib.resources import files
 
-cdef char *_read_file(const char *filename) except *:
+cdef char *_read_file(const char *filename):
     data = files("cyclone").joinpath(filename.decode()).read_bytes()
 
     cdef char *out = <char *>malloc(sizeof(char) * (len(data) + 1))
@@ -14,7 +14,7 @@ cdef char *_read_file(const char *filename) except *:
 
     return out
 
-# cdef char *_read_file(const char *filename) except *:
+# cdef char *_read_file(const char *filename):
 #     cdef FILE *file = fopen(filename, "r")
 #     if file == NULL:
 #         raise FileNotFoundError(
@@ -43,7 +43,7 @@ cdef char *_read_file(const char *filename) except *:
 
 cdef void _checkCompileErrors(
     GLuint shader, const char *compile_type, const char *path
-) except *:
+):
     cdef GLint success
     cdef GLchar infoLog[1024]
     if not strcmp(compile_type, "PROGRAM") == 0:
@@ -65,7 +65,7 @@ cdef void _checkCompileErrors(
 
 cdef void shader_create(
     s_Shader *self, const char *vs_path, const char *fs_path
-) except *:
+):
     cdef char *vs_code = _read_file(vs_path)
     cdef char *fs_code = _read_file(fs_path)
 

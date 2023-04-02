@@ -1,39 +1,47 @@
-def load(str filepath, bint resize_nearest=False):
-    stbi_set_flip_vertically_on_load(1)
-
-    cdef int width, height, n
-    cdef unsigned char *data = stbi_load(filepath.encode(), &width, &height, &n, 4)
-
-    if data == NULL:
-        texture = None
-        raise RuntimeError(f"Failed to load texture at {filepath}")
-    else:
-        # slicing to exact length because
-        # Cython assumes unsigned char * has null terminator
-        texture = Texture(
-            width, height, data[:width * height * 4], resize_nearest
-        )
-        stbi_image_free(data)
-
-    return texture
-
-
 cdef class Texture:
 
     def __init__(
         self, int width, int height, bytes data=None, bint resize_nearest=False
     ):
-        self.width = width
-        self.height = height
-        self.orig_width = width
-        self.orig_height = height
-
         cdef unsigned char *t_data
         if data is None:
             t_data = NULL
         else:
             t_data = data
 
+        self._init(width, height, data, resize_nearest)
+
+    @classmethod
+    def load(cls, str filepath, bint resize_nearest=False):
+        stbi_set_flip_vertically_on_load(1)
+
+        cdef int width, height, n
+        cdef unsigned char *data = stbi_load(filepath.encode(), &width, &height, &n, 4)
+
+        cdef Texture texture
+        if data == NULL:
+            texture = None
+            raise RuntimeError(f"Failed to load texture at {filepath}")
+        else:
+            texture = cls.__new__(cls)
+            texture._init(width, height, data, resize_nearest)
+            stbi_image_free(data)
+
+        return texture
+
+    cdef _init(
+        self, int width, int height, unsigned char *data, bint resize_nearest
+    ):
+        self.width = width
+        self.height = height
+        self.orig_width = width
+        self.orig_height = height
+
+        self._gen_texture(width, height, data, resize_nearest)
+
+    cdef _gen_texture(
+        self, int width, int height, unsigned char *data, bint resize_nearest
+    ):
         # generate texture
         glGenTextures(1, &self.texture_id)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
@@ -56,7 +64,7 @@ cdef class Texture:
             0,
             GL_RGBA,
             GL_UNSIGNED_BYTE,
-            t_data
+            data
         )
         glGenerateMipmap(GL_TEXTURE_2D)
 
@@ -86,7 +94,10 @@ cdef class RenderTexture(Texture):
         bint resize_nearest=False,
         bint high_dpi=True
     ):
-        super().__init__(size[0], size[1], None, resize_nearest)
+        self.width = size[0]
+        self.height = size[1]
+        self.orig_width = self.width
+        self.orig_height = self.height
 
         # if high_dpi is True, use the window's size to framebuffer_size scale
         if high_dpi:
@@ -99,6 +110,10 @@ cdef class RenderTexture(Texture):
         else:
             self.framebuffer_width = self.width
             self.framebuffer_height = self.height
+
+        self._gen_texture(
+            self.framebuffer_width, self.framebuffer_height, NULL, resize_nearest
+        )
 
         # setup framebuffer
         glGenFramebuffers(1, &self.fbo)

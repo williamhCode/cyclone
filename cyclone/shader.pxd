@@ -11,7 +11,7 @@ cdef struct s_Shader:
 
 cdef void shader_create(
     s_Shader *self, const char *vs_path, const char *fs_path
-) except *
+)
 
 cdef void shader_destroy(const s_Shader *self)
 

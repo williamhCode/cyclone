@@ -5,6 +5,7 @@ from cyclone.render cimport Renderer
 from cyclone.texture cimport RenderTexture
 from cyclone.callbacks cimport *
 
+from libc.stdio cimport *
 
 cdef class Window:
     cdef:

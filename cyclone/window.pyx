@@ -19,7 +19,9 @@ cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height) n
             curr_window.framebuffer_height = height
 
 
-cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept:
+cdef void key_callback(
+    GLFWwindow* window, int key, int scancode, int action, int mods
+) noexcept:
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
@@ -28,7 +30,9 @@ cdef void key_callback(GLFWwindow* window, int key, int scancode, int action, in
             )
 
 
-cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) noexcept:
+cdef void mouse_button_callback(
+    GLFWwindow* window, int button, int action, int mods
+) noexcept:
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:
@@ -37,7 +41,9 @@ cdef void mouse_button_callback(GLFWwindow* window, int button, int action, int 
             )
 
 
-cdef void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) noexcept:
+cdef void cursor_position_callback(
+    GLFWwindow* window, double xpos, double ypos
+) noexcept:
     cdef Window curr_window
     for curr_window in windows:
         if curr_window.window == window:

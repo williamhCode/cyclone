@@ -10,6 +10,7 @@ from cyclone import callbacks
 import math
 import random
 import glm
+import copy
 from camera import Camera2D
 
 # colors = []
@@ -65,17 +66,15 @@ def main():
 
     camera = Camera2D(*WIN_SIZE)
 
-    # texture_1 = texture.load("imgs/Flappy Bird_1.png", resize_nearest=True)
-    # texture_1.size = 10, 10
-    # texture_2 = texture.load("imgs/Flappy Bird_1.png", resize_nearest=True)
-    # texture_2.size = 50, 40
-    # texture_3 = texture.load("imgs/test2.jpeg")
-    texture_4 = texture.load("imgs/test3.png")
-    # texture_5 = texture.load("imgs/single.jpeg")
-    # texture_5.size = 400, 400
+    texture_1 = Texture.load("imgs/Flappy Bird_1.png", resize_nearest=True)
+    texture_1.size = 10, 10
+    texture_2 = Texture.load("imgs/Flappy Bird_1.png", resize_nearest=True)
+    texture_2.size = 50, 40
+    # texture_3 = Texture.load("imgs/test2.jpeg")
+    # texture_4 = Texture.load("imgs/test3.png")
 
     # render_texture = RenderTexture(window, WIN_SIZE)
-    # render_texture = window.create_render_texture(WIN_SIZE)
+    render_texture = window.create_render_texture(WIN_SIZE)
 
     rect = Rectangle(0, 0, 100, 100)
     rect.size = (100, 100)
@@ -148,11 +147,8 @@ def main():
 
         # render to texture
         renderer.begin(view_matrix=camera.get_transform())
-        # renderer.begin(view_matrix=camera.get_transform(), texture=render_texture)
+        # renderer.begin(view_matrix=camera.get_transform(), target=render_texture)
         renderer.clear((100, 100, 100, 255))
-
-        # renderer.draw_texture(texture_5, (0, 0))
-        renderer.draw_texture(texture_4, (0, 0))
 
         # texture test
         # dt = math.sin(time * 5) * 20
@@ -161,7 +157,7 @@ def main():
         #         renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # texture region test
-        # renderer.draw_texture_region(texture_2, (0, 0), (0, 0, 500, 500))
+        renderer.draw_texture_region(texture_2, (0, 0), (0, 0, 500, 500))
         # renderer.draw_texture_region(
         #     texture_2, (100, 100), Rectangle(100, 100, 300, 300), color=(0, 255, 0, 255)
         # )
