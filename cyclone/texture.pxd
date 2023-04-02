@@ -14,8 +14,6 @@ cdef class Texture:
         public int width
         public int height
 
-    cdef update_data(self, unsigned char *data)
-
 cdef class RenderTexture(Texture):
     cdef:
         GLuint fbo

@@ -4,19 +4,15 @@ def load(str filepath, bint resize_nearest=False):
     cdef int width, height, n
     cdef unsigned char *data = stbi_load(filepath.encode(), &width, &height, &n, 4)
 
-    # p_data = list(data[200000 * 4:200010 * 4])
-    # print(p_data)
-
-    # py_data = data
-    # p_data = list(py_data[200000 * 4:200010 * 4])
-    # print(p_data)
-
     if data == NULL:
         texture = None
         raise RuntimeError(f"Failed to load texture at {filepath}")
     else:
-        texture = Texture(width, height, data, resize_nearest, filepath)
-        texture.update_data(data)
+        # slicing to exact length because
+        # Cython assumes unsigned char * has null terminator
+        texture = Texture(
+            width, height, data[:width * height * 4], resize_nearest
+        )
         stbi_image_free(data)
 
     return texture
@@ -25,22 +21,18 @@ def load(str filepath, bint resize_nearest=False):
 cdef class Texture:
 
     def __init__(
-        self, int width, int height, bytes py_data=None, bint resize_nearest=False
-        , str path=None
+        self, int width, int height, bytes data=None, bint resize_nearest=False
     ):
         self.width = width
         self.height = height
         self.orig_width = width
         self.orig_height = height
 
-        cdef unsigned char *data
-        if py_data is None:
-            data = NULL
+        cdef unsigned char *t_data
+        if data is None:
+            t_data = NULL
         else:
-            data = py_data
-
-        # p_data = list(data[200000 * 4:200010 * 4])
-        # print(p_data)
+            t_data = data
 
         # generate texture
         glGenTextures(1, &self.texture_id)
@@ -56,15 +48,17 @@ cdef class Texture:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
         glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data
+            GL_TEXTURE_2D,
+            0,
+            GL_RGBA,
+            width,
+            height,
+            0,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            t_data
         )
         glGenerateMipmap(GL_TEXTURE_2D)
-
-    cdef update_data(self, unsigned char *data):
-        glBindTexture(GL_TEXTURE_2D, self.texture_id)
-        glTexSubImage2D(
-            GL_TEXTURE_2D, 0, 0, 0, self.width, self.height, GL_RGBA, GL_UNSIGNED_BYTE, data
-        )
 
     def __del__(self):
         glDeleteTextures(1, &self.texture_id)
@@ -92,7 +86,7 @@ cdef class RenderTexture(Texture):
         bint resize_nearest=False,
         bint high_dpi=True
     ):
-        # super().__init__(size[0], size[1], None, resize_nearest)
+        super().__init__(size[0], size[1], None, resize_nearest)
 
         # if high_dpi is True, use the window's size to framebuffer_size scale
         if high_dpi:

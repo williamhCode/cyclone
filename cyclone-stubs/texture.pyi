@@ -9,7 +9,9 @@ class Texture:
     resize_nearest: bool
     size: tuple[int, int]
 
-    def __init__(self, texture_id: int, width: int, height: int) -> None: ...
+    def __init__(
+        self, width: int, height: int, data: bytes = None, resize_nearest: bool = False
+    ) -> None: ...
     def reset_size(self) -> None: ...
 
 class RenderTexture(Texture):
