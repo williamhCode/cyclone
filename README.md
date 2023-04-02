@@ -35,6 +35,11 @@ The library is built with simplicity and modularity in mind. It takes care of wi
   - [ ] simple shapes collision detection
 
 ## Contributing
+#### Clone Repo
+```
+git clone --recurse-submodule https://github.com/williamhCode/cyclone.git
+```
+
 #### Install Python Modules
 ```
 pip install -r requirements.txt
