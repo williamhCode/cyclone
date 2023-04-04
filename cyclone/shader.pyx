@@ -1,44 +1,9 @@
-# import errno
-# import os
 from importlib.resources import files
 
-cdef char *_read_file(const char *filename):
+
+cdef void _read_file(const char *filename, char **out):
     data = files("cyclone").joinpath(filename.decode()).read_bytes()
-
-    cdef char *out = <char *>malloc(sizeof(char) * (len(data) + 1))
-    cdef int i
-    cdef char c
-    for i, c in enumerate(data):
-        out[i] = c
-    out[len(data)] = b'\0'
-
-    return out
-
-# cdef char *_read_file(const char *filename):
-#     cdef FILE *file = fopen(filename, "r")
-#     if file == NULL:
-#         raise FileNotFoundError(
-#             errno.ENOENT, os.strerror(errno.ENOENT), filename.decode()
-#         )
-
-#     fseek(file, 0, SEEK_END)
-#     cdef int length = ftell(file)
-#     fseek(file, 0, SEEK_SET)
-
-#     cdef char *out = <char *>malloc(sizeof(char) * (length + 1))
-#     cdef char c
-#     cdef int i = 0
-#     while True:
-#         c = fgetc(file)
-#         if c == EOF:
-#             break
-#         out[i] = c
-#         i += 1
-#     out[i] = b'\0'
-
-#     fclose(file)
-
-#     return out
+    out[0] = data
 
 
 cdef void _checkCompileErrors(
@@ -66,8 +31,10 @@ cdef void _checkCompileErrors(
 cdef void shader_create(
     s_Shader *self, const char *vs_path, const char *fs_path
 ):
-    cdef char *vs_code = _read_file(vs_path)
-    cdef char *fs_code = _read_file(fs_path)
+    cdef char *vs_code
+    _read_file(vs_path, &vs_code)
+    cdef char *fs_code
+    _read_file(fs_path, &fs_code)
 
     # vertex shader
     self.vs_ID = glCreateShader(GL_VERTEX_SHADER)
@@ -90,9 +57,6 @@ cdef void shader_create(
     cdef char buf[512]
     snprintf(buf, 512, "[%s, %s]", vs_path, fs_path)
     _checkCompileErrors(self.ID, "PROGRAM", buf)
-
-    free(vs_code)
-    free(fs_code)
 
 
 cdef void shader_destroy(const s_Shader *self):
