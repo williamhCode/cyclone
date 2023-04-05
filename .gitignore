@@ -15,6 +15,7 @@ cyclone/*.so
 cyclone/*.html
 
 # cmake
+cmake_build/
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles

@@ -19,6 +19,7 @@ include_dirs = [
     "deps/glad/include",
     "deps/cglm/include",
     "deps/stb",
+    "deps/freetype/include",
 ]
 
 library_dirs = [
@@ -26,8 +27,9 @@ library_dirs = [
 ]
 
 libraries = [
-    "glad",
     "glfw",
+    "glad",
+    "freetype",
 ]
 
 macros = [

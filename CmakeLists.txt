@@ -4,11 +4,14 @@ project(BuildDeps)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
-# build glfw as shared library
+# glfw
 set(BUILD_SHARED_LIBS ON)
 add_subdirectory(deps/glfw deps/glfw/build)
 
-# build glad as shared library
+# glad
 add_library(glad SHARED deps/glad/src/glad.c)
 target_include_directories(glad PUBLIC deps/glad/include)
 
+# freetype
+set(BUILD_SHARED_LIBS ON)
+add_subdirectory(deps/freetype deps/freetype/build)

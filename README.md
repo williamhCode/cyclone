@@ -48,8 +48,9 @@ pip install -r requirements.txt
 #### Build C Library Dependencies
 Make sure CMake is installed, shared object files should end up in `lib/`.
 ```
-cmake .
-cmake --build .
+cmake -E make_directory cmake_build
+cmake -E chdir cmake_build cmake ..
+cmake --build cmake_build
 ```
 
 #### Install Library in Dev Mode
