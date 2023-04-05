@@ -1,5 +1,5 @@
 from libc.stdio cimport *
-from libc.string cimport strcmp
+from libc.string cimport strcmp, strcpy
 from libc.stdlib cimport malloc, free
 
 from cyclone.lib.glad cimport *

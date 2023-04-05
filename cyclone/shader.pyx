@@ -1,9 +1,13 @@
 from importlib.resources import files
 
 
-cdef void _read_file(const char *filename, char **out):
+cdef char *_read_file(const char *filename):
     data = files("cyclone").joinpath(filename.decode()).read_bytes()
-    out[0] = data
+
+    cdef char *out = <char *>malloc(sizeof(char) * (len(data) + 1))
+    strcpy(out, data)
+
+    return out
 
 
 cdef void _checkCompileErrors(
@@ -31,10 +35,8 @@ cdef void _checkCompileErrors(
 cdef void shader_create(
     s_Shader *self, const char *vs_path, const char *fs_path
 ):
-    cdef char *vs_code
-    _read_file(vs_path, &vs_code)
-    cdef char *fs_code
-    _read_file(fs_path, &fs_code)
+    cdef char *vs_code = _read_file(vs_path)
+    cdef char *fs_code = _read_file(fs_path)
 
     # vertex shader
     self.vs_ID = glCreateShader(GL_VERTEX_SHADER)
@@ -57,6 +59,9 @@ cdef void shader_create(
     cdef char buf[512]
     snprintf(buf, 512, "[%s, %s]", vs_path, fs_path)
     _checkCompileErrors(self.ID, "PROGRAM", buf)
+
+    free(vs_code)
+    free(fs_code)
 
 
 cdef void shader_destroy(const s_Shader *self):

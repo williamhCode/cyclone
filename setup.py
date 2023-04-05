@@ -3,7 +3,9 @@ from os import path
 from glob import glob
 
 from Cython.Build import cythonize
-from setuptools import Extension, setup, find_namespace_packages
+from setuptools import Extension, setup
+
+os.environ["CC"] = "gcc"
 
 # general --------------------------------------
 files = []
@@ -20,6 +22,7 @@ include_dirs = [
     "deps/cglm/include",
     "deps/stb",
     "deps/freetype/include",
+    "deps/freetype/include/freetype",
 ]
 
 library_dirs = [

@@ -6,7 +6,9 @@ from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
 from cyclone import constants as const
 from cyclone import callbacks
+from cyclone.font import Font
 
+from pathlib import Path
 import math
 import random
 import glm
@@ -75,6 +77,8 @@ def main():
 
     # render_texture = RenderTexture(window, WIN_SIZE)
     render_texture = window.create_render_texture(WIN_SIZE)
+
+    font = Font("/System/Library/Fonts/Supplemental/Arial.ttf")
 
     rect = Rectangle(0, 0, 100, 100)
     rect.size = (100, 100)
