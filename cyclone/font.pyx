@@ -14,8 +14,8 @@ cdef class Font:
 
         FT_Set_Pixel_Sizes(face, 0, size)
 
-        cdef int width = size * 16
-        cdef int height = size * 8
+        cdef int width = (size + 2) * 16
+        cdef int height = (size + 2) * 8
 
         cdef unsigned char *data = <unsigned char *>malloc(
             sizeof(unsigned char) * width * height * 4
@@ -29,8 +29,8 @@ cdef class Font:
         for i in range(128):
             FT_Load_Char(face, i, FT_LOAD_RENDER)
 
-            x = (i % 16) * size
-            y = (i // 16) * size
+            x = (i % 16) * (size + 2) + 1
+            y = (i // 16) * (size + 2) + 1
 
             bitmap = face.glyph.bitmap
             for xx in range(bitmap.width):

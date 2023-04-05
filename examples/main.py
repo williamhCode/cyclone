@@ -155,10 +155,21 @@ def main():
         renderer.clear((100, 100, 100, 255))
 
         # render font
+        # for i in range(128):
+        #     x = (i % 16) * 30
+        #     y = (i // 16) * 30
+        #     if (i + (i // 16)) % 2  == 0:
+        #         color = (10, 200, 200)
+        #     else:
+        #         color = (200, 10, 200)
+        #     renderer.draw_rectangle(color, (x, y), (30, 30), width=1)
+
+        # renderer.draw_texture(test_font.texture, (0, 0), flipped=2)
+
         renderer.draw_text(test_font, "ABCDEFGHIJKLMNOP", (0, 90), (220, 220, 0))
         renderer.draw_text(test_font, "abcdefghijklmnop", (0, 60), (220, 220, 0))
         renderer.draw_text(test_font, "$_#_%_&_*_nice@gmail.com", (0, 30), (220, 220, 0))
-        renderer.draw_text(test_font, "$_#_%_&_*_nice@gmail.com", (0, 0), (220, 220, 0))
+        # renderer.draw_text(test_font, "$_#_%_&_*_nice@gmail.com", (0, 0), (220, 220, 0))
 
 
         # texture test

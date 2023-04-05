@@ -363,7 +363,12 @@ cdef class Renderer:
         cdef char c
         for c in text:
             char_data = font.char_datas[c]
-            region = [(c % 16) * font.size, (c // 16) * font.size, font.size, font.size]
+            region = [
+                (c % 16) * (font.size + 2) + 1,
+                (c // 16) * (font.size + 2) + 1,
+                font.size,
+                font.size
+            ]
 
             xpos = position[0] + char_data.bearing[0]
             ypos = position[1] - (font.size - char_data.bearing[1])
