@@ -9,7 +9,7 @@ cdef class Texture:
         else:
             t_data = data
 
-        self._init(width, height, data, resize_nearest)
+        self._init(width, height, t_data, resize_nearest)
 
     @classmethod
     def load(cls, str filepath, bint resize_nearest=False):
