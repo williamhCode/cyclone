@@ -4,3 +4,6 @@
 [submodule "deps/cglm"]
 	path = deps/cglm
 	url = https://github.com/recp/cglm
+[submodule "deps/freetype"]
+	path = deps/freetype
+	url = https://github.com/freetype/freetype.git
