@@ -8,6 +8,7 @@ from cyclone.shader cimport *
 from cyclone.window cimport Window
 from cyclone.texture cimport Texture, RenderTexture
 from cyclone.shapes cimport Rectangle
+from cyclone.font cimport Font, CharData
 
 
 cdef struct Vertex:
@@ -62,9 +63,11 @@ cdef class Renderer:
         vec2 size,
         float rotation,
         vec2 offset,
-        bint flipped,
+        int flipped,
         vec4 color
     )
+
+    cdef void _draw_text(self, Font font, char *text, vec2 position, vec4 color)
 
     cdef void _draw_circle(
         self,

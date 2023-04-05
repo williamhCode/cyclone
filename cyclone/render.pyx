@@ -199,7 +199,7 @@ cdef class Renderer:
         position,
         float rotation=0.0,
         offset=(0.0, 0.0),
-        bint flipped=False,
+        int flipped=0,
         color=(255, 255, 255, 255)
     ):
         cdef GLuint texture_id = texture.texture_id
@@ -220,7 +220,7 @@ cdef class Renderer:
         region,
         float rotation=0.0,
         offset=(0.0, 0.0),
-        bint flipped=False,
+        int flipped=0,
         color=(255, 255, 255, 255)
     ):
         cdef GLuint texture_id = texture.texture_id
@@ -254,7 +254,7 @@ cdef class Renderer:
         vec2 size,
         float rotation,
         vec2 offset,
-        bint flipped,
+        int flipped,
         vec4 color
     ):
         cdef size_t i
@@ -317,12 +317,19 @@ cdef class Renderer:
                 [left, top]
             ]
 
-        if flipped:
+        if flipped == 1 or flipped == 3:
             tex_coords = [
                 tex_coords[1],
                 tex_coords[0],
                 tex_coords[3],
                 tex_coords[2]
+            ]
+        if flipped == 2 or flipped == 3:
+            tex_coords = [
+                tex_coords[3],
+                tex_coords[2],
+                tex_coords[1],
+                tex_coords[0]
             ]
 
         cdef vec3 _position = [position[0], position[1], 0.0]
@@ -339,6 +346,40 @@ cdef class Renderer:
             self.vertices_ptr += 1
 
         self.count += 1
+
+    def draw_text(self, Font font, str text, position, color=(255, 255, 255, 255)):
+        cdef bytes b_text = text.encode()
+        cdef char *t_text = b_text
+        cdef vec2 t_position = [position[0], position[1]]
+        cdef vec4 t_color
+        self._handle_color(color, t_color)
+
+        self._draw_text(font, t_text, t_position, t_color)
+
+    cdef void _draw_text(self, Font font, char *text, vec2 position, vec4 color):
+        cdef float xpos, ypos
+        cdef vec4 region
+        cdef CharData char_data
+        cdef char c
+        for c in text:
+            char_data = font.char_datas[c]
+            region = [(c % 16) * font.size, (c // 16) * font.size, font.size, font.size]
+
+            xpos = position[0] + char_data.bearing[0]
+            ypos = position[1] - (font.size - char_data.bearing[1])
+
+            self._draw_texture(
+                font.texture.texture_id,
+                [xpos, ypos],
+                region,
+                [font.texture.width, font.texture.height],
+                0,
+                [0, 0],
+                2,
+                color
+            )
+
+            position[0] += char_data.advance
 
     def draw_circle(
         self, color, position, float radius, float width = 0.0, float fade = 0.0

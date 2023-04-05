@@ -63,7 +63,7 @@ def spinning_star(renderer: Renderer, time):
 
 def main():
     WIN_SIZE = (1200, 800)
-    window = Window(WIN_SIZE, vsync=False, high_dpi=True)
+    window = Window(WIN_SIZE, vsync=False, high_dpi=False)
     renderer = window.create_renderer()
 
     camera = Camera2D(*WIN_SIZE)
@@ -78,7 +78,7 @@ def main():
     # render_texture = RenderTexture(window, WIN_SIZE)
     render_texture = window.create_render_texture(WIN_SIZE)
 
-    font = Font("/System/Library/Fonts/Supplemental/Arial.ttf")
+    test_font = Font("/System/Library/Fonts/Supplemental/Arial.ttf", 30)
 
     rect = Rectangle(0, 0, 100, 100)
     rect.size = (100, 100)
@@ -154,6 +154,13 @@ def main():
         # renderer.begin(view_matrix=camera.get_transform(), target=render_texture)
         renderer.clear((100, 100, 100, 255))
 
+        # render font
+        renderer.draw_text(test_font, "ABCDEFGHIJKLMNOP", (0, 90), (220, 220, 0))
+        renderer.draw_text(test_font, "abcdefghijklmnop", (0, 60), (220, 220, 0))
+        renderer.draw_text(test_font, "$_#_%_&_*_nice@gmail.com", (0, 30), (220, 220, 0))
+        renderer.draw_text(test_font, "$_#_%_&_*_nice@gmail.com", (0, 0), (220, 220, 0))
+
+
         # texture test
         # dt = math.sin(time * 5) * 20
         # for i in range(300):
@@ -161,7 +168,7 @@ def main():
         #         renderer.draw_texture(texture_1, (i * 10, j * 10))
 
         # texture region test
-        renderer.draw_texture_region(texture_2, (0, 0), (0, 0, 500, 500))
+        # renderer.draw_texture_region(texture_2, (0, 0), (0, 0, 500, 500))
         # renderer.draw_texture_region(
         #     texture_2, (100, 100), Rectangle(100, 100, 300, 300), color=(0, 255, 0, 255)
         # )
