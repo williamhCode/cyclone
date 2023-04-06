@@ -1,5 +1,5 @@
-# Cyclone - 2d Graphics Library
-_A 2D batch renderer written in Cython, Python, and OpenGL._
+# Cyclone
+_A 2D graphics library written in Cython, Python, and OpenGL._
 
 ## Goal
 There are many great 2D python graphics libraries like pygame, pyglet, and arcade. However, they either lack in performance, have a steep learning curve, or have issues with macOS (memory leaks and high dpi rendering).
