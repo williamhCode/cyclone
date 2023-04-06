@@ -1,0 +1,19 @@
+site_name: Cyclone Docs
+theme:
+  name: "material"
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            members_order: source
+
+watch:
+  - cyclone-stubs
+
+nav:
+  - Home: index.md
+  - Code Reference:
+    - Render: render.md

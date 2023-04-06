@@ -1,5 +1,6 @@
 cimport cython
 
+
 cdef class Renderer:
 
     def __init__(self, Window window not None):
