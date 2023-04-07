@@ -1,7 +1,7 @@
 cdef class Texture:
 
     def __init__(
-        self, int width, int height, bytes data=None, bint resize_nearest=False
+        self, size, bytes data=None, bint resize_nearest=False
     ):
         cdef unsigned char *t_data
         if data is None:
@@ -9,7 +9,7 @@ cdef class Texture:
         else:
             t_data = data
 
-        self._init(width, height, t_data, resize_nearest)
+        self._init([size[0], size[1]], t_data, resize_nearest)
 
     @classmethod
     def load(cls, str filepath, bint resize_nearest=False):
@@ -24,24 +24,29 @@ cdef class Texture:
             raise RuntimeError(f"Failed to load texture at {filepath}")
         else:
             texture = cls.__new__(cls)
-            texture._init(width, height, data, resize_nearest)
+            texture._init([width, height], data, resize_nearest)
             stbi_image_free(data)
 
         return texture
 
     cdef _init(
-        self, int width, int height, unsigned char *data, bint resize_nearest
+        self,
+        int[2] size,
+        unsigned char *data,
+        bint resize_nearest,
+        int[2] framebuffer_size=NULL,
     ):
-        self.width = width
-        self.height = height
-        self.orig_width = width
-        self.orig_height = height
+        self.width = size[0]
+        self.height = size[1]
+        self.orig_width = size[0]
+        self.orig_height = size[1]
 
-        self._gen_texture(width, height, data, resize_nearest)
+        if framebuffer_size == NULL:
+            framebuffer_size = size
 
-    cdef _gen_texture(
-        self, int width, int height, unsigned char *data, bint resize_nearest
-    ):
+        self.framebuffer_width = framebuffer_size[0]
+        self.framebuffer_height = framebuffer_size[1]
+
         # generate texture
         glGenTextures(1, &self.texture_id)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
@@ -49,18 +54,22 @@ cdef class Texture:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
         if resize_nearest:
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+            glTexParameteri(
+                GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST
+            )
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         else:
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+            glTexParameteri(
+                GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR
+            )
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
             GL_RGBA,
-            width,
-            height,
+            self.framebuffer_width,
+            self.framebuffer_height,
             0,
             GL_RGBA,
             GL_UNSIGNED_BYTE,
@@ -89,30 +98,26 @@ cdef class RenderTexture(Texture):
 
     def __init__(
         self,
-        Window window not None,
         size,
         bint resize_nearest=False,
         bint high_dpi=True
     ):
-        self.width = size[0]
-        self.height = size[1]
-        self.orig_width = self.width
-        self.orig_height = self.height
-
-        # if high_dpi is True, use the window's size to framebuffer_size scale
+        cdef int[2] t_size = [size[0], size[1]]
+        cdef int[2] framebuffer_size
+        cdef Window window = cyclone.current_window
         if high_dpi:
-            self.framebuffer_width = (
-                self.width * window.framebuffer_width // window.width
-            )
-            self.framebuffer_height = (
-                self.height * window.framebuffer_height // window.height
-            )
+            framebuffer_size = [
+                t_size[0] * window.framebuffer_width // window.width,
+                t_size[1] * window.framebuffer_height // window.height
+            ]
         else:
-            self.framebuffer_width = self.width
-            self.framebuffer_height = self.height
+            framebuffer_size = t_size
 
-        self._gen_texture(
-            self.framebuffer_width, self.framebuffer_height, NULL, resize_nearest
+        self._init(
+            t_size,
+            NULL,
+            resize_nearest,
+            framebuffer_size
         )
 
         # setup framebuffer

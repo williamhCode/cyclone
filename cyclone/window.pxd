@@ -1,11 +1,13 @@
 from cyclone.lib.glad cimport *
 from cyclone.lib.glfw cimport *
 
+cimport cyclone
 from cyclone.render cimport Renderer
 from cyclone.texture cimport RenderTexture
 from cyclone.callbacks cimport *
 
 from libc.stdio cimport *
+
 
 cdef class Window:
     cdef:

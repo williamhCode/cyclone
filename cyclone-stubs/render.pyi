@@ -1,9 +1,17 @@
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
+from cyclone.window import Window
 from ._common import Vec2, Mat4, Color, Region
 
 class Renderer:
-    def __init__(self) -> None: ...
+    def __init__(self) -> None:
+        """initializes the renderer
+
+        Initializes the renderer with the given window.
+
+        Returns:
+            None
+        """
     def clear(self, color: Color) -> None:
         """clears the current target
 
@@ -49,7 +57,7 @@ class Renderer:
         position: Vec2,
         rotation: float = 0.0,
         offset: Vec2 = (0.0, 0.0),
-        flipped: int = 0,
+        flip_mode: int = 0,
         color: Color = (255, 255, 255, 255),
     ) -> None:
         """draws a texture
@@ -62,7 +70,7 @@ class Renderer:
             position: bottom-left position of the texture
             rotation: angle in degrees to rotate the texture
             offset: the position offset
-            flipped: the flip mode, if
+            flip_mode: the flip mode, if
 
                 - 0, don't flip
                 - 1, flip horizontally
@@ -82,7 +90,7 @@ class Renderer:
         region: Region,
         rotation: float = 0.0,
         offset: Vec2 = (0.0, 0.0),
-        flipped: int = 0,
+        flip_mode: int = 0,
         color: Color = (255, 255, 255, 255),
     ) -> None:
         """draws a texture region
@@ -98,7 +106,7 @@ class Renderer:
                 texture's wrap mode (currently repeat).
             rotation: angle in degrees to rotate the texture
             offset: the position offset
-            flipped: the flip mode, if
+            flip_mode: the flip mode, if
 
                 - 0, don't flip
                 - 1, flip horizontally

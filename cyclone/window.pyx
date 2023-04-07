@@ -3,66 +3,67 @@ from cyclone.constants import (
 )
 
 
-cdef void window_size_callback(GLFWwindow* window, int width, int height) noexcept:
-    cdef Window curr_window
-    for curr_window in windows:
-        if curr_window.window == window:
-            curr_window.width = width
-            curr_window.height = height
+cdef void window_size_callback(GLFWwindow* glfw_window, int width, int height) noexcept:
+    cdef Window window
+    for window in windows:
+        if window.window == glfw_window:
+            window.width = width
+            window.height = height
 
 
-cdef void framebuffer_size_callback(GLFWwindow* window, int width, int height) noexcept:
-    cdef Window curr_window
-    for curr_window in windows:
-        if curr_window.window == window:
-            curr_window.framebuffer_width = width
-            curr_window.framebuffer_height = height
+cdef void framebuffer_size_callback(GLFWwindow* glfw_window, int width, int height) noexcept:
+    cdef Window window
+    for window in windows:
+        if window.window == glfw_window:
+            window.framebuffer_width = width
+            window.framebuffer_height = height
 
 
 cdef void key_callback(
-    GLFWwindow* window, int key, int scancode, int action, int mods
+    GLFWwindow* glfw_window, int key, int scancode, int action, int mods
 ) noexcept:
-    cdef Window curr_window
-    for curr_window in windows:
-        if curr_window.window == window:
-            curr_window.callbacks.append(
+    cdef Window window
+    for window in windows:
+        if window.window == glfw_window:
+            window.callbacks.append(
                 (KEY_CALLBACK, KeyData(key, scancode, action, mods))
             )
 
 
 cdef void mouse_button_callback(
-    GLFWwindow* window, int button, int action, int mods
+    GLFWwindow* glfw_window, int button, int action, int mods
 ) noexcept:
-    cdef Window curr_window
-    for curr_window in windows:
-        if curr_window.window == window:
-            curr_window.callbacks.append(
+    cdef Window window
+    for window in windows:
+        if window.window == glfw_window:
+            window.callbacks.append(
                 (MOUSE_BUTTON_CALLBACK, MouseButtonData(button, action, mods))
             )
 
 
 cdef void cursor_position_callback(
-    GLFWwindow* window, double xpos, double ypos
+    GLFWwindow* glfw_window, double xpos, double ypos
 ) noexcept:
-    cdef Window curr_window
-    for curr_window in windows:
-        if curr_window.window == window:
-            curr_window.callbacks.append(
+    cdef Window window
+    for window in windows:
+        if window.window == glfw_window:
+            window.callbacks.append(
                 (
                     CURSOR_POSITION_CALLBACK,
-                    CursorPositionData(xpos, curr_window.height - ypos)
+                    CursorPositionData(xpos, window.height - ypos)
                 )
             )
 
 
-cdef void window_close_callback(GLFWwindow* window) noexcept:
-    cdef Window curr_window
-    for curr_window in windows:
-        if curr_window.window == window:
-            curr_window.callbacks.append((WINDOW_CLOSE_CALLBACK, None))
+cdef void window_close_callback(GLFWwindow* glfw_window) noexcept:
+    cdef Window window
+    for window in windows:
+        if window.window == glfw_window:
+            window.callbacks.append((WINDOW_CLOSE_CALLBACK, None))
 
 
-windows = []
+cdef list windows = []
+
 
 cdef class Window:
 
@@ -122,9 +123,13 @@ cdef class Window:
 
         # add window to windows list
         windows.append(self)
+        cyclone.current_window = self
 
     cdef void make_context_current(self):
         glfwMakeContextCurrent(self.window)
+
+    def set_current(self):
+        cyclone.current_window = self
 
     def should_close(self):
         if self.window == NULL:
@@ -140,14 +145,6 @@ cdef class Window:
     def get_framebuffer_size(self):
         return (self.framebuffer_width, self.framebuffer_height)
 
-    def create_renderer(self):
-        return Renderer(self)
-
-    def create_render_texture(
-        self, size, bint resize_nearest=False, bint high_dpi=True
-    ):
-        return RenderTexture(self, size, resize_nearest, high_dpi)
-
     def set_title(self, str title):
         self.title = title
         glfwSetWindowTitle(self.window, title.encode())
@@ -157,9 +154,10 @@ cdef class Window:
 
     def get_callbacks(self):
         glfwPollEvents()
-        callback = self.callbacks.copy()
-        self.callbacks = []
-        return callback
+        try:
+            return self.callbacks
+        finally:
+            self.callbacks = []
 
     # Input ----------------------------------------------------------
     # Keys

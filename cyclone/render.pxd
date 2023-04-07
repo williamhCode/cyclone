@@ -4,6 +4,7 @@ from libc.stdlib cimport malloc, free
 from cyclone.lib.glad cimport *
 from cyclone.lib.cglm cimport *
 
+cimport cyclone
 from cyclone.shader cimport *
 from cyclone.window cimport Window
 from cyclone.texture cimport Texture, RenderTexture
@@ -63,7 +64,7 @@ cdef class Renderer:
         vec2 size,
         float rotation,
         vec2 offset,
-        int flipped,
+        int flip_mode,
         vec4 color
     )
 

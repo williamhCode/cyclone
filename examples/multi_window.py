@@ -2,15 +2,17 @@ import cyclone
 from cyclone.constants import *
 from cyclone.window import Window
 from cyclone.timer import Timer
+from cyclone.render import Renderer
 
 
 def main():
     window_1 = Window((800, 600), "Window 1")
-    window_2 = Window((800, 600), "Window 2")
-    windows = [window_1, window_2]
+    renderer_1 = Renderer()
 
-    renderer_1 = window_1.create_renderer()
-    renderer_2 = window_2.create_renderer()
+    window_2 = Window((800, 600), "Window 2")
+    renderer_2 = Renderer()
+
+    windows = [window_1, window_2]
 
     clock = Timer()
 

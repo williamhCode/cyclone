@@ -3,8 +3,8 @@ cimport cython
 
 cdef class Renderer:
 
-    def __init__(self, Window window not None):
-        self.window = window
+    def __init__(self):
+        self.window = cyclone.current_window
         self.window.make_context_current()
 
         # gl options
@@ -200,7 +200,7 @@ cdef class Renderer:
         position,
         float rotation=0.0,
         offset=(0.0, 0.0),
-        int flipped=0,
+        int flip_mode=0,
         color=(255, 255, 255, 255)
     ):
         cdef GLuint texture_id = texture.texture_id
@@ -211,7 +211,7 @@ cdef class Renderer:
         self._handle_color(color, t_color)
 
         self._draw_texture(
-            texture_id, t_position, NULL, t_size, rotation, t_offset, flipped, t_color
+            texture_id, t_position, NULL, t_size, rotation, t_offset, flip_mode, t_color
         )
 
     def draw_texture_region(
@@ -221,7 +221,7 @@ cdef class Renderer:
         region,
         float rotation=0.0,
         offset=(0.0, 0.0),
-        int flipped=0,
+        int flip_mode=0,
         color=(255, 255, 255, 255)
     ):
         cdef GLuint texture_id = texture.texture_id
@@ -243,7 +243,7 @@ cdef class Renderer:
             t_size,
             rotation,
             t_offset,
-            flipped,
+            flip_mode,
             t_color
         )
 
@@ -255,7 +255,7 @@ cdef class Renderer:
         vec2 size,
         float rotation,
         vec2 offset,
-        int flipped,
+        int flip_mode,
         vec4 color
     ):
         cdef size_t i
@@ -283,7 +283,7 @@ cdef class Renderer:
         cdef vec2[4] local_positions
         cdef vec2[4] tex_coords
         cdef float left, right, top, bottom
-        if region is NULL:
+        if region == NULL:
             local_positions = [
                 [0, 0],
                 [size[0], 0],
@@ -318,14 +318,14 @@ cdef class Renderer:
                 [left, top]
             ]
 
-        if flipped == 1 or flipped == 3:
+        if flip_mode == 1 or flip_mode == 3:
             tex_coords = [
                 tex_coords[1],
                 tex_coords[0],
                 tex_coords[3],
                 tex_coords[2]
             ]
-        if flipped == 2 or flipped == 3:
+        if flip_mode == 2 or flip_mode == 3:
             tex_coords = [
                 tex_coords[3],
                 tex_coords[2],
@@ -382,7 +382,7 @@ cdef class Renderer:
                 0,
                 [0, 0],
                 2,
-                color
+                color,
             )
 
             position[0] += char_data.advance

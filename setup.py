@@ -49,7 +49,7 @@ release_args = ["-std=c17", "-w", "-O3", "-ffast-math", "-march=native"]
 args = debug_args
 
 # cythonize options
-annotate = False
+annotate = True
 force = False
 quiet = False
 

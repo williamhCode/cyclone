@@ -27,7 +27,6 @@ from camera import Camera2D
 #         )
 #     )
 
-
 def spinning_star(renderer: Renderer, time):
     # points = []
 
@@ -65,7 +64,7 @@ def spinning_star(renderer: Renderer, time):
 def main():
     WIN_SIZE = (1200, 800)
     window = Window(WIN_SIZE, vsync=False, high_dpi=True)
-    renderer = window.create_renderer()
+    renderer = Renderer()
 
     camera = Camera2D(*WIN_SIZE)
 
@@ -77,8 +76,7 @@ def main():
     # texture_4 = Texture.load("imgs/test3.png")
     texture_5 = Texture.load("imgs/Flappy Bird_1.png", resize_nearest=True)
 
-    # render_texture = RenderTexture(window, WIN_SIZE)
-    render_texture = window.create_render_texture(WIN_SIZE)
+    render_texture = RenderTexture(WIN_SIZE)
 
     test_font = Font("/System/Library/Fonts/Supplemental/Arial.ttf", 30)
 
@@ -94,9 +92,9 @@ def main():
 
     time = 0
 
-    close_window = False
-    while not close_window:
-        dt = clock.tick(60)
+    while not window.should_close():
+        # dt = clock.tick(60)
+        dt = clock.tick()
         time += dt
 
         framerate = clock.get_fps()
@@ -104,13 +102,10 @@ def main():
 
         # key events
         for callback, data in window.get_callbacks():
-            if callback == const.WINDOW_CLOSE_CALLBACK:
-                close_window = True
-
             if callback == const.KEY_CALLBACK:
                 if data.action == const.PRESS:
                     if data.key == const.KEY_ESCAPE:
-                        close_window = True
+                        window.set_should_close(True)
                     if data.key == const.KEY_T:
                         print(time)
 
@@ -152,8 +147,8 @@ def main():
         camera.look_at(look_pos)
 
         # render to texture
-        renderer.begin(view_matrix=camera.get_transform())
-        # renderer.begin(view_matrix=camera.get_transform(), target=render_texture)
+        # renderer.begin(view_matrix=camera.get_transform())
+        renderer.begin(view_matrix=camera.get_transform(), target=render_texture)
         renderer.clear((100, 100, 100))
 
         # render font
@@ -166,26 +161,27 @@ def main():
         #         color = (200, 10, 200)
         #     renderer.draw_rectangle(color, (x, y), (32, 32), width=1)
 
-        # renderer.draw_texture(test_font.texture, (0, 0), flipped=2)
+        # renderer.draw_texture(test_font.texture, (0, 0), flip_mode=2)
 
-        # renderer.draw_text(test_font, "ABCDEFGHIJKLMNOP", (0, 90), (220, 220, 0))
-        # renderer.draw_text(test_font, "abcdefghijklmnop", (0, 60), (220, 220, 0))
-        # renderer.draw_text(
-        #     test_font, "$_#_%_&_*_nice@gmail.com", (0, 30), (220, 220, 0)
-        # )
-        # renderer.draw_text(test_font, "$_#_%_&_*_nice@gmail.com", (0, 0), (220, 220, 0))
+        renderer.draw_text(test_font, "ABCDEFGHIJKLMNOP", (0, 90), (220, 220, 0))
+        renderer.draw_text(test_font, "abcdefghijklmnop", (0, 60), (220, 220, 0))
+        renderer.draw_text(
+            test_font, "$_#_%_&_*_nice@gmail.com", (0, 30), (220, 220, 0)
+        )
+        renderer.draw_text(test_font, "$_#_%_&_*_nice@gmail.com", (0, 0), (220, 220, 0))
 
         # texture test
         # dt = math.sin(time * 5) * 20
         # for i in range(300):
         #     for j in range(300):
         #         renderer.draw_texture(texture_1, (i * 10, j * 10))
-        position = (200, 200)
-        offset = -glm.vec2(texture_5.size) / 2
-        rotation = 10
-        renderer.draw_rectangle((255, 255, 255), position, texture_5.size, rotation, offset)
-        renderer.draw_texture(texture_5, position, rotation, offset)
-        renderer.draw_circle((255, 0, 0), position, 10)
+
+        # position = (200, 200)
+        # offset = -glm.vec2(texture_5.size) / 2
+        # rotation = 10
+        # renderer.draw_rectangle((255, 255, 255), position, texture_5.size, rotation, offset)
+        # renderer.draw_texture(texture_5, position, rotation, offset)
+        # renderer.draw_circle((255, 0, 0), position, 10)
 
         # texture region test
         # renderer.draw_texture_region(texture_2, (0, 0), (0, 0, 500, 500))
@@ -221,12 +217,12 @@ def main():
         renderer.end()
 
         # render to main screen
-        # renderer.begin()
-        # renderer.clear((50, 50, 50, 255))
+        renderer.begin()
+        renderer.clear((50, 50, 50, 255))
 
-        # renderer.draw_texture(render_texture, (0, 0))
+        renderer.draw_texture(render_texture, (0, 0))
 
-        # renderer.end()
+        renderer.end()
 
         window.update()
 
