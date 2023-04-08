@@ -1,19 +1,20 @@
 # Cyclone
 _A 2D graphics library written in Cython, Python, and OpenGL._
 
-## Goal
+## Motivation
 There are many great 2D python graphics libraries like pygame, pyglet, and arcade. However, they either lack in performance, have a steep learning curve, or have issues with macOS (memory leaks and high dpi rendering).
-The purpose of the library is to provide a blazingly fast Python 2D graphics library that is, at the same time, easy to use and pick up. 
+The purpose of the library is to provide a capable and fast 2D graphics library for Python that is at the same time, easy to pick up and use. 
 
-The library is built with simplicity and modularity in mind. It takes care of windowing and input, everything you need for 2d rendering, and things useful for game dev. However, you can opt out of using built-in data types, and use other libraries for math related stuff (vectors, shapes and collisions).
+The library takes care of windowing and input, 2d rendering, and all necessary components for making a 2D game. You can also opt out of using built-in data types, and use other libraries for math related functionality (vectors, shapes and collisions).
 
-### Features: 
-- high-dpi support (macos)
-- fancy primitive rendering
+### Key Features: 
+- simple to use
+- blazingly fast 2D rendering for textures and primitives
 - texture rendering with built-in rotation/offset
-- minimizes cpu load by offloading as much calculations to the GPU (python is slow and hard to parallelize)
+- high-dpi support (macos)
+- minimizes cpu load by offloading as much calculations to the GPU
 - multiple windows
-- blazingly fast
+
 
 ## Todo
 - [ ] rendering
@@ -23,7 +24,7 @@ The library is built with simplicity and modularity in mind. It takes care of wi
   - [x] lines
   - [ ] polygons
   - [x] render texture (framebuffer)
-  - [ ] fonts
+  - [ ] fonts - wip
   - [ ] blend options
   - [ ] custom shaders
 - [ ] windowing
