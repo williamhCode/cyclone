@@ -15,3 +15,4 @@ target_include_directories(glad PUBLIC deps/glad/include)
 # freetype
 set(BUILD_SHARED_LIBS ON)
 add_subdirectory(deps/freetype deps/freetype/build)
+

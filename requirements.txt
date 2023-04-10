@@ -1,2 +1,6 @@
 Cython==3.0.0b2
+cython-lint==0.14.0
+mkdocs==1.4.2
+mkdocs-material==9.1.5
+mkdocstrings==0.21.2
 PyGLM==2.7.0
