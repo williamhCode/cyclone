@@ -78,7 +78,7 @@ def main():
 
     render_texture = RenderTexture(WIN_SIZE)
 
-    test_font = Font("/System/Library/Fonts/Supplemental/Comic Sans MS.ttf", 30)
+    test_font = Font("/System/Library/Fonts/Supplemental/Arial.ttf", 30)
 
     rect = Rectangle(0, 0, 100, 100)
     rect.size = (100, 100)

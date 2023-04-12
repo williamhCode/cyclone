@@ -3,6 +3,19 @@ if FT_Init_FreeType(&library):
     raise RuntimeError("Failed to initalize Freetype")
 
 
+cdef class Face:
+    cdef FT_Face face
+
+    @staticmethod
+    cdef Face init(FT_Face face):
+        cdef Face self = Face.__new__(Face)
+        self.face = face
+        return self
+
+
+cdef dict faces = {}
+
+
 cdef class Font:
 
     def __init__(self, str path, unsigned int size=12):
@@ -14,7 +27,6 @@ cdef class Font:
         cdef Window window = cyclone.current_window
         cdef int fb_width = width * window.framebuffer_width // window.width
         cdef int fb_height = height * window.framebuffer_height // window.height
-        # cdef bint retina = fb_width > width
         cdef int ratio = window.framebuffer_width // window.width
 
         cdef unsigned char *data = <unsigned char *>malloc(
@@ -23,8 +35,13 @@ cdef class Font:
         memset(data, 0, fb_width * fb_height * 4)
 
         cdef FT_Face face
-        if FT_New_Face(library, path.encode(), 0, &face):
-            raise RuntimeError("Failed to load font")
+        cdef Face _face = faces.get(path)
+        if _face is None:
+            if FT_New_Face(library, path.encode(), 0, &face):
+                raise RuntimeError("Failed to load font")
+            faces[path] = Face.init(face)
+        else:
+            face = _face.face
 
         FT_Set_Pixel_Sizes(face, 0, size)
 
@@ -62,3 +79,6 @@ cdef class Font:
         self.texture._init([width, height], data, False, [fb_width, fb_height])
 
         free(data)
+
+
+# def SysFont(

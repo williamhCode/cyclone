@@ -3,50 +3,52 @@ from cyclone.constants import (
 )
 
 
-cdef void window_size_callback(GLFWwindow* glfw_window, int width, int height) noexcept:
+cdef void window_size_callback(GLFWwindow* _window, int width, int height) noexcept:
     cdef Window window
     for window in windows:
-        if window.window == glfw_window:
+        if window.window == _window:
             window.width = width
             window.height = height
 
 
-cdef void framebuffer_size_callback(GLFWwindow* glfw_window, int width, int height) noexcept:
+cdef void framebuffer_size_callback(
+    GLFWwindow* _window, int width, int height
+) noexcept:
     cdef Window window
     for window in windows:
-        if window.window == glfw_window:
+        if window.window == _window:
             window.framebuffer_width = width
             window.framebuffer_height = height
 
 
 cdef void key_callback(
-    GLFWwindow* glfw_window, int key, int scancode, int action, int mods
+    GLFWwindow* _window, int key, int scancode, int action, int mods
 ) noexcept:
     cdef Window window
     for window in windows:
-        if window.window == glfw_window:
+        if window.window == _window:
             window.callbacks.append(
                 (KEY_CALLBACK, KeyData(key, scancode, action, mods))
             )
 
 
 cdef void mouse_button_callback(
-    GLFWwindow* glfw_window, int button, int action, int mods
+    GLFWwindow* _window, int button, int action, int mods
 ) noexcept:
     cdef Window window
     for window in windows:
-        if window.window == glfw_window:
+        if window.window == _window:
             window.callbacks.append(
                 (MOUSE_BUTTON_CALLBACK, MouseButtonData(button, action, mods))
             )
 
 
 cdef void cursor_position_callback(
-    GLFWwindow* glfw_window, double xpos, double ypos
+    GLFWwindow* _window, double xpos, double ypos
 ) noexcept:
     cdef Window window
     for window in windows:
-        if window.window == glfw_window:
+        if window.window == _window:
             window.callbacks.append(
                 (
                     CURSOR_POSITION_CALLBACK,
@@ -55,10 +57,10 @@ cdef void cursor_position_callback(
             )
 
 
-cdef void window_close_callback(GLFWwindow* glfw_window) noexcept:
+cdef void window_close_callback(GLFWwindow* _window) noexcept:
     cdef Window window
     for window in windows:
-        if window.window == glfw_window:
+        if window.window == _window:
             window.callbacks.append((WINDOW_CLOSE_CALLBACK, None))
 
 
