@@ -10,7 +10,7 @@ from setuptools.command.build_ext import build_ext as _build_ext
 
 
 # options
-release = True
+release = False
 build_libs = False
 
 annotate = False
@@ -73,8 +73,8 @@ library_dirs = [
 ]
 
 runtime_library_dirs = [
-    os.getcwd() + "/lib",  # for editable install
     sys.prefix + "/lib",  # for non-editable install
+    os.getcwd() + "/lib",  # for editable install
 ]
 
 libraries = [

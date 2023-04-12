@@ -372,7 +372,7 @@ cdef class Renderer:
             ]
 
             xpos = position[0] + char_data.bearing[0]
-            ypos = position[1] - (font.size - char_data.bearing[1])
+            ypos = position[1] - font.size + char_data.bearing[1]
 
             self._draw_texture(
                 font.texture.texture_id,

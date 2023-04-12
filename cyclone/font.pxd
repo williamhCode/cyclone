@@ -10,8 +10,9 @@ from cyclone.window cimport Window
 
 
 cdef struct CharData:
+    vec2 size
     vec2 bearing
-    unsigned int advance
+    float advance
 
 
 cdef class Font:

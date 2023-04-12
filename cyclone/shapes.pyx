@@ -13,6 +13,22 @@ cdef class Rectangle:
         return f"Rectangle({self.x}, {self.y}, {self.width}, {self.height})"
 
     @property
+    def bottom(self):
+        return self.y
+
+    @property
+    def left(self):
+        return self.x
+
+    @property
+    def top(self):
+        return self.y + self.height
+
+    @property
+    def right(self):
+        return self.x + self.width
+
+    @property
     def position(self):
         return self.x, self.y
 

@@ -20,7 +20,16 @@ class Rect:
     h: float
 
     def get_points(self):
-        return (self.x, self.y, self.x + self.w, self.y, self.x + self.w, self.y + self.h, self.x, self.y + self.h)
+        return (
+            self.x,
+            self.y,
+            self.x + self.w,
+            self.y,
+            self.x + self.w,
+            self.y + self.h,
+            self.x,
+            self.y + self.h,
+        )
 
     @property
     def bottom(self):
@@ -48,22 +57,20 @@ class Rect:
 
 
 def collide(rect1: Rect, rect2: Rect) -> tuple[bool, vec2]:
-    if (rect1.left < rect2.right and
-        rect1.right > rect2.left and
-        rect1.top > rect2.bottom and
-            rect1.bottom < rect2.top):
-
+    if (
+        rect1.left < rect2.right
+        and rect1.right > rect2.left
+        and rect1.top > rect2.bottom
+        and rect1.bottom < rect2.top
+    ):
         # normals order = left, bottom, right, up
-        normals = ((-1, 0),
-                   (0, -1),
-                   (1, 0),
-                   (0, 1))
+        normals = ((-1, 0), (0, -1), (1, 0), (0, 1))
 
         vals = (
             -rect2.left + rect1.right,
             -rect2.bottom + rect1.top,
             rect2.right - rect1.left,
-            rect2.top - rect1.bottom
+            rect2.top - rect1.bottom,
         )
 
         min_p = min(vals)
@@ -74,14 +81,12 @@ def collide(rect1: Rect, rect2: Rect) -> tuple[bool, vec2]:
 
 
 class Platform:
-
     def __init__(self, x, y, w, h, color):
         self.rect = Rect(x, y, w, h)
         self.color = color
 
-    def draw(self, renderer: Renderer ):
-        renderer.draw_rectangle(
-            self.color, self.rect.position, self.rect.size, fade=1)
+    def draw(self, renderer: Renderer):
+        renderer.draw_rectangle(self.color, self.rect.position, self.rect.size, fade=1)
 
 
 def length_squared(vec: vec2):
@@ -117,7 +122,8 @@ class Player:
             self.vel.x = move_towards(self.vel.x, 0.0, self.FRICTION * dt)
         else:
             self.vel.x = move_towards(
-                self.vel.x, input * self.MAX_SPEED, self.ACCELERATION * dt)
+                self.vel.x, input * self.MAX_SPEED, self.ACCELERATION * dt
+            )
 
     def jump(self):
         self.vel.y = 600
@@ -128,7 +134,8 @@ class Player:
 
     def draw(self, renderer: Renderer):
         renderer.draw_rectangle(
-            (255, 0, 0), (self.pos.x, self.pos.y), self.SIZE, fade=4, width=5)
+            (255, 0, 0), (self.pos.x, self.pos.y), self.SIZE, fade=4, width=5
+        )
 
 
 def main():
@@ -169,7 +176,7 @@ def main():
 
         # check events -------------------------------------------------- #
         jump = False
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -217,9 +224,10 @@ def main():
         renderer.end()
         pygame.display.flip()
 
+
 if __name__ == "__main__":
     import os
+
     os.chdir(os.path.abspath(os.path.dirname(__file__)))
     main()
     pygame.quit()
-

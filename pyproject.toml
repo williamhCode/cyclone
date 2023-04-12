@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools",
+    "setuptools <= 62.6.0",  # bug with editable installs: https://github.com/pypa/setuptools/issues/3548
     "wheel",
     "cython >= 3.0.0b2",
     "cmake >= 3.10",

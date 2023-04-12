@@ -78,7 +78,7 @@ def main():
 
     render_texture = RenderTexture(WIN_SIZE)
 
-    test_font = Font("/System/Library/Fonts/Supplemental/Arial.ttf", 30)
+    test_font = Font("/System/Library/Fonts/Supplemental/Comic Sans MS.ttf", 30)
 
     rect = Rectangle(0, 0, 100, 100)
     rect.size = (100, 100)
@@ -162,6 +162,8 @@ def main():
         #     renderer.draw_rectangle(color, (x, y), (32, 32), width=1)
 
         # renderer.draw_texture(test_font.texture, (0, 0), flip_mode=2)
+        
+        # renderer.draw_circle((255, 0, 0), (1, 225), 1)
 
         renderer.draw_text(test_font, "ABCDEFGHIJKLMNOP", (0, 90), (220, 220, 0))
         renderer.draw_text(test_font, "abcdefghijklmnop", (0, 60), (220, 220, 0))

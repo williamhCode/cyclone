@@ -14,7 +14,7 @@ cdef class Font:
         cdef Window window = cyclone.current_window
         cdef int fb_width = width * window.framebuffer_width // window.width
         cdef int fb_height = height * window.framebuffer_height // window.height
-        cdef bint retina = fb_width > width
+        # cdef bint retina = fb_width > width
         cdef int ratio = window.framebuffer_width // window.width
 
         cdef unsigned char *data = <unsigned char *>malloc(
@@ -32,44 +32,31 @@ cdef class Font:
         cdef FT_Bitmap bitmap
         cdef unsigned char c
         cdef int index
+        FT_Set_Pixel_Sizes(face, 0, size * ratio)
+
         for i in range(128):
             FT_Load_Char(face, i, FT_LOAD_RENDER)
 
-            if not retina:
-                x = (i % 16) * (size + 2) + 1
-                y = (i // 16) * (size + 2) + 1
+            x = ((i % 16) * (size + 2) + 1) * ratio
+            y = ((i // 16) * (size + 2) + 1) * ratio
 
-                bitmap = face.glyph.bitmap
+            bitmap = face.glyph.bitmap
+            for yy in range(bitmap.rows):
                 for xx in range(bitmap.width):
-                    for yy in range(bitmap.rows):
-                        c = bitmap.buffer[xx + yy * bitmap.width]
-                        index = (y + yy) * width * 4 + (x + xx) * 4
-                        data[index + 0] = 255
-                        data[index + 1] = 255
-                        data[index + 2] = 255
-                        data[index + 3] = c
+                    c = bitmap.buffer[xx + yy * bitmap.width]
+                    index = (y + yy) * fb_width * 4 + (x + xx) * 4
+                    data[index + 0] = 255
+                    data[index + 1] = 255
+                    data[index + 2] = 255
+                    data[index + 3] = c
 
-            self.char_datas[i].bearing = [face.glyph.bitmap_left, face.glyph.bitmap_top]
-            self.char_datas[i].advance = face.glyph.advance.x // 64
-
-        if retina:
-            FT_Set_Pixel_Sizes(face, 0, size * ratio)
-
-            for i in range(128):
-                FT_Load_Char(face, i, FT_LOAD_RENDER)
-
-                x = ((i % 16) * (size + 2) + 1) * ratio
-                y = ((i // 16) * (size + 2) + 1) * ratio
-
-                bitmap = face.glyph.bitmap
-                for xx in range(bitmap.width):
-                    for yy in range(bitmap.rows):
-                        c = bitmap.buffer[xx + yy * bitmap.width]
-                        index = (y + yy) * fb_width * 4 + (x + xx) * 4
-                        data[index + 0] = 255
-                        data[index + 1] = 255
-                        data[index + 2] = 255
-                        data[index + 3] = c
+            self.char_datas[i].size = [
+                face.glyph.bitmap.width / ratio, face.glyph.bitmap.rows / ratio
+            ]
+            self.char_datas[i].bearing = [
+                face.glyph.bitmap_left / ratio, face.glyph.bitmap_top / ratio
+            ]
+            self.char_datas[i].advance = face.glyph.advance.x / 64 / ratio
 
         self.texture = Texture.__new__(Texture)
         self.texture._init([width, height], data, False, [fb_width, fb_height])
