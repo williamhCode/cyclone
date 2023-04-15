@@ -8,12 +8,13 @@ The purpose of the library is to provide a blazingly fast Python 2D graphics lib
 The library is built with simplicity and modularity in mind. It takes care of windowing and input, everything you need for 2d rendering, and things useful for game dev. However, you can opt out of using built-in data types, and use other libraries for math related stuff (vectors, shapes and collisions).
 
 ## Features: 
+- blazingly fast (90,000 textures at 60fps)*
+- texture/primitive rendering with built-in rotation/offset
 - high-dpi support (macos)
-- fancy primitive rendering
-- texture rendering with built-in rotation/offset
-- minimizes cpu load by offloading as much calculations to the GPU (python is slow and hard to parallelize)
+- minimizes cpu load by offloading most calculations to the GPU (python is slow and hard to parallelize)
 - multiple windows
-- blazingly fast
+
+<sub>*: tested on m1 macbook pro
 
 ## Todo
 _Library is in very early stages, only tested on macOS_
