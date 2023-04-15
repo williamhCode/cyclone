@@ -25,7 +25,7 @@ _Library is in very early stages, only tested on macOS_
   - [ ] polygons
   - [x] render texture (framebuffer)
   - [x] fonts
-  - [ ] blend options
+  - [ ] rendering options (blend, render to stencil buffer, etc.)
   - [ ] custom shaders
 - [ ] windowing
   - [x] keyboard and mouse input
