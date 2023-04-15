@@ -47,6 +47,15 @@ cdef class Texture:
         self.framebuffer_width = framebuffer_size[0]
         self.framebuffer_height = framebuffer_size[1]
 
+        cdef GLint MAX_TEXTURE_SIZE
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &MAX_TEXTURE_SIZE)
+
+        if (
+            self.framebuffer_width > MAX_TEXTURE_SIZE
+            or self.framebuffer_height > MAX_TEXTURE_SIZE
+        ):
+            raise RuntimeError("Texture size too large.")
+
         # generate texture
         glGenTextures(1, &self.texture_id)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
@@ -57,11 +66,18 @@ cdef class Texture:
             glTexParameteri(
                 GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST
             )
+            # glTexParameteri(
+            #     GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST
+            # )
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         else:
             glTexParameteri(
                 GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR
             )
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            # glTexParameteri(
+            #     GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR
+            # )
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
         glTexImage2D(

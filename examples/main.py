@@ -6,7 +6,7 @@ from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
 from cyclone import constants as const
 from cyclone import callbacks
-from cyclone.font import Font
+from cyclone.font import Font, SysFont
 
 from pathlib import Path
 import math
@@ -14,7 +14,6 @@ import random
 import glm
 import copy
 from camera import Camera2D
-
 
 # colors = []
 # for _ in range(4446):
@@ -26,6 +25,7 @@ from camera import Camera2D
 #             255,
 #         )
 #     )
+
 
 def spinning_star(renderer: Renderer, time):
     # points = []
@@ -63,7 +63,7 @@ def spinning_star(renderer: Renderer, time):
 
 def main():
     WIN_SIZE = (1200, 800)
-    window = Window(WIN_SIZE, vsync=False, high_dpi=True)
+    window = Window(WIN_SIZE, vsync=True, high_dpi=True)
     renderer = Renderer()
 
     camera = Camera2D(*WIN_SIZE)
@@ -78,7 +78,8 @@ def main():
 
     render_texture = RenderTexture(WIN_SIZE)
 
-    test_font = Font("/System/Library/Fonts/Supplemental/Arial.ttf", 30)
+    # test_font = Font("/System/Library/Fonts/Supplemental/Arial.ttf", 30)
+    font_1 = SysFont("Roboto Mono", 30)
 
     rect = Rectangle(0, 0, 100, 100)
     rect.size = (100, 100)
@@ -161,16 +162,14 @@ def main():
         #         color = (200, 10, 200)
         #     renderer.draw_rectangle(color, (x, y), (32, 32), width=1)
 
-        # renderer.draw_texture(test_font.texture, (0, 0), flip_mode=2)
-        
+        # renderer.draw_texture(font_1.texture, (0, 0), flip_mode=2)
+
         # renderer.draw_circle((255, 0, 0), (1, 225), 1)
 
-        renderer.draw_text(test_font, "ABCDEFGHIJKLMNOP", (0, 90), (220, 220, 0))
-        renderer.draw_text(test_font, "abcdefghijklmnop", (0, 60), (220, 220, 0))
-        renderer.draw_text(
-            test_font, "$_#_%_&_*_nice@gmail.com", (0, 30), (220, 220, 0)
-        )
-        renderer.draw_text(test_font, "$_#_%_&_*_nice@gmail.com", (0, 0), (220, 220, 0))
+        renderer.draw_text(font_1, "ABCDEFGHIJKLMNOP", (0, 90), (220, 220, 0))
+        renderer.draw_text(font_1, "abcdefghijklmnop", (0, 60), (220, 220, 0))
+        renderer.draw_text(font_1, "$_#_%_&_*_nice@gmail.com", (0, 30), (220, 220, 0))
+        renderer.draw_text(font_1, "$_#_%_&_*_nice@gmail.com", (0, 0), (220, 220, 0))
 
         # texture test
         # dt = math.sin(time * 5) * 20

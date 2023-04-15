@@ -11,7 +11,7 @@ from setuptools.command.build_ext import build_ext as _build_ext
 
 # options
 release = False
-build_libs = False
+build_libs = True
 
 annotate = False
 force = False
@@ -43,7 +43,7 @@ class build_ext(_build_ext):
             env=env,
         )
         subprocess.check_call(
-            ["cmake", "--build", self.build_temp, "--config", "Release"],
+            ["cmake", "--build", self.build_temp],
             env=env,
         )
 

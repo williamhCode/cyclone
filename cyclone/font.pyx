@@ -1,3 +1,7 @@
+from matplotlib import font_manager
+from pathlib import Path
+
+
 cdef FT_Library library
 if FT_Init_FreeType(&library):
     raise RuntimeError("Failed to initalize Freetype")
@@ -18,7 +22,7 @@ cdef dict faces = {}
 
 cdef class Font:
 
-    def __init__(self, str path, unsigned int size=12):
+    def __init__(self, str file_path, unsigned int size):
         self.size = size
 
         cdef int width = (size + 2) * 16
@@ -35,11 +39,11 @@ cdef class Font:
         memset(data, 0, fb_width * fb_height * 4)
 
         cdef FT_Face face
-        cdef Face _face = faces.get(path)
+        cdef Face _face = faces.get(file_path)
         if _face is None:
-            if FT_New_Face(library, path.encode(), 0, &face):
+            if FT_New_Face(library, file_path.encode(), 0, &face):
                 raise RuntimeError("Failed to load font")
-            faces[path] = Face.init(face)
+            faces[file_path] = Face.init(face)
         else:
             face = _face.face
 
@@ -76,9 +80,16 @@ cdef class Font:
             self.char_datas[i].advance = face.glyph.advance.x / 64 / ratio
 
         self.texture = Texture.__new__(Texture)
-        self.texture._init([width, height], data, False, [fb_width, fb_height])
+        try:
+            self.texture._init([width, height], data, False, [fb_width, fb_height])
+        except Exception:
+            raise RuntimeError("Font size too large")
 
         free(data)
 
 
-# def SysFont(
+def SysFont(family, size, style=None, weight=None):
+    file_path = font_manager.findfont(
+        font_manager.FontProperties(family, style, None, weight),
+    )
+    return Font(file_path, size)
