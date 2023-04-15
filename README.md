@@ -24,7 +24,7 @@ _Library is in very early stages, only tested on macOS_
   - [x] lines
   - [ ] polygons
   - [x] render texture (framebuffer)
-  - [ ] fonts
+  - [x] fonts
   - [ ] blend options
   - [ ] custom shaders
 - [ ] windowing
