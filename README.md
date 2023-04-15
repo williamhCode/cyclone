@@ -46,20 +46,12 @@ git clone --recurse-submodule https://github.com/williamhCode/cyclone.git
 pip install -r requirements.txt
 ```
 
-#### Build C Library Dependencies
-Make sure CMake is installed, shared object files should end up in `lib/`.
+#### Build Cyclone
 ```
-cmake -E make_directory cmake_build
-cmake -E chdir cmake_build cmake ..
-cmake --build cmake_build
+python setup.py build_ext --inplace
 ```
 
 #### Install Library in Dev Mode
 ```
 pip install -e .
-```
-
-#### Build Cyclone
-```
-python setup.py build_ext --inplace
 ```
