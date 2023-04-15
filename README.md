@@ -16,6 +16,7 @@ The library is built with simplicity and modularity in mind. It takes care of wi
 - blazingly fast
 
 ## Todo
+_Library is in very early stages, only tested on macOS_
 - [ ] rendering
   - [x] textures
   - [x] circles
@@ -34,8 +35,12 @@ The library is built with simplicity and modularity in mind. It takes care of wi
   - [ ] vector/matrix classes
   - [ ] shapes
   - [ ] simple collision detection
+- [ ] build for linux and windows
+- [ ] upload to pypi
+- [ ] documentation
 
 ## Contributing
+
 #### Clone Repo
 ```
 git clone --recurse-submodule https://github.com/williamhCode/cyclone.git
