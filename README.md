@@ -50,6 +50,7 @@ pip install -r requirements.txt
 ```
 python setup.py build_ext --inplace
 ```
+You can control the build mode in `setup.py`. You only need to run with `build_libs` option once, which builds the c libraries.
 
 #### Install Library in Dev Mode
 ```
