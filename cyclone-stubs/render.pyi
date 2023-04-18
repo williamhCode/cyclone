@@ -7,7 +7,7 @@ class Renderer:
     def __init__(self) -> None:
         """initializes the renderer
 
-        Initializes the renderer with the given window.
+        Initializes the renderer with the current window.
 
         Returns:
             None

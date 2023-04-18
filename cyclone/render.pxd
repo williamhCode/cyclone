@@ -24,7 +24,7 @@ cdef class Renderer:
     cdef:
         Window window
 
-        unsigned int MAX_QUADS
+        unsigned int MAX_TRIANGLES
         unsigned int MAX_VERTICES
         unsigned int MAX_INDICES
         int MAX_TEXTURE_SLOTS
@@ -37,9 +37,12 @@ cdef class Renderer:
         GLuint vao
         GLuint vbo
         GLuint ebo
-        unsigned int count
+        unsigned int vertex_count
+        unsigned int index_count
         Vertex *vertices
         Vertex *vertices_ptr
+        GLuint *indices
+        GLuint *indices_ptr
 
         GLuint *texture_slots
         size_t texture_slot_index
@@ -47,8 +50,6 @@ cdef class Renderer:
         # matrices
         mat4 proj_mat
         mat4 view_mat
-
-    cdef void _handle_color(self, py_color, vec4 color)
 
     cdef void _set_proj_mat(self, float width, float height)
 
@@ -91,5 +92,15 @@ cdef class Renderer:
     )
 
     cdef void _draw_line(self, vec4 color, vec2 start, vec2 end, float width)
+
+    cdef void _set_quad_indices(self)
+
+    cdef void _draw_filled_polygon(self, vec4 color, vec2 *points, unsigned int length)
+
+    cdef void _draw_polygon(
+        self, vec4 color, vec2 *points, unsigned int length, float width
+    )
+
+    cdef void _handle_color(self, py_color, vec4 color)
 
 cdef void py_to_glm_mat4(py_mat, mat4 mat)

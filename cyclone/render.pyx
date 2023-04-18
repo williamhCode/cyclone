@@ -11,9 +11,9 @@ cdef class Renderer:
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        self.MAX_QUADS = 200000
-        self.MAX_VERTICES = self.MAX_QUADS * 4
-        self.MAX_INDICES = self.MAX_QUADS * 6
+        self.MAX_TRIANGLES = 200000
+        self.MAX_VERTICES = self.MAX_TRIANGLES * 3  # worst case, all triangles
+        self.MAX_INDICES = self.MAX_TRIANGLES * 3
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &self.MAX_TEXTURE_SLOTS)
 
         # shader stuff ----------------------------------------- #
@@ -88,27 +88,17 @@ cdef class Renderer:
             )
 
         # generate index buffer and buffer data
-        cdef GLuint *indices = <GLuint *>malloc(self.MAX_INDICES * sizeof(GLuint))
-        cdef int offset = 0
-        for i in range(0, self.MAX_INDICES, 6):
-            indices[i + 0] = offset + 0
-            indices[i + 1] = offset + 1
-            indices[i + 2] = offset + 2
-            indices[i + 3] = offset + 2
-            indices[i + 4] = offset + 3
-            indices[i + 5] = offset + 0
-            offset += 4
-
+        self.indices = <GLuint *>malloc(self.MAX_INDICES * sizeof(GLuint))
         glGenBuffers(1, &self.ebo)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ebo)
         glBufferData(
             GL_ELEMENT_ARRAY_BUFFER,
-            self.MAX_INDICES * sizeof(GLuint), indices, GL_STATIC_DRAW
+            self.MAX_INDICES * sizeof(GLuint),
+            self.indices,
+            GL_DYNAMIC_DRAW
         )
 
         self.texture_slots = <GLuint *>malloc(self.MAX_TEXTURE_SLOTS * sizeof(GLuint))
-
-        free(indices)
 
     def __del__(self):
         cdef s_Shader shader
@@ -116,34 +106,14 @@ cdef class Renderer:
             shader_destroy(&shader)
 
         free(self.vertices)
+        free(self.indices)
         free(self.texture_slots)
-
-    cdef void _handle_color(self, py_color, vec4 color):
-        if len(py_color) == 3:
-            color[:4] = [
-                py_color[0] / 255.0, py_color[1] / 255.0, py_color[2] / 255.0, 1.0
-            ]
-        else:
-            color[:4] = [
-                py_color[0] / 255.0,
-                py_color[1] / 255.0,
-                py_color[2] / 255.0,
-                py_color[3] / 255.0
-            ]
 
     def clear(self, color):
         cdef vec4 _color
         self._handle_color(color, _color)
         glClearColor(_color[0], _color[1], _color[2], _color[3])
         glClear(GL_COLOR_BUFFER_BIT)
-
-    cdef void _set_proj_mat(self, float width, float height):
-        glm_ortho(0, width, 0, height, -1, 1, self.proj_mat)
-
-    cdef void _begin_batch(self):
-        self.count = 0
-        self.vertices_ptr = self.vertices
-        self.texture_slot_index = 0
 
     def begin(self, view_matrix=None, RenderTexture target=None):
         self.window.make_context_current()
@@ -174,12 +144,34 @@ cdef class Renderer:
 
         self._begin_batch()
 
+    cdef void _set_proj_mat(self, float width, float height):
+        glm_ortho(0, width, 0, height, -1, 1, self.proj_mat)
+
+    cdef void _begin_batch(self):
+        self.vertex_count = 0
+        self.vertices_ptr = self.vertices
+        self.index_count = 0
+        self.indices_ptr = self.indices
+        self.texture_slot_index = 0
+
+    def end(self):
+        self._end_batch()
+
     cdef void _end_batch(self):
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferSubData(
-            GL_ARRAY_BUFFER, 0,
-            self.count * 4 * sizeof(Vertex),
+            GL_ARRAY_BUFFER,
+            0,
+            self.vertex_count * sizeof(Vertex),
             self.vertices
+        )
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ebo)
+        glBufferSubData(
+            GL_ELEMENT_ARRAY_BUFFER,
+            0,
+            self.index_count * sizeof(GLuint),
+            self.indices
         )
 
         cdef size_t i
@@ -189,10 +181,7 @@ cdef class Renderer:
 
         shader_use(&self.shader)
         glBindVertexArray(self.vao)
-        glDrawElements(GL_TRIANGLES, self.count * 6, GL_UNSIGNED_INT, NULL)
-
-    def end(self):
-        self._end_batch()
+        glDrawElements(GL_TRIANGLES, self.index_count, GL_UNSIGNED_INT, NULL)
 
     def draw_texture(
         self,
@@ -261,7 +250,7 @@ cdef class Renderer:
         cdef size_t i
 
         if (
-            self.count >= self.MAX_QUADS
+            self.index_count >= self.MAX_INDICES
             or self.texture_slot_index >= self.MAX_TEXTURE_SLOTS
         ):
             self._end_batch()
@@ -346,7 +335,9 @@ cdef class Renderer:
             self.vertices_ptr.extra_data[1][3] = texture_index
             self.vertices_ptr += 1
 
-        self.count += 1
+        self._set_quad_indices()
+        self.vertex_count += 4
+        self.index_count += 6
 
     def draw_text(self, Font font, str text, position, color=(255, 255, 255, 255)):
         cdef bytes b_text = text.encode()
@@ -395,7 +386,6 @@ cdef class Renderer:
         cdef vec2 t_position = [position[0], position[1]]
 
         self._draw_circle(t_color, t_position, radius, width, fade)
-        self.count += 1
 
     cdef void _draw_circle(
         self,
@@ -405,7 +395,7 @@ cdef class Renderer:
         float width = 0.0,
         float fade = 0.0
     ):
-        if self.count >= self.MAX_QUADS:
+        if self.index_count >= self.MAX_INDICES:
             self._end_batch()
             self._begin_batch()
 
@@ -441,7 +431,9 @@ cdef class Renderer:
             self.vertices_ptr.extra_data[0][3] = fade
             self.vertices_ptr += 1
 
-        self.count += 1
+        self._set_quad_indices()
+        self.vertex_count += 4
+        self.index_count += 6
 
     # rectangle functions ----------------------------------- #
     def draw_rectangle(
@@ -463,7 +455,6 @@ cdef class Renderer:
         self._draw_rectangle(
             t_color, t_position, t_size, rotation, t_offset, width, fade
         )
-        self.count += 1
 
     cdef void _draw_rectangle(
         self,
@@ -477,7 +468,7 @@ cdef class Renderer:
     ):
         cdef size_t i
 
-        if self.count >= self.MAX_QUADS:
+        if self.index_count >= self.MAX_INDICES:
             self._end_batch()
             self._begin_batch()
 
@@ -519,7 +510,9 @@ cdef class Renderer:
             self.vertices_ptr.extra_data[2][2:4] = _fade
             self.vertices_ptr += 1
 
-        self.count += 1
+        self._set_quad_indices()
+        self.vertex_count += 4
+        self.index_count += 6
 
     def draw_line(self, color, start, end, float width=1.0):
         cdef vec4 t_color
@@ -528,7 +521,6 @@ cdef class Renderer:
         cdef vec2 t_end = [end[0], end[1]]
 
         self._draw_line(t_color, t_start, t_end, width)
-        self.count += 1
 
     def draw_lines(self, color, points, float width=1.0):
         cdef vec4 t_color
@@ -544,10 +536,8 @@ cdef class Renderer:
             t_end = [point[0], point[1]]
             self._draw_line(t_color, t_start, t_end, width)
 
-        self.count += 1
-
     cdef void _draw_line(self, vec4 color, vec2 start, vec2 end, float width):
-        if self.count >= self.MAX_QUADS:
+        if self.index_count >= self.MAX_INDICES:
             self._end_batch()
             self._begin_batch()
 
@@ -571,10 +561,81 @@ cdef class Renderer:
             self.vertices_ptr.color = color
             self.vertices_ptr += 1
 
-        self.count += 1
+        self._set_quad_indices()
+        self.vertex_count += 4
+        self.index_count += 6
 
     def draw_lines_miter(self, color, points, float width=1.0):
         pass
+
+    cdef void _set_quad_indices(self):
+        self.indices_ptr[0] = self.vertex_count + 0
+        self.indices_ptr[1] = self.vertex_count + 1
+        self.indices_ptr[2] = self.vertex_count + 2
+        self.indices_ptr[3] = self.vertex_count + 2
+        self.indices_ptr[4] = self.vertex_count + 3
+        self.indices_ptr[5] = self.vertex_count + 0
+        self.indices_ptr += 6
+
+    def draw_polygon(self, color, points, float width=0.0):
+        cdef vec4 t_color
+        self._handle_color(color, t_color)
+        cdef unsigned int length = len(points)
+        if length < 3:
+            raise RuntimeError("Polygon must have at least 3 points")
+        cdef vec2 *t_points = <vec2 *>malloc(length * sizeof(vec2))
+        cdef size_t i
+        for i in range(length):
+            t_points[i][0] = points[i][0]
+            t_points[i][1] = points[i][1]
+
+        if width == 0.0:
+            self._draw_filled_polygon(t_color, t_points, length)
+        else:
+            self._draw_polygon(t_color, t_points, length, width)
+
+        free(t_points)
+
+    cdef void _draw_filled_polygon(self, vec4 color, vec2 *points, unsigned int length):
+        if self.index_count >= self.MAX_INDICES:
+            self._end_batch()
+            self._begin_batch()
+
+        cdef size_t i
+        for i in range(length):
+            self.vertices_ptr.render_type = 4.0
+            self.vertices_ptr.position = [points[i][0], points[i][1], 0.0]
+            self.vertices_ptr.color = color
+            self.vertices_ptr += 1
+
+        if length == 3:
+            self.indices_ptr[0] = self.vertex_count + 0
+            self.indices_ptr[1] = self.vertex_count + 1
+            self.indices_ptr[2] = self.vertex_count + 2
+            self.indices_ptr += 3
+            self.vertex_count += 3
+            self.index_count += 3
+        else:
+            # triangulate
+            pass
+
+    cdef void _draw_polygon(
+        self, vec4 color, vec2 *points, unsigned int length, float width
+    ):
+        pass
+
+    cdef void _handle_color(self, py_color, vec4 color):
+        if len(py_color) == 3:
+            color[:4] = [
+                py_color[0] / 255.0, py_color[1] / 255.0, py_color[2] / 255.0, 1.0
+            ]
+        else:
+            color[:4] = [
+                py_color[0] / 255.0,
+                py_color[1] / 255.0,
+                py_color[2] / 255.0,
+                py_color[3] / 255.0
+            ]
 
 
 # util funcs

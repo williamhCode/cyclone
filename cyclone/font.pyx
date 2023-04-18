@@ -1,5 +1,4 @@
 from matplotlib import font_manager
-from pathlib import Path
 
 
 cdef FT_Library library
