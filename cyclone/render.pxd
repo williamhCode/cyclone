@@ -10,6 +10,7 @@ from cyclone.window cimport Window
 from cyclone.texture cimport Texture, RenderTexture
 from cyclone.shapes cimport Rectangle
 from cyclone.font cimport Font, CharData
+from cyclone cimport utils
 
 
 cdef struct Vertex:
@@ -95,12 +96,8 @@ cdef class Renderer:
 
     cdef void _set_quad_indices(self)
 
-    cdef void _draw_filled_polygon(self, vec4 color, vec2 *points, unsigned int length)
+    cdef void _draw_filled_polygon(self, vec4 color, vec2 *points, size_t length)
 
-    cdef void _draw_polygon(
-        self, vec4 color, vec2 *points, unsigned int length, float width
-    )
+    cdef void _draw_polygon(self, vec4 color, vec2 *points, size_t length, float width)
 
     cdef void _handle_color(self, py_color, vec4 color)
-
-cdef void py_to_glm_mat4(py_mat, mat4 mat)

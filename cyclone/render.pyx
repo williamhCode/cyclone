@@ -1,6 +1,3 @@
-cimport cython
-
-
 cdef class Renderer:
 
     def __init__(self):
@@ -132,7 +129,7 @@ cdef class Renderer:
         if view_matrix is None:
             glm_mat4_identity(self.view_mat)
         else:
-            py_to_glm_mat4(view_matrix, self.view_mat)
+            utils.convert_mat4(view_matrix, self.view_mat)
 
         cdef mat4 proj_view_mat
         glm_mat4_mul(self.proj_mat, self.view_mat, proj_view_mat)
@@ -580,7 +577,7 @@ cdef class Renderer:
     def draw_polygon(self, color, points, float width=0.0):
         cdef vec4 t_color
         self._handle_color(color, t_color)
-        cdef unsigned int length = len(points)
+        cdef size_t length = len(points)
         if length < 3:
             raise RuntimeError("Polygon must have at least 3 points")
         cdef vec2 *t_points = <vec2 *>malloc(length * sizeof(vec2))
@@ -596,18 +593,20 @@ cdef class Renderer:
 
         free(t_points)
 
-    cdef void _draw_filled_polygon(self, vec4 color, vec2 *points, unsigned int length):
+    cdef void _draw_filled_polygon(self, vec4 color, vec2 *points, size_t length):
         if self.index_count >= self.MAX_INDICES:
             self._end_batch()
             self._begin_batch()
 
         cdef size_t i
         for i in range(length):
-            self.vertices_ptr.render_type = 4.0
+            self.vertices_ptr.render_type = 3.0
             self.vertices_ptr.position = [points[i][0], points[i][1], 0.0]
             self.vertices_ptr.color = color
             self.vertices_ptr += 1
 
+        cdef size_t num_indices
+        cdef size_t[3] *indices
         if length == 3:
             self.indices_ptr[0] = self.vertex_count + 0
             self.indices_ptr[1] = self.vertex_count + 1
@@ -616,12 +615,17 @@ cdef class Renderer:
             self.vertex_count += 3
             self.index_count += 3
         else:
-            # triangulate
-            pass
+            indices = utils.triangulate_polygon(points, length, &num_indices)
+            for i in range(num_indices):
+                self.indices_ptr[0] = self.vertex_count + indices[i][0]
+                self.indices_ptr[1] = self.vertex_count + indices[i][1]
+                self.indices_ptr[2] = self.vertex_count + indices[i][2]
+                self.indices_ptr += 3
+            free(indices)
+            self.vertex_count += length
+            self.index_count += num_indices * 3
 
-    cdef void _draw_polygon(
-        self, vec4 color, vec2 *points, unsigned int length, float width
-    ):
+    cdef void _draw_polygon(self, vec4 color, vec2 *points, size_t length, float width):
         pass
 
     cdef void _handle_color(self, py_color, vec4 color):
@@ -636,13 +640,3 @@ cdef class Renderer:
                 py_color[2] / 255.0,
                 py_color[3] / 255.0
             ]
-
-
-# util funcs
-@cython.boundscheck(False)
-@cython.wraparound(False)
-cdef void py_to_glm_mat4(py_mat, mat4 mat):
-    cdef size_t i, j
-    for i in range(4):
-        for j in range(4):
-            mat[i][j] = py_mat[i][j]
