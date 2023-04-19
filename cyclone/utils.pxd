@@ -1,4 +1,5 @@
 from libc.stdlib cimport malloc, free
+from libc.stdio cimport printf
 
 from cyclone.lib.cglm cimport *
 

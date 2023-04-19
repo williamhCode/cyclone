@@ -11,21 +11,51 @@ cdef struct Node:
     Node *next
 
 
-cdef Node *node_prepend(Node **head, size_t index):
+# appends new node to current node (end), and returns new node
+# if head is NULL, sets head to new node
+# cdef Node *node_append(Node **head, Node *curr, size_t index):
+#     cdef Node *new = <Node *>malloc(sizeof(Node))
+#     new.index = index
+#     new.prev = curr
+#     new.next = NULL
+#     if curr != NULL:
+#         curr.next = new
+#     if head[0] == NULL:
+#         head[0] = new
+#     return new
+
+
+cdef Node *node_append(Node **head_ptr, size_t index):
     cdef Node *new = <Node *>malloc(sizeof(Node))
     new.index = index
-    new.prev = NULL
-    new.next = head[0]
-    if head[0] != NULL:
-        head[0].prev = new
-    head[0] = new
+    new.next = NULL
+    if head_ptr[0] == NULL:
+        new.prev = NULL
+        head_ptr[0] = new
+        return new
+    cdef Node *last = head_ptr[0]
+    while last.next != NULL:
+        last = last.next
+    last.next = new
+    new.prev = last
     return new
 
 
-cdef Node *node_pop(Node **head):
-    cdef Node *curr = head[0]
+cdef Node *node_prepend(Node **head_ptr, size_t index):
+    cdef Node *new = <Node *>malloc(sizeof(Node))
+    new.index = index
+    new.prev = NULL
+    new.next = head_ptr[0]
+    if head_ptr[0] != NULL:
+        head_ptr[0].prev = new
+    head_ptr[0] = new
+    return new
+
+
+cdef Node *node_pop(Node **head_ptr):
+    cdef Node *curr = head_ptr[0]
     if curr != NULL:
-        head[0] = curr.next
+        head_ptr[0] = curr.next
         if curr.next != NULL:
             curr.next.prev = NULL
         curr.next = NULL
@@ -34,33 +64,32 @@ cdef Node *node_pop(Node **head):
 
 # removes node with value from linked list, and returns the removed node
 # updates head if necessary
-cdef Node *node_remove(Node **head, size_t value):
-    cdef Node *curr = head[0]
+cdef Node *node_remove(Node **head_ptr, size_t value):
+    cdef Node *curr = head_ptr[0]
     while curr != NULL:
         if curr.index == value:
             if curr.prev != NULL:
                 curr.prev.next = curr.next
             if curr.next != NULL:
                 curr.next.prev = curr.prev
-            if curr == head[0]:
-                head[0] = curr.next
+            if curr == head_ptr[0]:
+                head_ptr[0] = curr.next
             return curr
         curr = curr.next
     return NULL
 
 
-cdef Node *node_remove_len(Node **head, size_t value, size_t *length):
-    cdef Node *curr = head[0]
+cdef Node *node_remove_len(Node **head_ptr, size_t value, size_t length):
+    cdef Node *curr = head_ptr[0]
     cdef size_t i
-    for i in range(length[0]):
+    for i in range(length):
         if curr.index == value:
             if curr.prev != NULL:
                 curr.prev.next = curr.next
             if curr.next != NULL:
                 curr.next.prev = curr.prev
-            if curr == head[0]:
-                head[0] = curr.next
-            length[0] -= 1
+            if curr == head_ptr[0]:
+                head_ptr[0] = curr.next
             return curr
         curr = curr.next
     return NULL
@@ -102,6 +131,12 @@ cdef bint node_contains(Node *head, size_t value):
     return False
 
 
+cdef void node_print(Node *head):
+    cdef Node *curr = head
+    while curr != NULL:
+        printf("%d, ", curr.index)
+        curr = curr.next
+
 # counter clockwise rotation
 cdef bint node_is_convex(const Node *node, const vec2 *points):
     cdef vec2 p0 = points[node.prev.index]
@@ -113,7 +148,7 @@ cdef bint node_is_convex(const Node *node, const vec2 *points):
         p1[0] * (p2[1] - p0[1]) +
         p2[0] * (p0[1] - p1[1])
     )
-    return True if area_sum < 0 else False
+    return True if area_sum > 0 else False
 
 
 cdef bint point_in_triangle(vec2 p, vec2 p0, vec2 p1, vec2 p2):
@@ -141,7 +176,6 @@ cdef bint node_is_ear(
     return True
 
 
-# triagulates by ear clipping, and returns indices matrix of length (length - 2)
 cdef size_t[3] *triangulate_polygon(
     const vec2 *points, size_t length, size_t *num_indices_ptr
 ):
@@ -158,10 +192,10 @@ cdef size_t[3] *triangulate_polygon(
     # setup cylical list of vertices
     cdef Node *end = NULL
     for i in range(0, length):
-        if data[0] == NULL:
-            end = node_prepend(&data[0], i)
+        if i == length - 1:
+            end = node_append(&data[0], i)
         else:
-            node_prepend(&data[0], i)
+            node_append(&data[0], i)
     end.next = data[0]
     data[0].prev = end
 
@@ -169,18 +203,16 @@ cdef size_t[3] *triangulate_polygon(
     cdef Node *curr = data[0]
     for i in range(length):
         if node_is_convex(curr, points):
-            node_prepend(&data[1], curr.index)
+            node_append(&data[1], curr.index)
         else:
-            node_prepend(&data[2], curr.index)
+            node_append(&data[2], curr.index)
         curr = curr.next
 
     # setup ear list
-    cdef size_t num_ear_vertices = 0
     cdef Node *convex_curr = data[1]
     while convex_curr != NULL:
         if node_is_ear(node_get(data[0], convex_curr.index), data[2], points):
-            node_prepend(&data[3], convex_curr.index)
-            num_ear_vertices += 1
+            node_append(&data[3], convex_curr.index)
         convex_curr = convex_curr.next
 
     cdef size_t num_indices = length - 2
@@ -194,13 +226,14 @@ cdef size_t[3] *triangulate_polygon(
 
     cdef size_t num_vertices = length
     for i in range(num_indices):
-        curr_node = node_remove_len(&data[0], data[3].index, &num_vertices)
+        curr_node = node_remove_len(&data[0], data[3].index, num_vertices)
+        num_vertices -= 1
         free(node_pop(&data[3]))  # remove from ear list
-        num_ear_vertices -= 1
 
         indices[i][0] = curr_node.prev.index
         indices[i][1] = curr_node.index
         indices[i][2] = curr_node.next.index
+
         adj_nodes = [curr_node.prev, curr_node.next]
         for adj_node in adj_nodes:
             is_convex = not node_contains(data[2], adj_node.index)
@@ -209,15 +242,14 @@ cdef size_t[3] *triangulate_polygon(
                     free(node_remove(&data[2], adj_node.index))
                     is_convex = True
             if is_convex and node_is_ear(adj_node, data[2], points):
-                node_prepend(&data[3], adj_node.index)
-                num_ear_vertices += 1
+                node_append(&data[3], adj_node.index)
         free(curr_node)
 
     # free all remaining nodes
     node_free_len(data[0], num_vertices)
     node_free(data[1])
     node_free(data[2])
-    node_free_len(data[3], num_ear_vertices)
+    node_free(data[3])
 
     num_indices_ptr[0] = num_indices
     return indices

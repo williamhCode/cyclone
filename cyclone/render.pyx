@@ -4,6 +4,9 @@ cdef class Renderer:
         self.window = cyclone.current_window
         self.window.make_context_current()
 
+        # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        # glEnable(GL_LINE_SMOOTH)
+
         # gl options
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
