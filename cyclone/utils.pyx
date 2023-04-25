@@ -1,3 +1,8 @@
+from cython.operator cimport (
+    dereference as deref, preincrement as inc, predecrement as dec
+)
+
+
 cdef void convert_mat4(py_mat, mat4 mat):
     cdef size_t i, j
     for i in range(4):
@@ -95,22 +100,24 @@ cdef Node *node_remove_len(Node **head_ptr, size_t value, size_t length):
     return NULL
 
 
-cdef Node *node_free(Node *head):
-    cdef Node *curr_node = head
+cdef Node *node_free(Node **head_ptr):
+    cdef Node *curr_node = head_ptr[0]
     cdef Node *temp
     while curr_node != NULL:
         temp = curr_node.next
         free(curr_node)
         curr_node = temp
+    head_ptr[0] = NULL
 
 
-cdef Node *node_free_len(Node *head, size_t length):
-    cdef Node *curr_node = head
+cdef Node *node_free_len(Node **head_ptr, size_t length):
+    cdef Node *curr_node = head_ptr[0]
     cdef Node *temp
     for i in range(length):
         temp = curr_node.next
         free(curr_node)
         curr_node = temp
+    head_ptr[0] = NULL
 
 
 cdef Node *node_get(Node *head, size_t value):
@@ -137,8 +144,9 @@ cdef void node_print(Node *head):
         printf("%d, ", curr.index)
         curr = curr.next
 
+
 # counter clockwise rotation
-cdef bint node_is_convex(const Node *node, const vec2 *points):
+cdef bint node_is_convex(Node *node, vec2 *points):
     cdef vec2 p0 = points[node.prev.index]
     cdef vec2 p1 = points[node.index]
     cdef vec2 p2 = points[node.next.index]
@@ -161,7 +169,7 @@ cdef bint point_in_triangle(vec2 p, vec2 p0, vec2 p1, vec2 p2):
 
 
 cdef bint node_is_ear(
-    const Node *convex_curr, const Node *reflex_root, const vec2 *points
+    Node *convex_curr, Node *reflex_root, vec2 *points
 ):
     cdef Node *reflex_curr = reflex_root
     while reflex_curr != NULL:
@@ -176,8 +184,8 @@ cdef bint node_is_ear(
     return True
 
 
-cdef size_t[3] *triangulate_polygon(
-    const vec2 *points, size_t length, size_t *num_indices_ptr
+cdef size_t[3] *_triangulate_polygon(
+    vec2 *points, size_t length, size_t *num_indices_ptr
 ):
     cdef size_t i
 
@@ -216,13 +224,15 @@ cdef size_t[3] *triangulate_polygon(
         convex_curr = convex_curr.next
 
     cdef size_t num_indices = length - 2
+    # cdef size_t num_indices = debug
+    # debug = min(debug, length - 2)
     cdef size_t[3] *indices = <size_t[3] *>malloc(num_indices * sizeof(size_t[3]))
 
     # loop through ears and remove them
     cdef Node *curr_node
     cdef Node *adj_nodes[2]
     cdef Node *adj_node
-    cdef bint is_convex
+    cdef bint is_reflex
 
     cdef size_t num_vertices = length
     for i in range(num_indices):
@@ -236,20 +246,152 @@ cdef size_t[3] *triangulate_polygon(
 
         adj_nodes = [curr_node.prev, curr_node.next]
         for adj_node in adj_nodes:
-            is_convex = not node_contains(data[2], adj_node.index)
-            if not is_convex:  # if node is reflex
+            if node_contains(data[3], adj_node.index):  # if is ear
+                if not node_is_ear(adj_node, data[2], points):
+                    free(node_remove(&data[3], adj_node.index))  # remove is not ear
+                continue
+            is_reflex = node_contains(data[2], adj_node.index)
+            if is_reflex:  # if node is reflex
                 if node_is_convex(adj_node, points):
                     free(node_remove(&data[2], adj_node.index))
-                    is_convex = True
-            if is_convex and node_is_ear(adj_node, data[2], points):
+                    is_reflex = False
+            if (not is_reflex) and node_is_ear(adj_node, data[2], points):
                 node_append(&data[3], adj_node.index)
         free(curr_node)
 
     # free all remaining nodes
-    node_free_len(data[0], num_vertices)
-    node_free(data[1])
-    node_free(data[2])
-    node_free(data[3])
+    node_free_len(&data[0], num_vertices)
+    node_free(&data[1])
+    node_free(&data[2])
+    node_free(&data[3])
+
+    num_indices_ptr[0] = num_indices
+    return indices
+
+
+cdef set[size_t].iterator iter_prev(set[size_t].iterator iter, set[size_t]& set):
+    return dec(set.end()) if iter == set.begin() else dec(iter)
+
+
+cdef set[size_t].iterator iter_next(set[size_t].iterator iter, set[size_t]& set):
+    return set.begin() if iter == dec(set.end()) else inc(iter)
+
+
+cdef bint is_convex(
+    set[size_t].iterator vertex_iter, set[size_t]& vertices, vec2 *points
+):
+    return _is_convex(
+        points[deref(iter_prev(vertex_iter, vertices))],
+        points[deref(vertex_iter)],
+        points[deref(iter_next(vertex_iter, vertices))],
+    )
+
+
+cdef bint _is_convex(vec2 p0, vec2 p1, vec2 p2):
+    cdef float area_sum = (
+        p0[0] * (p1[1] - p2[1]) +
+        p1[0] * (p2[1] - p0[1]) +
+        p2[0] * (p0[1] - p1[1])
+    )
+    return True if area_sum > 0 else False
+
+
+cdef void print_set(set[size_t]& vertices):
+    cdef set[size_t].iterator iter = vertices.begin()
+    while iter != vertices.end():
+        print(deref(iter), end=', ')
+        inc(iter)
+    print()
+
+
+cdef bint is_ear(
+    set[size_t].iterator vertex_iter,
+    set[size_t]& vertices,
+    set[size_t]& reflex_vertices,
+    vec2 *points
+):
+    cdef set[size_t].iterator iter = reflex_vertices.begin()
+    while iter != reflex_vertices.end():
+        if (point_in_triangle(
+            points[deref(iter)],
+            points[deref(iter_prev(vertex_iter, vertices))],
+            points[deref(vertex_iter)],
+            points[deref(iter_next(vertex_iter, vertices))],
+        )):
+            return False
+        inc(iter)
+    return True
+
+
+cdef size_t[3] *triangulate_polygon(
+    vec2 *points, size_t length, size_t *num_indices_ptr
+):
+    cdef size_t i
+
+    cdef set[size_t] vertices
+    cdef vector[size_t] convex_vertices
+    cdef set[size_t] reflex_vertices
+    cdef set[size_t] ear_vertices
+
+    # setup list of vertices
+    for i in range(0, length):
+        vertices.insert(i)
+
+    cdef int a
+    # setup convex and reflex list
+    cdef set[size_t].iterator iter = vertices.begin()
+    for i in range(length):
+        if is_convex(iter, vertices, points):
+            convex_vertices.push_back(i)
+        else:
+            reflex_vertices.insert(i)
+        # print(distance(vertices.begin(), iter))
+        a = distance(vertices.begin(), iter)
+        inc(iter)
+        # iter = next(iter, 1)
+        # prev(iter, 1)
+
+    # setup ear list
+    for i in convex_vertices:
+        if is_ear(vertices.find(i), vertices, reflex_vertices, points):
+            ear_vertices.insert(i)
+
+    cdef size_t num_indices = length - 2
+    cdef size_t[3] *indices = <size_t[3] *>malloc(num_indices * sizeof(size_t[3]))
+
+    # loop through ears and remove them
+    cdef set[size_t].iterator curr_iter
+    cdef set[size_t].iterator adj_iters[2]
+    cdef set[size_t].iterator adj_iter
+    cdef bint is_reflex
+
+    for i in range(num_indices):
+        curr_iter = vertices.find(deref(ear_vertices.begin()))
+        ear_vertices.erase(ear_vertices.begin())  # remove from ear list
+
+        adj_iters = [
+            iter_prev(curr_iter, vertices),
+            iter_next(curr_iter, vertices)
+        ]
+
+        indices[i][0] = deref(adj_iters[0])
+        indices[i][1] = deref(curr_iter)
+        indices[i][2] = deref(adj_iters[1])
+
+        vertices.erase(curr_iter)  # remove from vertices
+
+        for adj_iter in adj_iters:
+            if ear_vertices.contains(deref(adj_iter)):
+                if not is_ear(adj_iter, vertices, reflex_vertices, points):
+                    ear_vertices.erase(deref(adj_iter))
+                continue
+            is_reflex = reflex_vertices.contains(deref(adj_iter))
+            if is_reflex:
+                if is_convex(adj_iter, vertices, points):
+                    reflex_vertices.erase(deref(adj_iter))
+                    is_reflex = False
+            if (not is_reflex) and is_ear(adj_iter, vertices, reflex_vertices, points):
+                ear_vertices.insert(deref(adj_iter))
 
     num_indices_ptr[0] = num_indices
     return indices

@@ -11,9 +11,9 @@ from setuptools.command.build_ext import build_ext as _build_ext
 
 # options
 release = True
-build_libs = True
+build_libs = False
 
-annotate = False
+annotate = True
 force = False
 quiet = False
 
@@ -90,9 +90,9 @@ macros = [
 
 
 # compiler -------------------------------------
-language = "c"
-debug_args = ["-w", "-O0"]
-release_args = ["-w", "-O3"]
+language = "c++"
+debug_args = ["-std=c++20", "-w", "-O0"]
+release_args = ["-std=c++20", "-w", "-O3"]
 if release:
     args = release_args
 else:

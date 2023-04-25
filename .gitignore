@@ -11,6 +11,7 @@ dist/
 *.egg-info/
 *.spec
 cyclone/*.c
+cyclone/*.cpp
 cyclone/*.so
 cyclone/*.html
 

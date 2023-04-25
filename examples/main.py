@@ -82,6 +82,31 @@ def main():
     rect = Rectangle(0, 0, 100, 100)
     rect.size = (100, 100)
 
+    poly_points = (
+        (800, 400),
+        (700, 500),
+        (600, 500),
+        (500, 400),
+        (500, 300),
+        (600, 200),
+        (700, 300),
+        (800, 200),
+    )
+    # debug = 0
+    # poly_points = []
+    # # generate counterclockwise polygon points for circle
+    # num = 4
+    # for i in range(num):
+    #     # if i == num - 1:
+    #     #     break
+    #     angle = 2 * math.pi * i / num
+    #     x = math.cos(angle) * 200 + 600
+    #     y = math.sin(angle) * 200 + 400
+    #     poly_points.append((x, y))
+    # poly_points.append((800, 100))
+    # print(poly_points)
+
+    # game loop -------------------------------------------- #
     clock = Timer()
 
     zoom_time = 0
@@ -107,6 +132,11 @@ def main():
                         window.set_should_close(True)
                     if data.key == const.KEY_T:
                         print(time)
+                    if data.key == const.KEY_D:
+                        if data.mods == const.MOD_SHIFT:
+                            debug -= 1
+                        else:
+                            debug += 1
 
             if callback == const.MOUSE_BUTTON_CALLBACK:
                 if data.action == const.PRESS:
@@ -151,15 +181,9 @@ def main():
         renderer.clear((100, 100, 100))
 
         # polygon test
-        points = (
-            (100, 50),
-            (200, 200),
-            (500, 100),
-            (400, 400),
-            (200, 500),
-        )
-        for _ in range(1):
-            renderer.draw_polygon((220, 30, 30), points)
+        for _ in range(100):
+            renderer.draw_polygon((150, 200, 90), poly_points)
+            # renderer.draw_polygon((220, 30, 30), poly_points)
 
         # render font
         # for i in range(128):

@@ -39,7 +39,7 @@ class Timer:
 
         if dt != 0:
             self._fps_list.append(1 / dt)
-            if len(self._fps_list) > 20:
+            if len(self._fps_list) > 5:
                 self._fps_list.pop(0)
 
         return dt
