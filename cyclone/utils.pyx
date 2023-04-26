@@ -347,8 +347,8 @@ cdef size_t[3] *triangulate_polygon(
             reflex_vertices.insert(i)
         # print(distance(vertices.begin(), iter))
         a = distance(vertices.begin(), iter)
-        inc(iter)
-        # iter = next(iter, 1)
+        # inc(iter)
+        iter = next(iter, 1)
         # prev(iter, 1)
 
     # setup ear list
