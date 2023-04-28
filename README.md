@@ -39,6 +39,7 @@ _Library is in very early stages, only tested on macOS_
 - [ ] build for linux and windows
 - [ ] upload to pypi
 - [ ] documentation
+- [ ] convert OpenGL to [WebGPU](https://github.com/gfx-rs/wgpu-native) for future proofing?
 
 ## Contributing
 
