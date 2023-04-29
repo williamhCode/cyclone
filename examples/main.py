@@ -5,7 +5,7 @@ from cyclone import texture
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
 from cyclone import constants as const
-from cyclone import callbacks
+from cyclone import callbacks as cb
 from cyclone.font import Font, SysFont
 
 import math
@@ -92,7 +92,7 @@ def main():
         (700, 300),
         (800, 200),
     )
-    # debug = 0
+    debug = 0
     # poly_points = []
     # # generate counterclockwise polygon points for circle
     # num = 4
@@ -138,7 +138,7 @@ def main():
                         else:
                             debug += 1
 
-            if callback == const.MOUSE_BUTTON_CALLBACK:
+            elif callback == const.MOUSE_BUTTON_CALLBACK:
                 if data.action == const.PRESS:
                     if data.button == const.MOUSE_BUTTON_LEFT:
                         print("left pressed!")

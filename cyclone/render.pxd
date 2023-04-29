@@ -11,6 +11,7 @@ from cyclone.texture cimport Texture, RenderTexture
 from cyclone.shapes cimport Rectangle
 from cyclone.font cimport Font, CharData
 from cyclone cimport utils
+from cyclone cimport triangulation
 
 
 cdef struct Vertex:

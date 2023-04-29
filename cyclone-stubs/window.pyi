@@ -1,6 +1,5 @@
-from cyclone.render import Renderer
-from cyclone.texture import RenderTexture
 from ._common import Vec2, CallbackData
+from types import Any
 
 class Window:
     def __init__(
