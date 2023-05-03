@@ -39,7 +39,7 @@ _Library is in very early stages, only tested on macOS_
 - [ ] build for linux and windows
 - [ ] upload to pypi
 - [ ] documentation
-- [ ] convert OpenGL to [WebGPU](https://github.com/eliemichel/WebGPU-Cpp) for future proofing?
+- [ ] convert OpenGL to [WebGPU](https://developer.chrome.com/blog/webgpu-release/) for future proofing?
 
 ## Contributing
 
