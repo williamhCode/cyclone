@@ -5,7 +5,6 @@ from cyclone.timer import Timer
 from cyclone.texture import Texture
 from cyclone.font import SysFont
 
-import math
 import random
 from dataclasses import dataclass
 
@@ -50,22 +49,20 @@ def main():
                 if data.action == PRESS and data.key == KEY_ESCAPE:
                     window.close()
 
-        num = int(5000 * dt)
+        num = int(10000 * dt)
         if window.mouse_button_pressed(MOUSE_BUTTON_LEFT):
             objs += num
             for _ in range(num):
                 x, y = window.get_cursor_position()
-                angle = random.uniform(0, 2 * math.pi)
-                x_vel = math.cos(angle) * SPEED
-                y_vel = math.sin(angle) * SPEED
-                obj_list.append(
-                    Obj(
-                        x - python_tex.width / 2,
-                        y - python_tex.height / 2,
-                        x_vel,
-                        y_vel,
-                    )
-                )
+                x -= python_tex.width / 2
+                y -= python_tex.height / 2
+                x_vel = random.uniform(-SPEED, SPEED)
+                y_vel = random.uniform(-SPEED, SPEED)
+                # angle = random.uniform(0, 2 * math.pi)
+                # x_vel = math.cos(angle) * SPEED
+                # y_vel = math.sin(angle) * SPEED
+                obj_list.append(Obj(x, y, x_vel, y_vel))
+
         if window.mouse_button_pressed(MOUSE_BUTTON_RIGHT):
             for _ in range(num * 2):
                 if len(obj_list) > 0:
@@ -98,7 +95,7 @@ def main():
             renderer.draw_texture(python_tex, (obj.x, obj.y))
 
         color = (255, 0, 0) if curr_fps < 55 else (255, 255, 255)
-        renderer.draw_rectangle(color, (10, 730), (450, 50))
+        renderer.draw_rectangle(color, (10, WIN_SIZE[1] - 65), (450, 50))
         renderer.draw_text(font, f"{fps=:.1f}, {objs= }", (20, 750), (0, 0, 0))
 
         renderer.end()
