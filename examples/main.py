@@ -128,7 +128,7 @@ def main():
             if callback == KEY_CALLBACK:
                 if data.action == PRESS:
                     if data.key == KEY_ESCAPE:
-                        window.set_should_close(True)
+                        window.close()
                     if data.key == KEY_T:
                         print(time)
                     if data.key == KEY_D:

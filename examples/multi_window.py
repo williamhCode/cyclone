@@ -18,7 +18,6 @@ def main():
 
     while not (window_1.should_close() and window_2.should_close()):
         clock.tick(60)
-        framerate = clock.get_fps()
 
         for window in windows.copy():
             if window.should_close():
@@ -26,7 +25,7 @@ def main():
                 windows.remove(window)
 
         if not window_1.should_close():
-            window_1.set_title(f"Running at {framerate :.2f} fps.")
+            window_1.set_title("Window 1")
 
             for callback, data in window_1.get_callbacks():
                 if callback == KEY_CALLBACK:
@@ -45,7 +44,7 @@ def main():
             window_1.update()
 
         if not window_2.should_close():
-            window_2.set_title(f"Running at {framerate :.2f} fps.")
+            window_2.set_title("Window 2")
 
             for callback, data in window_2.get_callbacks():
                 if callback == KEY_CALLBACK:

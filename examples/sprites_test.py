@@ -29,8 +29,8 @@ def main():
         python_tex = Texture.load("imgs/python_logo_big.png")
         python_tex.width /= 2
         python_tex.height /= 2
-    python_tex.width /= 2
-    python_tex.height /= 2
+    # python_tex.width /= 2
+    # python_tex.height /= 2
     COL_SIZE = (WIN_SIZE[0] - python_tex.width, WIN_SIZE[1] - python_tex.height)
 
     SPEED = 100
