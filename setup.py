@@ -9,7 +9,7 @@ from setuptools.command.build_ext import build_ext as _build_ext
 
 
 # options
-release = True
+release = False
 build_libs = False
 
 annotate = False
@@ -44,7 +44,7 @@ class build_ext(_build_ext):
         )
 
 
-os.environ["CC"] = "gcc"
+os.environ["CC"] = "clang"
 
 # general --------------------------------------
 files = []

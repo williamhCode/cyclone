@@ -100,5 +100,3 @@ cdef class Renderer:
     cdef void _draw_filled_polygon(self, vec4 color, vec2 *points, size_t length)
 
     cdef void _draw_polygon(self, vec4 color, vec2 *points, size_t length, float width)
-
-    cdef void _handle_color(self, py_color, vec4 color)

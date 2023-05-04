@@ -1,11 +1,11 @@
 from ._common import Vec2
 
 class Texture:
-    width: int
-    height: int
+    width: float
+    height: float
     framebuffer_width: int
     framebuffer_height: int
-    size: tuple[int, int]
+    size: tuple[float, float]
 
     def __init__(
         self, size: Vec2, data: bytes = None, resize_nearest: bool = False

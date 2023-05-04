@@ -1,7 +1,18 @@
+# constants
+CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE
+CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
+MIRRORED_REPEAT = GL_MIRRORED_REPEAT
+REPEAT = GL_REPEAT
+
+
 cdef class Texture:
 
     def __init__(
-        self, size, bytes data=None, bint resize_nearest=False
+        self,
+        size,
+        bytes data=None,
+        bint resize_nearest=False,
+        int wrap_mode=GL_CLAMP_TO_BORDER
     ):
         cdef unsigned char *t_data
         if data is None:
@@ -9,10 +20,12 @@ cdef class Texture:
         else:
             t_data = data
 
-        self._init([size[0], size[1]], t_data, resize_nearest)
+        self._init([size[0], size[1]], t_data, resize_nearest, wrap_mode)
 
     @classmethod
-    def load(cls, str filepath, bint resize_nearest=False):
+    def load(
+        cls, str filepath, bint resize_nearest=False, int wrap_mode=GL_CLAMP_TO_BORDER
+    ):
         stbi_set_flip_vertically_on_load(1)
 
         cdef int width, height, n
@@ -24,7 +37,7 @@ cdef class Texture:
             raise RuntimeError(f"Failed to load texture at {filepath}")
         else:
             texture = cls.__new__(cls)
-            texture._init([width, height], data, resize_nearest)
+            texture._init([width, height], data, resize_nearest, wrap_mode)
             stbi_image_free(data)
 
         return texture
@@ -34,6 +47,7 @@ cdef class Texture:
         int[2] size,
         unsigned char *data,
         bint resize_nearest,
+        int wrap_mode,
         int[2] framebuffer_size=NULL,
     ):
         self.width = size[0]
@@ -60,8 +74,8 @@ cdef class Texture:
         glGenTextures(1, &self.texture_id)
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_mode)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_mode)
         if resize_nearest:
             glTexParameteri(
                 GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST
@@ -115,7 +129,8 @@ cdef class RenderTexture(Texture):
         self,
         size,
         bint resize_nearest=False,
-        bint high_dpi=True
+        bint high_dpi=True,
+        int clamp_mode=GL_CLAMP_TO_BORDER
     ):
         cdef int[2] t_size = [size[0], size[1]]
         cdef int[2] framebuffer_size
@@ -132,6 +147,7 @@ cdef class RenderTexture(Texture):
             t_size,
             NULL,
             resize_nearest,
+            clamp_mode,
             framebuffer_size
         )
 

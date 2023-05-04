@@ -80,7 +80,9 @@ cdef class Font:
 
         self.texture = Texture.__new__(Texture)
         try:
-            self.texture._init([width, height], data, False, [fb_width, fb_height])
+            self.texture._init(
+                [width, height], data, False, GL_CLAMP_TO_BORDER, [fb_width, fb_height]
+            )
         except Exception:
             raise RuntimeError("Font size too large")
 

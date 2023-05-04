@@ -19,7 +19,7 @@ class Obj:
 
 def main():
     WIN_SIZE = (1200, 800)
-    high_dpi = False
+    high_dpi = True
     window = Window(WIN_SIZE, vsync=False, high_dpi=high_dpi)
     renderer = Renderer()
     font = SysFont("Arial", 30)
@@ -31,7 +31,6 @@ def main():
         python_tex.height /= 2
     # python_tex.width /= 2
     # python_tex.height /= 2
-    COL_SIZE = (WIN_SIZE[0] - python_tex.width, WIN_SIZE[1] - python_tex.height)
 
     SPEED = 100
     obj_list = []
@@ -46,8 +45,15 @@ def main():
         # key events
         for callback, data in window.get_callbacks():
             if callback == KEY_CALLBACK:
-                if data.action == PRESS and data.key == KEY_ESCAPE:
-                    window.close()
+                if data.action == PRESS:
+                    if data.key == KEY_ESCAPE:
+                        window.close()
+                    if data.key == KEY_EQUAL:
+                        python_tex.width *= 2
+                        python_tex.height *= 2
+                    if data.key == KEY_MINUS:
+                        python_tex.width /= 2
+                        python_tex.height /= 2
 
         num = int(10000 * dt)
         if window.mouse_button_pressed(MOUSE_BUTTON_LEFT):
@@ -70,6 +76,7 @@ def main():
                     obj_list.pop()
 
         # update
+        COL_SIZE = (WIN_SIZE[0] - python_tex.width, WIN_SIZE[1] - python_tex.height)
         for obj in obj_list:
             obj.x += obj.x_vel * dt
             obj.y += obj.y_vel * dt

@@ -8,8 +8,8 @@ from cyclone.window cimport Window
 cdef class Texture:
     cdef:
         GLuint texture_id
-        public int width
-        public int height
+        public float width
+        public float height
         int orig_width
         int orig_height
         readonly int framebuffer_width
@@ -20,6 +20,7 @@ cdef class Texture:
         int[2] size,
         unsigned char *data,
         bint resize_nearest,
+        int wrap_mode,
         int[2] framebuffer_size = *,
     )
 

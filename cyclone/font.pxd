@@ -3,6 +3,7 @@ from libc.string cimport memset, memcpy
 
 from cyclone.lib.freetype cimport *
 from cyclone.lib.cglm cimport *
+from cyclone.lib.glad cimport *
 
 cimport cyclone
 from cyclone.texture cimport Texture

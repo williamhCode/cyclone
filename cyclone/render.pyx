@@ -111,7 +111,7 @@ cdef class Renderer:
 
     def clear(self, color):
         cdef vec4 _color
-        self._handle_color(color, _color)
+        utils.convert_color(color, _color)
         glClearColor(_color[0], _color[1], _color[2], _color[3])
         glClear(GL_COLOR_BUFFER_BIT)
 
@@ -197,7 +197,7 @@ cdef class Renderer:
         cdef vec2 t_size = [texture.width, texture.height]
         cdef vec2 t_offset = [offset[0], offset[1]]
         cdef vec4 t_color
-        self._handle_color(color, t_color)
+        utils.convert_color(color, t_color)
 
         self._draw_texture(
             texture_id, t_position, NULL, t_size, rotation, t_offset, flip_mode, t_color
@@ -223,7 +223,7 @@ cdef class Renderer:
         cdef vec2 t_size = [texture.width, texture.height]
         cdef vec2 t_offset = [offset[0], offset[1]]
         cdef vec4 t_color
-        self._handle_color(color, t_color)
+        utils.convert_color(color, t_color)
 
         self._draw_texture(
             texture_id,
@@ -344,7 +344,7 @@ cdef class Renderer:
         cdef char *t_text = b_text
         cdef vec2 t_position = [position[0], position[1]]
         cdef vec4 t_color
-        self._handle_color(color, t_color)
+        utils.convert_color(color, t_color)
 
         self._draw_text(font, t_text, t_position, t_color)
 
@@ -382,7 +382,7 @@ cdef class Renderer:
         self, color, position, float radius, float width = 0.0, float fade = 0.0
     ):
         cdef vec4 t_color
-        self._handle_color(color, t_color)
+        utils.convert_color(color, t_color)
         cdef vec2 t_position = [position[0], position[1]]
 
         self._draw_circle(t_color, t_position, radius, width, fade)
@@ -447,7 +447,7 @@ cdef class Renderer:
         float fade=0.0
     ):
         cdef vec4 t_color
-        self._handle_color(color, t_color)
+        utils.convert_color(color, t_color)
         cdef vec2 t_position = [position[0], position[1]]
         cdef vec2 t_size = [size[0], size[1]]
         cdef vec2 t_offset = [offset[0], offset[1]]
@@ -516,7 +516,7 @@ cdef class Renderer:
 
     def draw_line(self, color, start, end, float width=1.0):
         cdef vec4 t_color
-        self._handle_color(color, t_color)
+        utils.convert_color(color, t_color)
         cdef vec2 t_start = [start[0], start[1]]
         cdef vec2 t_end = [end[0], end[1]]
 
@@ -524,7 +524,7 @@ cdef class Renderer:
 
     def draw_lines(self, color, points, float width=1.0):
         cdef vec4 t_color
-        self._handle_color(color, t_color)
+        utils.convert_color(color, t_color)
 
         cdef size_t i
         cdef vec2 t_start
@@ -579,7 +579,7 @@ cdef class Renderer:
 
     def draw_polygon(self, color, points, float width=0.0):
         cdef vec4 t_color
-        self._handle_color(color, t_color)
+        utils.convert_color(color, t_color)
         cdef size_t length = len(points)
         if length < 3:
             raise RuntimeError("Polygon must have at least 3 points")
@@ -631,15 +631,3 @@ cdef class Renderer:
     cdef void _draw_polygon(self, vec4 color, vec2 *points, size_t length, float width):
         pass
 
-    cdef void _handle_color(self, py_color, vec4 color):
-        if len(py_color) == 3:
-            color[:4] = [
-                py_color[0] / 255.0, py_color[1] / 255.0, py_color[2] / 255.0, 1.0
-            ]
-        else:
-            color[:4] = [
-                py_color[0] / 255.0,
-                py_color[1] / 255.0,
-                py_color[2] / 255.0,
-                py_color[3] / 255.0
-            ]
