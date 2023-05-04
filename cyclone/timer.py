@@ -7,7 +7,7 @@ class Timer:
         self._time = time.perf_counter()
         self._unprocessed = 0
         self._prev_time = time.perf_counter()
-        self._fps_list = []
+        self._dt_list = []
 
     def tick(self, fps=None):
         if fps is not None:
@@ -38,14 +38,14 @@ class Timer:
         self._prev_time = curr_time
 
         if dt != 0:
-            self._fps_list.append(1 / dt)
-            if len(self._fps_list) > 5:
-                self._fps_list.pop(0)
+            self._dt_list.append(dt)
+            if len(self._dt_list) > 10:
+                self._dt_list.pop(0)
 
         return dt
 
     def get_fps(self):
-        length = len(self._fps_list)
+        length = len(self._dt_list)
         if length == 0:
             return 0
-        return sum(self._fps_list) / length
+        return 1 / (sum(self._dt_list) / length)

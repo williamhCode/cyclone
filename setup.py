@@ -9,7 +9,7 @@ from setuptools.command.build_ext import build_ext as _build_ext
 
 
 # options
-release = False
+release = True
 build_libs = False
 
 annotate = False

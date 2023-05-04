@@ -138,8 +138,8 @@ cdef class Window:
             return True
         return glfwWindowShouldClose(self.window)
 
-    def set_should_close(self, bint value):
-        glfwSetWindowShouldClose(self.window, value)
+    def close(self):
+        glfwSetWindowShouldClose(self.window, True)
 
     def get_size(self):
         return (self.width, self.height)

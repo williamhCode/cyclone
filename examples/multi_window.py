@@ -1,5 +1,5 @@
 import cyclone
-from cyclone.constants import *
+from cyclone.window.input import *
 from cyclone.window import Window
 from cyclone.timer import Timer
 from cyclone.render import Renderer
@@ -32,7 +32,7 @@ def main():
                 if callback == KEY_CALLBACK:
                     if data.action == PRESS:
                         if data.key == KEY_ESCAPE:
-                            window_1.set_should_close(True)
+                            window_1.close()
 
                         if data.key == KEY_1:
                             print("Window 1!!")
@@ -50,7 +50,7 @@ def main():
             for callback, data in window_2.get_callbacks():
                 if callback == KEY_CALLBACK:
                     if data.key == KEY_ESCAPE:
-                        window_2.set_should_close(True)
+                        window_2.close()
 
                     if data.action == PRESS:
                         if data.key == KEY_2:
