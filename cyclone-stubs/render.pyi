@@ -1,6 +1,5 @@
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
-from cyclone.window import Window
 from ._common import Vec2, Mat4, Color, Region
 
 class Renderer:

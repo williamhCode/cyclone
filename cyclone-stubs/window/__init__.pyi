@@ -1,5 +1,4 @@
-from ._common import Vec2, CallbackData
-from types import Any
+from .._common import Vec2, CallbackData
 
 class Window:
     def __init__(

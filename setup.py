@@ -2,7 +2,6 @@ import os
 import sys
 import subprocess
 from glob import glob
-import pathlib
 
 from Cython.Build import cythonize
 from setuptools import Extension, setup
@@ -13,26 +12,23 @@ from setuptools.command.build_ext import build_ext as _build_ext
 release = False
 build_libs = False
 
-annotate = True
+annotate = False
 force = False
 quiet = False
 
 
 # build_ext from cmake
-# cmake -E make_directory cmake_build
-# cmake -E chdir cmake_build cmake ..
-# cmake --build cmake_build
+# cmake -E make_directory build
+# cmake -E chdir build cmake ..
+# cmake --build build
 class build_ext(_build_ext):
     def run(self):
         self.build_cmake()
         super().run()
 
     def build_cmake(self):
-        cwd = pathlib.Path().absolute()
-
+        cwd = os.getcwd()
         env = os.environ.copy()
-        build_temp = pathlib.Path(self.build_temp)
-        build_temp.mkdir(parents=True, exist_ok=True)
 
         subprocess.check_call(
             ["cmake", "-E", "make_directory", self.build_temp],

@@ -1,4 +1,4 @@
-from cyclone.constants import (
+from cyclone.window.input import (
     KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK, WINDOW_CLOSE_CALLBACK
 )
 

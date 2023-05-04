@@ -10,21 +10,10 @@ build/
 dist/
 *.egg-info/
 *.spec
-cyclone/*.c
-cyclone/*.cpp
-cyclone/*.so
-cyclone/*.html
+cyclone/**/*.c
+cyclone/**/*.cpp
+cyclone/**/*.so
+cyclone/**/*.html
 
 # cmake
 cmake_build/
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps

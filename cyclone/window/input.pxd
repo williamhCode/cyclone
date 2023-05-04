@@ -1,3 +1,6 @@
+from cyclone.lib.glfw cimport *
+
+
 cdef class KeyData:
     cdef:
         public int key

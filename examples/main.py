@@ -1,11 +1,10 @@
 from cyclone.window import Window
+from cyclone.window.input import *
 from cyclone.render import Renderer
 from cyclone.timer import Timer
 from cyclone import texture
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
-from cyclone import constants as const
-from cyclone import callbacks as cb
 from cyclone.font import Font, SysFont
 
 import math
@@ -126,51 +125,54 @@ def main():
 
         # key events
         for callback, data in window.get_callbacks():
-            if callback == const.KEY_CALLBACK:
-                if data.action == const.PRESS:
-                    if data.key == const.KEY_ESCAPE:
+            if callback == KEY_CALLBACK:
+                if data.action == PRESS:
+                    if data.key == KEY_ESCAPE:
                         window.set_should_close(True)
-                    if data.key == const.KEY_T:
+                    if data.key == KEY_T:
                         print(time)
-                    if data.key == const.KEY_D:
-                        if data.mods == const.MOD_SHIFT:
+                    if data.key == KEY_D:
+                        if data.mods == MOD_SHIFT:
                             debug -= 1
                         else:
                             debug += 1
 
-            elif callback == const.MOUSE_BUTTON_CALLBACK:
-                if data.action == const.PRESS:
-                    if data.button == const.MOUSE_BUTTON_LEFT:
+            elif callback == MOUSE_BUTTON_CALLBACK:
+                if data.action == PRESS:
+                    if data.button == MOUSE_BUTTON_LEFT:
+                        print("left pressed!")
+                if data.action == RELEASE:
+                    if data.button == MOUSE_BUTTON_LEFT:
                         print("left pressed!")
 
-            # if callback == const.CURSOR_POSITION_CALLBACK:
+            # if callback == CURSOR_POSITION_CALLBACK:
             # print(data.xpos, data.ypos)
 
         # key/button being pressed
-        if window.key_pressed(const.KEY_A):
+        if window.key_pressed(KEY_A):
             print("a!")
 
-        if window.mouse_button_pressed(const.MOUSE_BUTTON_RIGHT):
+        if window.mouse_button_pressed(MOUSE_BUTTON_RIGHT):
             print("right held!")
 
-        if window.key_pressed(const.KEY_EQUAL):
+        if window.key_pressed(KEY_EQUAL):
             zoom_time += dt
             camera.zoom = zoom_factor**zoom_time
 
-        if window.key_pressed(const.KEY_MINUS):
+        if window.key_pressed(KEY_MINUS):
             zoom_time -= dt
             camera.zoom = zoom_factor**zoom_time
 
-        if window.key_pressed(const.KEY_UP):
+        if window.key_pressed(KEY_UP):
             look_pos += glm.vec2(0, 3000 / camera.zoom * dt)
 
-        if window.key_pressed(const.KEY_DOWN):
+        if window.key_pressed(KEY_DOWN):
             look_pos -= glm.vec2(0, 3000 / camera.zoom * dt)
 
-        if window.key_pressed(const.KEY_LEFT):
+        if window.key_pressed(KEY_LEFT):
             look_pos -= glm.vec2(3000 / camera.zoom * dt, 0)
 
-        if window.key_pressed(const.KEY_RIGHT):
+        if window.key_pressed(KEY_RIGHT):
             look_pos += glm.vec2(3000 / camera.zoom * dt, 0)
 
         camera.look_at(look_pos)

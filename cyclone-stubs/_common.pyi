@@ -1,5 +1,5 @@
 from typing import Protocol, TypeVar
-from callbacks import *
+from cyclone.window.input import *
 from shapes import Rectangle
 
 T = TypeVar("T")

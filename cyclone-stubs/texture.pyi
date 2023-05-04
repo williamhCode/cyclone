@@ -1,5 +1,4 @@
 from ._common import Vec2
-from cyclone.window import Window
 
 class Texture:
     width: int
