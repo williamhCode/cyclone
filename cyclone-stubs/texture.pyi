@@ -1,5 +1,10 @@
 from ._common import Vec2
 
+CLAMP_TO_EDGE: int
+CLAMP_TO_BORDER: int
+MIRRORED_REPEAT: int
+REPEAT: int
+
 class Texture:
     width: float
     height: float
@@ -8,7 +13,11 @@ class Texture:
     size: tuple[float, float]
 
     def __init__(
-        self, size: Vec2, data: bytes = None, resize_nearest: bool = False
+        self,
+        size: Vec2,
+        data: bytes = None,
+        resize_nearest: bool = False,
+        wrap_mode=CLAMP_TO_EDGE,
     ) -> None: ...
     @classmethod
     def load(cls, filepath: str, resize_nearest: bool = False) -> Texture: ...
@@ -19,5 +28,6 @@ class RenderTexture(Texture):
         self,
         size: Vec2,
         resize_nearest: bool = False,
+        wrap_mode=CLAMP_TO_EDGE,
         high_dpi: bool = True,
     ) -> None: ...

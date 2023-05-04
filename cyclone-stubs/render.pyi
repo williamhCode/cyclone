@@ -102,7 +102,7 @@ class Renderer:
             position: bottom-left position of the texture
             region: the region of the texture to draw. If region is out of
                 the texture's bounds, texture will act based on the
-                texture's wrap mode (currently repeat).
+                texture's wrap mode (CLAMP_TO_EDGE by default).
             rotation: angle in degrees to rotate the texture
             offset: the position offset
             flip_mode: the flip mode, if

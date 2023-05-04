@@ -19,7 +19,7 @@ class Obj:
 
 def main():
     WIN_SIZE = (1200, 800)
-    high_dpi = True
+    high_dpi = False
     window = Window(WIN_SIZE, vsync=False, high_dpi=high_dpi)
     renderer = Renderer()
     font = SysFont("Arial", 30)

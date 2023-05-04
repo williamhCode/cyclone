@@ -12,7 +12,7 @@ cdef class Texture:
         size,
         bytes data=None,
         bint resize_nearest=False,
-        int wrap_mode=GL_CLAMP_TO_BORDER
+        int wrap_mode=GL_CLAMP_TO_EDGE
     ):
         cdef unsigned char *t_data
         if data is None:
@@ -24,7 +24,7 @@ cdef class Texture:
 
     @classmethod
     def load(
-        cls, str filepath, bint resize_nearest=False, int wrap_mode=GL_CLAMP_TO_BORDER
+        cls, str filepath, bint resize_nearest=False, int wrap_mode=GL_CLAMP_TO_EDGE
     ):
         stbi_set_flip_vertically_on_load(1)
 
@@ -129,8 +129,8 @@ cdef class RenderTexture(Texture):
         self,
         size,
         bint resize_nearest=False,
-        bint high_dpi=True,
-        int clamp_mode=GL_CLAMP_TO_BORDER
+        int clamp_mode=GL_CLAMP_TO_EDGE,
+        bint high_dpi=True
     ):
         cdef int[2] t_size = [size[0], size[1]]
         cdef int[2] framebuffer_size
