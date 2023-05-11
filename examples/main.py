@@ -187,6 +187,7 @@ def main():
 
         # polygon test
         for _ in range(1):
+            # renderer.draw_polygon((150, 200, 90), poly_points)
             renderer.draw_polygon((150, 200, 90), poly_points, width=30)
 
         # for point in inner_points:

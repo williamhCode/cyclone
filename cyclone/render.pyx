@@ -617,7 +617,7 @@ cdef class Renderer:
             self.vertex_count += 3
             self.index_count += 3
         else:
-            indices = triangulation.triangulate(points, length, &num_indices)
+            indices = triangulation.ear_clip(points, length, &num_indices)
             for i in range(num_indices):
                 self.indices_ptr[0] = self.vertex_count + indices[i][0]
                 self.indices_ptr[1] = self.vertex_count + indices[i][1]

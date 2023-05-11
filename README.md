@@ -23,7 +23,7 @@ _Library is in very early stages, only tested on macOS_
   - [x] circles
   - [x] rectangles
   - [x] lines
-  - [ ] polygons
+  - [x] polygons
   - [x] render texture (framebuffer)
   - [x] fonts
   - [ ] rendering options (blend, render to stencil buffer, etc.)

@@ -162,7 +162,7 @@ cdef bint node_is_ear(
     return True
 
 
-cdef size_t[3] *triangulate_linked_list(
+cdef size_t[3] *ear_clip_linked_list(
     vec2 *points, size_t length, size_t *num_indices_ptr
 ):
     cdef size_t i
@@ -293,7 +293,7 @@ cdef bint is_ear(
     return True
 
 
-cdef size_t[3] *triangulate(
+cdef size_t[3] *ear_clip(
     vec2 *points, size_t length, size_t *num_indices_ptr
 ):
     cdef size_t i
