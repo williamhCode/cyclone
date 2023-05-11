@@ -5,6 +5,7 @@ from libcpp.set cimport set
 
 from cyclone.lib.test cimport next, prev, advance, distance
 from cyclone.lib.cglm cimport *
+from cyclone cimport utils
 
 
 cdef size_t[3] *triangulate_linked_list(

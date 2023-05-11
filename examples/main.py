@@ -76,6 +76,7 @@ def main():
     render_texture = RenderTexture(WIN_SIZE)
 
     test_font = Font("/System/Library/Fonts/Supplemental/Arial.ttf", 30)
+    arial_font = SysFont("Arial", 30)
     font_1 = SysFont("Roboto Mono", 30)
 
     rect = Rectangle(0, 0, 100, 100)
@@ -91,7 +92,8 @@ def main():
         (700, 300),
         (800, 200),
     )
-    debug = 0
+
+    # debug = 0
     # poly_points = []
     # # generate counterclockwise polygon points for circle
     # num = 4
@@ -118,10 +120,11 @@ def main():
     while not window.should_close():
         # dt = clock.tick(60)
         dt = clock.tick()
+        fps = clock.get_fps()
         time += dt
 
         framerate = clock.get_fps()
-        window.set_title(f"Running at {framerate :.2f} fps.")
+        # window.set_title(f"Running at {framerate :.2f} fps.")
 
         # key events
         for callback, data in window.get_callbacks():
@@ -183,9 +186,11 @@ def main():
         renderer.clear((100, 100, 100))
 
         # polygon test
-        for _ in range(100):
-            renderer.draw_polygon((150, 200, 90), poly_points)
-            # renderer.draw_polygon((220, 30, 30), poly_points)
+        for _ in range(1):
+            renderer.draw_polygon((150, 200, 90), poly_points, width=30)
+
+        # for point in inner_points:
+        #     renderer.draw_circle((0, 0, 0), point, 3)
 
         # render font
         # for i in range(128):
@@ -249,6 +254,11 @@ def main():
         # renderer.draw_rectangle((200, 100, 100), (250, 250), (200, 200), width=50, fade=10)
         # renderer.draw_texture(texture_2, (300, 300))
         # renderer.draw_circle((100, 200, 100), (450, 450), 100, width=50, fade=10)
+
+        renderer.draw_rectangle(
+            (255, 255, 255), (10, WIN_SIZE[1] - 65), (200, 50), fade=3
+        )
+        renderer.draw_text(arial_font, f"{fps=:.1f}", (20, 750), (0, 0, 0))
 
         renderer.end()
 

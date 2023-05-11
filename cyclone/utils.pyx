@@ -17,3 +17,12 @@ cdef void convert_color(py_color, vec4 color):
             py_color[2] / 255.0,
             py_color[3] / 255.0
         ]
+
+
+cdef bint is_convex(vec2 p0, vec2 p1, vec2 p2):
+    cdef float area_sum = (
+        p0[0] * (p1[1] - p2[1]) +
+        p1[0] * (p2[1] - p0[1]) +
+        p2[0] * (p0[1] - p1[1])
+    )
+    return True if area_sum > 0 else False

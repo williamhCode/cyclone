@@ -259,20 +259,11 @@ cdef set[size_t].iterator iter_next(set[size_t].iterator iter, set[size_t]& set)
 cdef bint is_convex(
     set[size_t].iterator vertex_iter, set[size_t]& vertices, vec2 *points
 ):
-    return _is_convex(
+    return utils.is_convex(
         points[deref(iter_prev(vertex_iter, vertices))],
         points[deref(vertex_iter)],
         points[deref(iter_next(vertex_iter, vertices))],
     )
-
-
-cdef bint _is_convex(vec2 p0, vec2 p1, vec2 p2):
-    cdef float area_sum = (
-        p0[0] * (p1[1] - p2[1]) +
-        p1[0] * (p2[1] - p0[1]) +
-        p2[0] * (p0[1] - p1[1])
-    )
-    return True if area_sum > 0 else False
 
 
 cdef void print_set(set[size_t]& vertices):

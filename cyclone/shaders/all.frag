@@ -29,7 +29,7 @@ in RECT_OUT
 
 void main()
 {
-    // 0 = texture, 1 = circle, 2 = rectangle, 3 = line
+    // 0 = texture, 1 = circle, 2 = rectangle, 3 = line, filled polygon
     int renderType = int(v_RenderType);
 
     switch (renderType) {

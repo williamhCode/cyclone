@@ -6,6 +6,7 @@ from cyclone.texture import Texture
 from cyclone.font import SysFont
 
 import random
+import math
 from dataclasses import dataclass
 
 
@@ -33,7 +34,7 @@ def main():
     # python_tex.height /= 2
 
     SPEED = 100
-    obj_list = []
+    obj_list: list[Obj] = []
     objs = 0
 
     clock = Timer()
@@ -56,6 +57,7 @@ def main():
                         python_tex.height /= 2
 
         num = int(10000 * dt)
+        # num = 1
         if window.mouse_button_pressed(MOUSE_BUTTON_LEFT):
             objs += num
             for _ in range(num):
@@ -64,6 +66,7 @@ def main():
                 y -= python_tex.height / 2
                 x_vel = random.uniform(-SPEED, SPEED)
                 y_vel = random.uniform(-SPEED, SPEED)
+                angle = random.uniform(0, 2 * math.pi)
                 # angle = random.uniform(0, 2 * math.pi)
                 # x_vel = math.cos(angle) * SPEED
                 # y_vel = math.sin(angle) * SPEED
@@ -102,7 +105,7 @@ def main():
             renderer.draw_texture(python_tex, (obj.x, obj.y))
 
         color = (255, 0, 0) if curr_fps < 55 else (255, 255, 255)
-        renderer.draw_rectangle(color, (10, WIN_SIZE[1] - 65), (450, 50))
+        renderer.draw_rectangle(color, (10, WIN_SIZE[1] - 65), (450, 50), fade=3)
         renderer.draw_text(font, f"{fps=:.1f}, {objs= }", (20, 750), (0, 0, 0))
 
         renderer.end()

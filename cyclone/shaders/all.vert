@@ -40,7 +40,7 @@ mat2 rotate2d(float a){
 
 void main()
 {
-    // 0 = texture, 1 = circle, 2 = rectangle, 3 = line
+    // 0 = texture, 1 = circle, 2 = rectangle, 3 = line, filled polygon
     int renderType = int(a_RenderType);
     v_RenderType = a_RenderType;
     v_Color = a_Color;

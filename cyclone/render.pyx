@@ -94,7 +94,7 @@ cdef class Renderer:
         glBufferData(
             GL_ELEMENT_ARRAY_BUFFER,
             self.MAX_INDICES * sizeof(GLuint),
-            self.indices,
+            NULL,
             GL_DYNAMIC_DRAW
         )
 
@@ -250,7 +250,7 @@ cdef class Renderer:
         cdef size_t i
 
         if (
-            self.index_count >= self.MAX_INDICES
+            self.index_count >= self.MAX_INDICES - 6
             or self.texture_slot_index >= self.MAX_TEXTURE_SLOTS
         ):
             self._end_batch()
@@ -395,7 +395,7 @@ cdef class Renderer:
         float width = 0.0,
         float fade = 0.0
     ):
-        if self.index_count >= self.MAX_INDICES:
+        if self.index_count >= self.MAX_INDICES - 6:
             self._end_batch()
             self._begin_batch()
 
@@ -468,7 +468,7 @@ cdef class Renderer:
     ):
         cdef size_t i
 
-        if self.index_count >= self.MAX_INDICES:
+        if self.index_count >= self.MAX_INDICES - 6:
             self._end_batch()
             self._begin_batch()
 
@@ -537,7 +537,7 @@ cdef class Renderer:
             self._draw_line(t_color, t_start, t_end, width)
 
     cdef void _draw_line(self, vec4 color, vec2 start, vec2 end, float width):
-        if self.index_count >= self.MAX_INDICES:
+        if self.index_count >= self.MAX_INDICES - 6:
             self._end_batch()
             self._begin_batch()
 
@@ -590,14 +590,13 @@ cdef class Renderer:
             t_points[i][1] = points[i][1]
 
         if width == 0.0:
-            self._draw_filled_polygon(t_color, t_points, length)
+            self._draw_polygon_filled(t_color, t_points, length)
         else:
-            self._draw_polygon(t_color, t_points, length, width)
-
+            self._draw_polygon_outline(t_color, t_points, length, width)
         free(t_points)
 
-    cdef void _draw_filled_polygon(self, vec4 color, vec2 *points, size_t length):
-        if self.index_count >= self.MAX_INDICES:
+    cdef void _draw_polygon_filled(self, vec4 color, vec2 *points, size_t length):
+        if self.index_count >= self.MAX_INDICES - (length - 2) * 3:
             self._end_batch()
             self._begin_batch()
 
@@ -628,6 +627,46 @@ cdef class Renderer:
             self.vertex_count += length
             self.index_count += num_indices * 3
 
-    cdef void _draw_polygon(self, vec4 color, vec2 *points, size_t length, float width):
-        pass
+    cdef void _draw_polygon_outline(
+        self, vec4 color, vec2 *points, size_t length, float width
+    ):
+        cdef size_t new_length = (length + 1) * 2
+        cdef vec2 *new_points = <vec2 *>malloc(new_length * sizeof(vec2))
+        memcpy(new_points, points, length * sizeof(vec2))
 
+        cdef int i, new_i, prev_i, next_i
+        new_points[length] = new_points[0]
+        for i in range(length):
+            new_i = new_length - 1 - i
+            prev_i = i - 1 if i - 1 >= 0 else length - 1
+            next_i = (i + 1) % length
+            self._calc_inner_point(
+                new_points[prev_i],
+                new_points[i],
+                new_points[next_i],
+                width,
+                new_points[new_i]
+            )
+        new_points[length + 1] = new_points[new_length - 1]
+
+        self._draw_polygon_filled(color, new_points, new_length)
+        free(new_points)
+
+    cdef void _calc_inner_point(self, vec2 a, vec2 b, vec2 c, float width, vec2 dest):
+        glm_vec2_zero(dest)
+        cdef vec2 ba, bc, ba_norm, bc_norm
+        glm_vec2_sub(a, b, ba)
+        glm_vec2_sub(c, b, bc)
+        glm_vec2_normalize_to(ba, ba_norm)
+        glm_vec2_normalize_to(bc, bc_norm)
+        glm_vec2_add(ba_norm, bc_norm, dest)
+        cdef float sin = math.sqrt(
+            1 -
+            (glm_vec2_dot(ba, bc)**2) / (glm_vec2_dot(ba, ba) * glm_vec2_dot(bc, bc))
+        )
+        cdef float scale = width / 2 / sin
+        glm_vec2_scale(dest, scale, dest)
+        if utils.is_convex(a, b, c):
+            glm_vec2_add(b, dest, dest)
+        else:
+            glm_vec2_sub(b, dest, dest)

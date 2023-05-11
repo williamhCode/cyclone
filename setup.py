@@ -9,11 +9,11 @@ from setuptools.command.build_ext import build_ext as _build_ext
 
 
 # options
-release = True
+release = False
 build_libs = False
 
-annotate = False
-force = True
+annotate = True
+force = False
 quiet = False
 
 

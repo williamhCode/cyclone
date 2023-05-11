@@ -1,5 +1,6 @@
 from libc cimport math
-from libc.stdlib cimport malloc, free
+from libc.stdlib cimport malloc, free, realloc
+from libc.string cimport memcpy
 
 from cyclone.lib.glad cimport *
 from cyclone.lib.cglm cimport *
@@ -97,6 +98,10 @@ cdef class Renderer:
 
     cdef void _set_quad_indices(self)
 
-    cdef void _draw_filled_polygon(self, vec4 color, vec2 *points, size_t length)
+    cdef void _draw_polygon_filled(self, vec4 color, vec2 *points, size_t length)
 
-    cdef void _draw_polygon(self, vec4 color, vec2 *points, size_t length, float width)
+    cdef void _draw_polygon_outline(
+        self, vec4 color, vec2 *points, size_t length, float width
+    )
+
+    cdef void _calc_inner_point(self, vec2 a, vec2 b, vec2 c, float width, vec2 dest)
