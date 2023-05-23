@@ -30,7 +30,9 @@ class Camera2D:
         self.pan = pos - self.half_screen_size / self.zoom
 
     def world_to_screen(self, pos):
+        pos = glm.vec2(pos)
         return (pos - self.pan) * self.zoom
 
     def screen_to_world(self, pos):
+        pos = glm.vec2(pos)
         return pos / self.zoom + self.pan

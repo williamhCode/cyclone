@@ -134,16 +134,20 @@ cdef bint node_is_convex(Node *node, vec2 *points):
         p1[0] * (p2[1] - p0[1]) +
         p2[0] * (p0[1] - p1[1])
     )
-    return True if area_sum > 0 else False
+    return area_sum > 0
 
 
 cdef bint point_in_triangle(vec2 p, vec2 p0, vec2 p1, vec2 p2):
-    cdef float A = 1/2 * (-p1[1] * p2[0] + p0[1] * (-p1[0] + p2[0]) + p0[0] * (p1[1] - p2[1]) + p1[0] * p2[1])
-    cdef float sign = -1 if A < 0 else 1
-    cdef float s = (p0[1] * p2[0] - p0[0] * p2[1] + (p2[1] - p0[1]) * p[0] + (p0[0] - p2[0]) * p[1]) * sign
-    cdef float t = (p0[0] * p1[1] - p0[1] * p1[0] + (p0[1] - p1[1]) * p[0] + (p1[0] - p0[0]) * p[1]) * sign
+    cdef double A = 1/2 * (-p1[1] * p2[0] + p0[1] * (-p1[0] + p2[0]) + p0[0] * (p1[1] - p2[1]) + p1[0] * p2[1])
+    cdef double sign = -1 if A < 0 else 1
+    cdef double s = (p0[1] * p2[0] - p0[0] * p2[1] + (p2[1] - p0[1]) * p[0] + (p0[0] - p2[0]) * p[1]) * sign
+    cdef double t = (p0[0] * p1[1] - p0[1] * p1[0] + (p0[1] - p1[1]) * p[0] + (p1[0] - p0[0]) * p[1]) * sign
 
     return s > 0 and t > 0 and (s + t) < 2 * A * sign
+
+
+def _point_in_triangle(p, p0, p1, p2):
+    return point_in_triangle([p[0], p[1]], [p0[0], p0[1]], [p1[0], p1[1]], [p2[0], p2[1]])
 
 
 cdef bint node_is_ear(
@@ -315,11 +319,7 @@ cdef size_t[3] *ear_clip(
             convex_vertices.push_back(i)
         else:
             reflex_vertices.insert(i)
-        # print(distance(vertices.begin(), iter))
-        # a = distance(vertices.begin(), iter)
         inc(iter)
-        # iter = next(iter, 1)
-        # prev(iter, 1)
 
     # setup ear list
     for i in convex_vertices:
@@ -337,7 +337,17 @@ cdef size_t[3] *ear_clip(
 
     for i in range(num_indices):
         curr_iter = vertices.find(deref(ear_vertices.begin()))
+        print(f"AAAA {i = }")
+
+        iter = ear_vertices.begin()
+        while iter != ear_vertices.end():
+            print(deref(iter), end=", ")
+            inc(iter)
+        print()
+        # if ear_vertices.empty():
+        #     break
         ear_vertices.erase(ear_vertices.begin())  # remove from ear list
+        print(f"BBBB {i = }")
 
         adj_iters = [
             iter_prev(curr_iter, vertices),

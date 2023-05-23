@@ -1,5 +1,5 @@
-from cyclone.window import Window
-from cyclone.window.input import *
+from cyclone.window import *
+from cyclone.constants import *
 from cyclone.render import Renderer
 from cyclone.timer import Timer
 from cyclone.texture import Texture
@@ -44,21 +44,22 @@ def main():
         curr_fps = 1 / dt
 
         # key events
-        for callback, data in window.get_callbacks():
-            if callback == KEY_CALLBACK:
-                if data.action == PRESS:
-                    if data.key == KEY_ESCAPE:
-                        window.close()
-                    if data.key == KEY_EQUAL:
-                        python_tex.width *= 2
-                        python_tex.height *= 2
-                    if data.key == KEY_MINUS:
-                        python_tex.width /= 2
-                        python_tex.height /= 2
+        for callback in window.get_callbacks():
+            match callback:
+                case KeyCallback(key, scancode, action, mods):
+                    if action == Action.PRESS:
+                        if key == Key.ESCAPE:
+                            window.close()
+                        elif key == Key.EQUAL:
+                            python_tex.width *= 2
+                            python_tex.height *= 2
+                        elif key == Key.MINUS:
+                            python_tex.width /= 2
+                            python_tex.height /= 2
 
         num = int(10000 * dt)
         # num = 1
-        if window.mouse_button_pressed(MOUSE_BUTTON_LEFT):
+        if window.mouse_button_pressed(MouseButton.LEFT):
             objs += num
             for _ in range(num):
                 x, y = window.get_cursor_position()
@@ -72,7 +73,7 @@ def main():
                 # y_vel = math.sin(angle) * SPEED
                 obj_list.append(Obj(x, y, x_vel, y_vel))
 
-        if window.mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+        if window.mouse_button_pressed(MouseButton.RIGHT):
             for _ in range(num * 2):
                 if len(obj_list) > 0:
                     objs -= 1

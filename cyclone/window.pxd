@@ -4,7 +4,6 @@ from cyclone.lib.glfw cimport *
 cimport cyclone
 from cyclone.render cimport Renderer
 from cyclone.texture cimport RenderTexture
-from cyclone.window.input cimport *
 
 from libc.stdio cimport *
 

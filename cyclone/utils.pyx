@@ -25,4 +25,4 @@ cdef bint is_convex(vec2 p0, vec2 p1, vec2 p2):
         p1[0] * (p2[1] - p0[1]) +
         p2[0] * (p0[1] - p1[1])
     )
-    return True if area_sum > 0 else False
+    return area_sum > 0

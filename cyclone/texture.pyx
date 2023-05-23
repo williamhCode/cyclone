@@ -77,20 +77,20 @@ cdef class Texture:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_mode)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_mode)
         if resize_nearest:
-            glTexParameteri(
-                GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST
-            )
             # glTexParameteri(
-            #     GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST
+            #     GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST
             # )
+            glTexParameteri(
+                GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST
+            )
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         else:
-            glTexParameteri(
-                GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR
-            )
             # glTexParameteri(
-            #     GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR
+            #     GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR
             # )
+            glTexParameteri(
+                GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR
+            )
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
         glTexImage2D(

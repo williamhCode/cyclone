@@ -1,27 +1,17 @@
-from cyclone.window import Window
-from cyclone.window.input import *
+from cyclone.window import *
 from cyclone.render import Renderer
 from cyclone.timer import Timer
 from cyclone import texture
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
 from cyclone.font import Font, SysFont
+from cyclone import triangulation
+from cyclone.constants import *
 
 import math
 import random
 import glm
 from camera import Camera2D
-
-# colors = []
-# for _ in range(4446):
-#     colors.append(
-#         (
-#             random.randint(0, 255),
-#             random.randint(0, 255),
-#             random.randint(0, 255),
-#             255,
-#         )
-#     )
 
 
 def spinning_star(renderer: Renderer, time):
@@ -48,14 +38,6 @@ def spinning_star(renderer: Renderer, time):
             )
             renderer.draw_line(color, prev_point, (x, y), 0.01)
         prev_point = (x, y)
-
-    # points_1 = points[: edges // 3 + 1]
-    # points_2 = points[edges // 3 : edges // 3 * 2 + 1]
-    # points_3 = points[edges // 3 * 2 :]
-    # renderer.draw_lines((255, 0, 0, 255), points_1, 0.01)
-    # renderer.draw_lines((0, 255, 0, 255), points_2, 0.01)
-    # renderer.draw_lines((0, 0, 255, 255), points_3, 0.01)
-    # renderer.draw_lines((255, 255, 255, 255), points, 0.01)
 
 
 def main():
@@ -123,59 +105,50 @@ def main():
         fps = clock.get_fps()
         time += dt
 
-        framerate = clock.get_fps()
         # window.set_title(f"Running at {framerate :.2f} fps.")
 
-        # key events
-        for callback, data in window.get_callbacks():
-            if callback == KEY_CALLBACK:
-                if data.action == PRESS:
-                    if data.key == KEY_ESCAPE:
-                        window.close()
-                    if data.key == KEY_T:
-                        print(time)
-                    if data.key == KEY_D:
-                        if data.mods == MOD_SHIFT:
-                            debug -= 1
-                        else:
-                            debug += 1
+        for callback in window.get_callbacks():
+            match callback:
+                case KeyCallback(key, scancode, action, mods):
+                    if action == Action.PRESS:
+                        if key == Key.ESCAPE:
+                            window.close()
+                        elif key == Key.T:
+                            print(time)
 
-            elif callback == MOUSE_BUTTON_CALLBACK:
-                if data.action == PRESS:
-                    if data.button == MOUSE_BUTTON_LEFT:
-                        print("left pressed!")
-                if data.action == RELEASE:
-                    if data.button == MOUSE_BUTTON_LEFT:
-                        print("left pressed!")
+                case MouseButtonCallback(button, action, mods):
+                    if action == Action.PRESS:
+                        if button == MouseButton.LEFT:
+                            print("left pressed!")
+                    elif action == Action.RELEASE:
+                        if button == MouseButton.LEFT:
+                            print("left released!")
 
-            # if callback == CURSOR_POSITION_CALLBACK:
-            # print(data.xpos, data.ypos)
+                # case CursorPositionCallback(xpos, ypos):
+                #     print(xpos, ypos)
 
         # key/button being pressed
-        if window.key_pressed(KEY_A):
+        if window.key_pressed(Key.A):
             print("a!")
 
-        if window.mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+        if window.mouse_button_pressed(MouseButton.RIGHT):
             print("right held!")
 
-        if window.key_pressed(KEY_EQUAL):
+        if window.key_pressed(Key.EQUAL):
             zoom_time += dt
             camera.zoom = zoom_factor**zoom_time
 
-        if window.key_pressed(KEY_MINUS):
+        if window.key_pressed(Key.MINUS):
             zoom_time -= dt
             camera.zoom = zoom_factor**zoom_time
 
-        if window.key_pressed(KEY_UP):
+        if window.key_pressed(Key.UP):
             look_pos += glm.vec2(0, 3000 / camera.zoom * dt)
-
-        if window.key_pressed(KEY_DOWN):
+        if window.key_pressed(Key.DOWN):
             look_pos -= glm.vec2(0, 3000 / camera.zoom * dt)
-
-        if window.key_pressed(KEY_LEFT):
+        if window.key_pressed(Key.LEFT):
             look_pos -= glm.vec2(3000 / camera.zoom * dt, 0)
-
-        if window.key_pressed(KEY_RIGHT):
+        if window.key_pressed(Key.RIGHT):
             look_pos += glm.vec2(3000 / camera.zoom * dt, 0)
 
         camera.look_at(look_pos)
@@ -186,9 +159,27 @@ def main():
         renderer.clear((100, 100, 100))
 
         # polygon test
-        for _ in range(1):
-            # renderer.draw_polygon((150, 200, 90), poly_points)
-            renderer.draw_polygon((150, 200, 90), poly_points, width=30)
+        # for _ in range(1):
+        # renderer.draw_polygon((150, 200, 90), poly_points)
+        renderer.draw_polygon((150, 200, 90), poly_points, width=84)
+
+        # points = (
+        #     (100, 100),
+        #     (200, 100),
+        #     (150, 200),
+        #     (100, 100),
+        # )
+        # cursor_pos = window.get_cursor_position()
+        # cursor_pos = camera.screen_to_world(cursor_pos)
+        # if triangulation._point_in_triangle(cursor_pos, *points[:3]):
+        #     color = (255, 0, 0)
+        # else:
+        #     color = (0, 0, 0)
+        # renderer.draw_lines(color, points, width=0.5)
+        # renderer.draw_circle((100, 100, 200), cursor_pos, 1)
+
+        # other_poly_points = tuple((x - 400, y) for x, y in poly_points)
+        # renderer.draw_polygon((150, 200, 90), other_poly_points, width=80)
 
         # for point in inner_points:
         #     renderer.draw_circle((0, 0, 0), point, 3)
@@ -213,7 +204,6 @@ def main():
         # renderer.draw_text(font_1, "$_#_%_&_*_nice@gmail.com", (0, 0), (220, 220, 0))
 
         # texture test
-        # dt = math.sin(time * 5) * 20
         # for i in range(300):
         #     for j in range(300):
         #         renderer.draw_texture(texture_1, (i * 10, j * 10))
@@ -256,19 +246,20 @@ def main():
         # renderer.draw_texture(texture_2, (300, 300))
         # renderer.draw_circle((100, 200, 100), (450, 450), 100, width=50, fade=10)
 
+        renderer.end()
+
+        # fps
+        renderer.begin()
         renderer.draw_rectangle(
             (255, 255, 255), (10, WIN_SIZE[1] - 65), (200, 50), fade=3
         )
         renderer.draw_text(arial_font, f"{fps=:.1f}", (20, 750), (0, 0, 0))
-
         renderer.end()
 
-        # render to main screen
+        # framebuffer
         # renderer.begin()
         # renderer.clear((50, 50, 50, 255))
-
         # renderer.draw_texture(render_texture, (0, 0))
-
         # renderer.end()
 
         window.update()

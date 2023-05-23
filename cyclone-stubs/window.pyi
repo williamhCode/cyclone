@@ -1,4 +1,26 @@
-from .._common import Vec2, CallbackData
+from ._common import Vec2
+from typing import Any
+from dataclasses import dataclass
+
+from typing import NamedTuple
+
+class KeyCallback(NamedTuple):
+    key: int
+    scancode: int
+    action: int
+    mods: int
+
+class MouseButtonCallback(NamedTuple):
+    button: int
+    action: int
+    mods: int
+
+class CursorPositionCallback(NamedTuple):
+    xpos: float
+    ypos: float
+
+class WindowCloseCallback(NamedTuple):
+    pass
 
 class Window:
     def __init__(
@@ -15,7 +37,7 @@ class Window:
     def get_framebuffer_size(self) -> tuple[int, int]: ...
     def set_title(self, title: str) -> None: ...
     def get_title(self) -> str: ...
-    def get_callbacks(self) -> list[tuple[int, CallbackData]]: ...
+    def get_callbacks(self) -> list[Any]: ...
     def get_key(self, key: int) -> int: ...
     def key_pressed(self, key: int) -> bool: ...
     def key_released(self, key: int) -> bool: ...

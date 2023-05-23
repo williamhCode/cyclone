@@ -1,7 +1,10 @@
 from libc.stdlib cimport malloc, free
 from libc.stdio cimport printf
+from libc cimport math
 from libcpp.vector cimport vector
 from libcpp.set cimport set
+from libcpp.map cimport map
+from libcpp.pair cimport pair
 
 from cyclone.lib.test cimport next, prev, advance, distance
 from cyclone.lib.cglm cimport *

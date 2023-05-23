@@ -1,5 +1,4 @@
 from typing import Protocol, TypeVar
-from cyclone.window.input import *
 from shapes import Rectangle
 
 T = TypeVar("T")
@@ -14,5 +13,3 @@ Vec4 = tuple[float, float, float, float] | list[float] | HasGetItemAndLen[float]
 Mat4 = tuple[Vec4, Vec4, Vec4, Vec4] | list[Vec4] | HasGetItemAndLen[Vec4]
 Color = Vec3 | Vec4
 Region = tuple[float, float, float, float] | list[float] | Rectangle
-
-CallbackData = KeyData | MouseButtonData | CursorPositionData

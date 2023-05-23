@@ -649,6 +649,11 @@ cdef class Renderer:
             )
         new_points[length + 1] = new_points[new_length - 1]
 
+        # _points = []
+        # for i in range(new_length):
+        #     _points.append((new_points[i][0], new_points[i][1]))
+        # self.draw_lines((0, 0, 0), _points, 1)
+
         self._draw_polygon_filled(color, new_points, new_length)
         free(new_points)
 

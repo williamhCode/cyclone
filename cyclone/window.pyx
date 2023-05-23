@@ -1,6 +1,26 @@
-from cyclone.window.input import (
-    KEY_CALLBACK, MOUSE_BUTTON_CALLBACK, CURSOR_POSITION_CALLBACK, WINDOW_CLOSE_CALLBACK
-)
+from typing import NamedTuple
+
+
+class KeyCallback(NamedTuple):
+    key: int
+    scancode: int
+    action: int
+    mods: int
+
+
+class MouseButtonCallback(NamedTuple):
+    button: int
+    action: int
+    mods: int
+
+
+class CursorPositionCallback(NamedTuple):
+    xpos: float
+    ypos: float
+
+
+class WindowCloseCallback(NamedTuple):
+    pass
 
 
 cdef void window_size_callback(GLFWwindow* _window, int width, int height) noexcept:
@@ -28,7 +48,7 @@ cdef void key_callback(
     for window in windows:
         if window.window == _window:
             window.callbacks.append(
-                (KEY_CALLBACK, KeyData(key, scancode, action, mods))
+                KeyCallback(key, scancode, action, mods)
             )
 
 
@@ -39,7 +59,7 @@ cdef void mouse_button_callback(
     for window in windows:
         if window.window == _window:
             window.callbacks.append(
-                (MOUSE_BUTTON_CALLBACK, MouseButtonData(button, action, mods))
+                MouseButtonCallback(button, action, mods)
             )
 
 
@@ -50,10 +70,7 @@ cdef void cursor_position_callback(
     for window in windows:
         if window.window == _window:
             window.callbacks.append(
-                (
-                    CURSOR_POSITION_CALLBACK,
-                    CursorPositionData(xpos, window.height - ypos)
-                )
+                CursorPositionCallback(xpos, window.height - ypos)
             )
 
 
@@ -61,7 +78,7 @@ cdef void window_close_callback(GLFWwindow* _window) noexcept:
     cdef Window window
     for window in windows:
         if window.window == _window:
-            window.callbacks.append((WINDOW_CLOSE_CALLBACK, None))
+            window.callbacks.append(WindowCloseCallback())
 
 
 cdef list windows = []
