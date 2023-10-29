@@ -64,3 +64,7 @@ You can control the build mode in `setup.py`. You only need to run with `build_l
 ```
 pip install -e .
 ```
+#### Run Docs
+```
+mkdocs serve
+```
