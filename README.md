@@ -17,7 +17,8 @@ The library is built with simplicity and modularity in mind. It takes care of wi
 <sub>*: tested on m1 macbook pro
 
 ## Todo
-_Library is in very early stages, only tested on macOS_
+**_Not active, building a library from Cython alone is too hard to maintain due to lack of proper tooling and language quirks.  
+Planning to build 2D library in WebGPU and C++, and use Cython just for the glue to Python._**
 - [ ] rendering
   - [x] textures
   - [x] circles
