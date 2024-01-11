@@ -9,7 +9,7 @@ from setuptools.command.build_ext import build_ext as _build_ext
 
 
 # options
-release = True
+release = False
 build_libs = False
 
 annotate = False
@@ -30,6 +30,7 @@ class build_ext(_build_ext):
         cwd = os.getcwd()
         env = os.environ.copy()
 
+        print(self.build_temp)
         subprocess.check_call(
             ["cmake", "-E", "make_directory", self.build_temp],
             env=env,
@@ -82,6 +83,7 @@ libraries = [
 macros = [
     ("STB_IMAGE_IMPLEMENTATION", None),
     ("CGLM_DEFINE_PRINTS", None),
+    ("CFF_CONFIG_OPTION_OLD_ENGINE", None),
 ]
 
 

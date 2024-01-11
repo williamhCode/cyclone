@@ -337,17 +337,17 @@ cdef size_t[3] *ear_clip(
 
     for i in range(num_indices):
         curr_iter = vertices.find(deref(ear_vertices.begin()))
-        print(f"AAAA {i = }")
+        # print(f"AAAA {i = }")
 
         iter = ear_vertices.begin()
         while iter != ear_vertices.end():
-            print(deref(iter), end=", ")
+            # print(deref(iter), end=", ")
             inc(iter)
-        print()
+        # print()
         # if ear_vertices.empty():
         #     break
         ear_vertices.erase(ear_vertices.begin())  # remove from ear list
-        print(f"BBBB {i = }")
+        # print(f"BBBB {i = }")
 
         adj_iters = [
             iter_prev(curr_iter, vertices),

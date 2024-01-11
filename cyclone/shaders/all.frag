@@ -36,6 +36,8 @@ void main()
         case 0: {
             int index = int(v_Texture.TexIndex);
             o_Color = texture(u_Textures[index], v_Texture.TexCoord) * v_Color;
+            // do gamma correction
+            // o_Color.rgb = pow(o_Color.rgb, vec3(1.0 / 2.2));
             break;
 
         } case 1: {

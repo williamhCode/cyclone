@@ -1,11 +1,9 @@
 from cyclone.window import *
 from cyclone.render import Renderer
 from cyclone.timer import Timer
-from cyclone import texture
 from cyclone.texture import Texture, RenderTexture
 from cyclone.shapes import Rectangle
 from cyclone.font import Font, SysFont
-from cyclone import triangulation
 from cyclone.constants import *
 
 import math
@@ -18,8 +16,8 @@ def spinning_star(renderer: Renderer, time):
     # points = []
 
     start = (600, 400)
-    spin_speed = 2 * math.pi * 0.0001
-    edges = 4445
+    spin_speed = 2 * math.pi * 0.01
+    edges = 1001
 
     angle = 0
     angle_diff = 2 * math.pi / edges * int(edges / 2)
@@ -30,13 +28,14 @@ def spinning_star(renderer: Renderer, time):
         y = math.sin((time) * spin_speed + angle) * 300 + start[1]
         # points.append((x, y))
         if prev_point is not None:
-            color = (
-                random.randint(0, 255),
-                random.randint(0, 255),
-                random.randint(0, 255),
-                255,
-            )
-            renderer.draw_line(color, prev_point, (x, y), 0.01)
+            # color = (
+            #     random.randint(0, 255),
+            #     random.randint(0, 255),
+            #     random.randint(0, 255),
+            #     255,
+            # )
+            color = (255, 0, 0)
+            renderer.draw_line(color, prev_point, (x, y), 0.1)
         prev_point = (x, y)
 
 
@@ -48,7 +47,7 @@ def main():
     camera = Camera2D(*WIN_SIZE)
 
     texture_1 = Texture.load("imgs/Flappy Bird_1.png", resize_nearest=True)
-    texture_1.size = 10, 10
+    # texture_1.size = 10, 10
     texture_2 = Texture.load("imgs/Flappy Bird_1.png", resize_nearest=True)
     texture_2.size = 50, 40
     # texture_3 = Texture.load("imgs/test2.jpeg")
@@ -59,7 +58,9 @@ def main():
 
     test_font = Font("/System/Library/Fonts/Supplemental/Arial.ttf", 30)
     arial_font = SysFont("Arial", 30)
-    font_1 = SysFont("Roboto Mono", 30)
+    # sf_mono_font = SysFont("SF Mono", 15.0)
+    sf_mono_font = Font("/Library/Fonts/SF-Mono-Regular.otf", 15)
+    roboto_mono_font = SysFont("Roboto Mono", 15)
 
     rect = Rectangle(0, 0, 100, 100)
     rect.size = (100, 100)
@@ -156,12 +157,12 @@ def main():
         # render to texture
         renderer.begin(view_matrix=camera.get_transform())
         # renderer.begin(view_matrix=camera.get_transform(), target=render_texture)
-        renderer.clear((100, 100, 100))
+        renderer.clear((50, 50, 50))
 
         # polygon test
         # for _ in range(1):
         # renderer.draw_polygon((150, 200, 90), poly_points)
-        renderer.draw_polygon((150, 200, 90), poly_points, width=84)
+        # renderer.draw_polygon((0, 0, 0), poly_points, width=84)
 
         # points = (
         #     (100, 100),
@@ -194,7 +195,7 @@ def main():
         #         color = (200, 10, 200)
         #     renderer.draw_rectangle(color, (x, y), (32, 32), width=1)
 
-        # renderer.draw_texture(font_1.texture, (0, 0), flip_mode=2)
+        # renderer.draw_texture(sf_mono_font.texture, (0, 0), flip_mode=2)
 
         # renderer.draw_circle((255, 0, 0), (1, 225), 1)
 
@@ -207,6 +208,7 @@ def main():
         # for i in range(300):
         #     for j in range(300):
         #         renderer.draw_texture(texture_1, (i * 10, j * 10))
+        # renderer.draw_texture(texture_1, (100, 100))
 
         # position = (200, 200)
         # offset = -glm.vec2(texture_5.size) / 2
@@ -235,7 +237,7 @@ def main():
         #         renderer.draw_rectangle((200, 0, 0, 255), (i * 10, j * 10), (8, 8), 10, width=1, fade=1)
 
         # line test
-        # spinning_star(renderer, time)
+        spinning_star(renderer, time)
 
         # layering test
         # renderer.draw_rectangle((200, 100, 100), (100, 100), (200, 200), width=20, fade=10)
@@ -253,7 +255,8 @@ def main():
         renderer.draw_rectangle(
             (255, 255, 255), (10, WIN_SIZE[1] - 65), (200, 50), fade=3
         )
-        renderer.draw_text(arial_font, f"{fps=:.1f}", (20, 750), (0, 0, 0))
+        # renderer.draw_text(arial_font, f"{fps=:.1f}", (20, 750), (0, 0, 0))
+        renderer.draw_text(sf_mono_font, "renderer.draw_texture", (20, 750), (0, 0, 0))
         renderer.end()
 
         # framebuffer

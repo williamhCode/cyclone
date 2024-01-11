@@ -10,6 +10,7 @@ cdef class Renderer:
         # gl options
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        # glEnable(GL_FRAMEBUFFER_SRGB)
 
         self.MAX_TRIANGLES = 200000
         self.MAX_VERTICES = self.MAX_TRIANGLES * 3  # worst case, all triangles

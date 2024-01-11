@@ -5,6 +5,18 @@ cdef FT_Library library
 if FT_Init_FreeType(&library):
     raise RuntimeError("Failed to initalize Freetype")
 
+# cdef FT_UInt hinting_engine = FT_HINTING_ADOBE
+# FT_Property_Set(library, "cff", "hinting-engine", &hinting_engine)
+
+cdef FT_Bool no_stem_darkening = False
+FT_Property_Set(library, "cff", "no-stem-darkening", &no_stem_darkening)
+
+cdef FT_Int[8] darken_params = [500, 300,
+                                1000, 300,
+                                1500, 300,
+                                2000, 500]
+
+FT_Property_Set(library, "cff", "darkening-parameters", darken_params)
 
 cdef class Face:
     cdef FT_Face face
@@ -46,13 +58,12 @@ cdef class Font:
         else:
             face = _face.face
 
-        FT_Set_Pixel_Sizes(face, 0, size)
-
         cdef int i, x, y, xx, yy
         cdef FT_Bitmap bitmap
         cdef unsigned char c
         cdef int index
         FT_Set_Pixel_Sizes(face, 0, size * ratio)
+        # FT_Set_Char_Size(face, 0, size * 64, 144, 144)
 
         for i in range(128):
             FT_Load_Char(face, i, FT_LOAD_RENDER)

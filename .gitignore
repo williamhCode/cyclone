@@ -1,6 +1,3 @@
-# macos
-.DS_Store
-
 # shared libraries
 /lib/
 
